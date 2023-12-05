@@ -13,6 +13,7 @@
 #include "capabilities.h"
 #include "vmcs.h"
 #include "vmcs12.h"
+#include "vmx.h"
 
 #define KVM_EVMCS_VERSION 1
 
@@ -180,6 +181,16 @@ enum nested_evmptrld_status {
 	EVMPTRLD_VMFAIL,
 	EVMPTRLD_ERROR,
 };
+
+static inline bool guest_cpuid_has_evmcs(struct kvm_vcpu *vcpu)
+{
+	/*
+	 * eVMCS is exposed to the guest if Hyper-V is enabled in CPUID and
+	 * eVMCS has been explicitly enabled by userspace.
+	 */
+	return vcpu->arch.hyperv_enabled &&
+	       to_vmx(vcpu)->nested.enlightened_vmcs_enabled;
+}
 
 u64 nested_get_evmptr(struct kvm_vcpu *vcpu);
 uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu);
