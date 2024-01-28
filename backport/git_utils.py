@@ -8,7 +8,6 @@ EG_pretty_fmt=" --pretty=tformat:'%<(10) %h  %<(12) %an : %s: %cd' "
 def git_get_subject(sha1):
     cmd = "git  log -1 --pretty=tformat:'%<(10) %h  %<(12) %an : %s' " + sha1
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
-    #s = result.stdout.decode().split(": ")
     s = ": ".join(result.stdout.decode().split(": ")[1:])
     s= s.rstrip("\n")
     return s
