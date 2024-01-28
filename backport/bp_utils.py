@@ -4,6 +4,7 @@ import sys
 import importlib
 import glob
 from git_utils import *
+import git_utils
 
 def save_cp(state):
     st = state
@@ -38,9 +39,10 @@ def make_patch_dict(sha1):
     d['done'] = False
     d['pre_reqs'] = list()
     d['is_pre_req'] = False
-    d['subject'] = git_get_subject(sha1)
-    d['tag'] = git_first_containing_tag(sha1)
-    d['tag_date'] = git_get_commit_date(d['tag'])
+    #why is it suddenly needed to prefix the "git_utils." bit?
+    d['subject'] = git_utils.git_get_subject(sha1)
+    d['tag'] = git_utils.git_first_containing_tag(sha1)
+    d['tag_date'] = git_utils.git_get_commit_date(d['tag'])
     print("%s, %s, %s, %s, prq(%s)" %
           (d['sha1'], d['subject'], d['tag'],
            d['tag_date'], d['is_pre_req']))
