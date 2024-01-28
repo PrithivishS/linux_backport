@@ -114,6 +114,8 @@ def backport_patches(args, state):
     state['pickle_file'] = args.pickle_file
     state['log_depth'] = args.log_depth
     state['log_fobj'] = open(args.log_file, 'a')
+    state['first_commit'] = args.first_commit
+
 
     state['log_fobj'].flush()
     while True:
@@ -132,6 +134,9 @@ parser.add_argument('--pickle-dir', default='/tmp',
                     help='where to store checkpoints')
 parser.add_argument('--log-depth', default='10',
                     help='# of commits to show on git log menu item')
+parser.add_argument('--first-commit', default = 'HEAD~20',
+                    help='git log will be first-commit^..HEAD')
+
 
 # Parse the command line arguments
 args = parser.parse_args()
