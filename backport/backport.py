@@ -117,12 +117,17 @@ def backport_patches(args, state):
         state['log_fobj'].flush()
         
 parser = argparse.ArgumentParser()
-add_common_args(parser)
 parser.add_argument('--pickle-num', help='checkpoint to load')
 parser.add_argument('--sha-list',
                     help='File declaring py array of sha(s)')
 parser.add_argument('--log-file', default="~/tmp/backkport.log",
                     help='checkpoint to load')
+parser.add_argument('--pickle-file', default='backport.pickle',
+                    help='pickle file to load')
+parser.add_argument('--pickle-dir', default='/tmp',
+                    help='where to store checkpoints')
+parser.add_argument('--log-depth', default='10',
+                    help='# of commits to show on git log menu item')
 
 # Parse the command line arguments
 args = parser.parse_args()

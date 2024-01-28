@@ -98,14 +98,6 @@ def load_pickle_file(args):
         f = args.pickle_dir + "/" + args.pickle_file + "." + max_pickle_num
         return restore_cp(f)
 
-def add_common_args(parser):
-    parser.add_argument('--pickle-file', default='backport.pickle',
-                        help='pickle file to load')
-    parser.add_argument('--pickle-dir', default='/tmp',
-                        help='where to store checkpoints')
-    parser.add_argument('--log-depth', default='10',
-                    help='# of commits to show on git log menu item')
-
 def sha_file_to_pickled_state(args):
     if not args.sha_list or not args.pickle_dir \
        or not args.pickle_file or not args.pickle_num:
