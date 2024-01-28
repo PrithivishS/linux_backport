@@ -116,6 +116,9 @@ def backport_patches(args, state):
     state['log_fobj'] = open(args.log_file, 'a')
     state['first_commit'] = args.first_commit
 
+    current_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print("Startup: Current Time =", current_date_time,
+          file = state['log_fobj'])
 
     state['log_fobj'].flush()
     while True:
