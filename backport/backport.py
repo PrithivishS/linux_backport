@@ -42,9 +42,6 @@ def apply_next_patch(state):
     state['patch_list'] = patch_list[1:] #pop
     save_cp(state)
 
-def _do_menu_1():
-    print("_do_menu1")
-    
 def show_unapplied_patches(state):
     print_log("@@show_unapplied_patches", (state['log_fobj']))
     print_patch_list("", state['patch_list'], state['log_fobj'])
