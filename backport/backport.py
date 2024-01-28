@@ -74,48 +74,50 @@ def show_short_git_log(state):
     git_short_log(state['log_depth'], '%<(10) %h  %<(12) %an : %s')
 
 bp_menu_list = [
-    {'prompt' : 'apply next patch', 'action':  apply_next_patch,
-     'use_state' : True},
-    {'prompt' : 'show git status', 'action': do_git_status, 'use_state' : False},
-    {'prompt' : 'short_git_log', 'action': show_short_git_log,
-     'use_state' : True},
-    {'prompt' : 'show unapplied patches', 'action': show_unapplied_patches, 'use_state' : True},
+    {'prompt' : 'apply next patch', 'action':  apply_next_patch},
+    {'prompt' : 'show git status', 'action': do_git_status},
+    {'prompt' : 'short_git_log', 'action': show_short_git_log},
+    {'prompt' : 'show unapplied patches',
+     'action': show_unapplied_patches},
     {'prompt' : 'push unapplied (changes next)',
-     'action' : do_push_unapplied, 'use_state': True},
+     'action' : do_push_unapplied,},
     {'prompt' : 'pop unapplied (changes next)',
-     'action' : do_pop_unapplied, 'use_state': True},
-    {'prompt': 'pop applied patch', 'action' : pop_applied_patch,
-     'use_state' : False},
+     'action' : do_pop_unapplied,},
+    {'prompt': 'pop applied patch', 'action' : pop_applied_patch},
     {'prompt' : 'increment git branch', 'action' :
-     get_next_branch, 'use_state': False},
-    {'prompt' : 'launch pdb', 'action' : do_pdb, 'use_state': True},
-    {'prompt' : 'launch bash', 'action' : do_bash, 'use_state': False},
-    {'prompt' : 'save checkpoint', 'action' : do_checkpoint,
-     'use_state': True},
+     get_next_branch},
+    {'prompt' : 'launch pdb', 'action' : do_pdb,},
+    {'prompt' : 'launch bash', 'action' : _do_bash},
+    {'prompt' : 'save checkpoint', 'action' : do_checkpoint},
+    {'prompt' : 'note to log file', 'action' : do_log_note}
 ]
 
-def backport_patches(args):
-    state = load_pickle_file(args)
+def backport_patches(args, state):
     state['cp_num'] = next_cp_num(args)
     state['pickle_dir'] = args.pickle_dir
     state['pickle_file'] = args.pickle_file
     state['log_depth'] = args.log_depth
+    state['log_fobj'] = open(args.log_file, 'a')
 
+    state['log_fobj'].flush()
     while True:
         do_menu_choice(bp_menu_list, state)
+        state['log_fobj'].flush()
         
 parser = argparse.ArgumentParser()
 add_common_args(parser)
 parser.add_argument('--pickle-num', help='checkpoint to load')
 parser.add_argument('--sha-list',
                     help='File declaring py array of sha(s)')
+parser.add_argument('--log-file', default="~/tmp/backkport.log",
+                    help='checkpoint to load')
 
 # Parse the command line arguments
 args = parser.parse_args()
 
 if args.sha_list:
-    sha_file_to_pickled_state(args)
+    state = sha_file_to_pickled_state(args)
 else:
-    load_pickle_file(args)
-backport_patches(args)
+    state = load_pickle_file(args)
+backport_patches(args, state)
 

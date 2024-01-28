@@ -7,11 +7,13 @@ from git_utils import *
 
 def save_cp(state):
     st = state
+    tmp = state['log_fobj']
     f = state['pickle_dir'] + "/" + state['pickle_file'] + "." +\
         str(state['cp_num'])
     with open(f, 'wb') as handle:
         pickle.dump(st, handle, protocol=pickle.HIGHEST_PROTOCOL)
     state['cp_num']  = int(state['cp_num']) + 1
+    state['log_fobj'] = tmp
 
 def restore_cp(fpath):
     with open(fpath, 'rb') as handle:
@@ -21,6 +23,12 @@ def print_patch_dict(msg, patch):  # do we really re-use this?
     print("%s, %s, %s, %s, %s, prq(%s)" %
              (msg, patch['sha1'], patch['subject'], patch['tag'],
               patch['tag_date'], patch['is_pre_req']))
+def print_log(s, fobj):
+    print(s)
+    if fobj:
+        print(s, file=fobj)
+        fobj.flush()
+
 
 def make_patch_dict(sha1):
     print("lookup %s" % (sha1))
