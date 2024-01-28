@@ -85,6 +85,10 @@ def show_short_git_log(state):
 def _do_bash(state):
     do_bash(state['log_fobj'])
 
+def do_log_note(state):
+    s = input("enter text to be appended to the log: ")
+    print(s, file = state['log_fobj'])
+    
 bp_menu_list = [
     {'prompt' : 'apply next patch', 'action':  apply_next_patch},
     {'prompt' : 'show git status', 'action': do_git_status},
