@@ -19,16 +19,17 @@ def restore_cp(fpath):
     with open(fpath, 'rb') as handle:
         return pickle.load(handle)
 
-def print_patch_dict(msg, patch):  # do we really re-use this?
-    print("%s, %s, %s, %s, %s, prq(%s)" %
-             (msg, patch['sha1'], patch['subject'], patch['tag'],
-              patch['tag_date'], patch['is_pre_req']))
 def print_log(s, fobj):
     print(s)
     if fobj:
         print(s, file=fobj)
         fobj.flush()
 
+def print_patch_dict(msg, patch, fobj):  # do we really re-use this?
+    s = "%s, %s, %s, %s, %s, prq(%s)" % (
+        msg, patch['sha1'], patch['subject'], patch['tag'],
+              patch['tag_date'], patch['is_pre_req'])
+    print_log(s, fobj)
 
 def make_patch_dict(sha1):
     print("lookup %s" % (sha1))
@@ -45,13 +46,13 @@ def make_patch_dict(sha1):
            d['tag_date'], d['is_pre_req']))
     return d
 
-def print_patch_list(msg, patch_list):
+def print_patch_list(msg, patch_list, fobj):
     i = 0
-    print(">>>>>" + msg)
+    print_log(">>>>>: %s" % (msg), fobj)
     for patch in patch_list:
-        print_patch_dict(str(i), patch)
+        print_patch_dict(str(i), patch, fobj)
         i += 1
-    print("<<<<<" + msg)
+    print_log("<<<<<: %s" % (msg), fobj)
 
 def show_menu(menu):
     for (ix, d) in zip(range(len(menu) + 1), menu):
@@ -63,12 +64,11 @@ def do_menu_choice(menu, state):
         x = int(input("enter choice: "))
         if x in range(len(menu)): break
         else: print("bad input")
-    if menu[x]['use_state']:
-        menu[x]['action'](state)
-    else:
-        menu[x]['action']()
 
-def do_bash():
+    menu[x]['action'](state)
+
+def do_bash(fobj):
+    print("entering bash", file=fobj);fobj.flush()
     subprocess.run(['bash'])
 
 def next_cp_num(args):
@@ -118,4 +118,4 @@ def sha_file_to_pickled_state(args):
              'pickle_file': args.pickle_file,'cp_num': args.pickle_num,
              'patch_list': patch_list}
     save_cp(state)
-    
+    return state

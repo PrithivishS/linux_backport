@@ -1,14 +1,10 @@
 import subprocess
 import re
 import os
+from bp_utils import *
 
 EG_pretty_fmt=" --pretty=tformat:'%<(10) %h  %<(12) %an : %s: %cd' "
 
-def do_git_status():
-    print("\n\n=========")
-    os.system("git status")
-    print("=========\n\n");
-    
 def git_get_subject(sha1):
     cmd = "git  log -1 --pretty=tformat:'%<(10) %h  %<(12) %an : %s' " + sha1
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
@@ -17,11 +13,19 @@ def git_get_subject(sha1):
     s= s.rstrip("\n")
     return s
     
-def git_short_log(num, fmt):
-    cmd = "git log -" + str(num) + " --pretty=tformat:'%<(10) %h  %<(12) %an : %s'"
+def do_git_status(state):
+    result = subprocess.run("git status", shell=True,
+                            stdout=subprocess.PIPE)
+    s = result.stdout.decode().strip().rstrip()
+    s = "\n\n=========\n %s \n=========\n\n" % (s)
+    print_log(s, state['log_fobj'])
+    
+def git_short_log(state, fmt):
+    range = "%s^..HEAD" % (state['first_commit'])
+    cmd = "git log " + range + " --pretty=tformat:'%<(10) %h  %<(12) %an : %s'"
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
     s = result.stdout.decode().strip()
-    print(s.rstrip("\n"))
+    print_log(s.rstrip("\n"), state['log_fobj'])
     
 def git_get_commit_date(commitish):
     cmd = "git log -1 --pretty=format:'%ad' --date=format:'%m/%d/%y' " + commitish

@@ -11,30 +11,33 @@ import argparse
 import pickle
 from git_utils import *
 from bp_utils import *
+from datetime import datetime
 
-def buildit():
-    print("\n")
-    print("Check that the applied comit:")
-    print("\t1) has no conflicts")
-    print("\t2) builds")
-    print('\n and then enter "git cherry-pick --continue"')
-    print("\nDON'T CONTINUE FROM A NON BUILDING COMMIT\n")
-    do_bash()
+def buildit(fobj):
+    print_log("\n", fobj)
+    print_log("Check that the applied comit:", fobj)
+    print_log("\t1) has no conflicts", fobj)
+    print_log("\t2) builds", fobj)
+    print_log('\n and then enter "git cherry-pick --continue"', fobj)
+    print_log("\nDON'T CONTINUE FROM A NON BUILDING COMMIT\n", fobj)
+    do_bash(fobj)
     input("<enter> to continue, else <control-c>")
 
-def resolve_conflicts():
+def resolve_conflicts(state):
         # resolve conflicts
-    print("\n====  CONFLICT RESOLUTION REQUIRED ====\n")
-    do_git_status()
+    print_log("\n====  CONFLICT RESOLUTION REQUIRED ====\n",
+              state['log_fobj'])
+    do_git_status(state)
 
 def apply_next_patch(state):
+    print_log("@@apply_next_patch", (state['log_fobj']))
     patch_list = state['patch_list']
     patch = patch_list[0]
 
-    print_patch_dict("@@ cherry picking :", patch)
+    print_patch_dict("@@ cherry picking :", patch, state['log_fobj'])
     if git_cherry_pick(patch['sha1']) !=0:
-        resolve_conflicts()
-    buildit()
+        resolve_conflicts(state)
+    buildit(state['log_fobj'])
 
     state['patch_list'] = patch_list[1:] #pop
     save_cp(state)
@@ -43,35 +46,47 @@ def _do_menu_1():
     print("_do_menu1")
     
 def show_unapplied_patches(state):
-    print_patch_list("", state['patch_list'])
+    print_log("@@show_unapplied_patches", (state['log_fobj']))
+    print_patch_list("", state['patch_list'], state['log_fobj'])
 
 def do_pdb(state):
+    print_log("@@sdo_pdb", (state['log_fobj']))
     pdb.set_trace()
 
 def do_checkpoint(state):
-    save_cp(state)
+    print_log("@@sdo_checkpoint", (state['log_fobj']))
+    state['log_fobj'] = None #pickle fails if you pickle state containing fobj    save_cp(state)
 
 def do_push_unapplied(state):
+    print_log("@@sdo_push_unapplied", (state['log_fobj']))
     sha_string = input("enter SHA1 id or <enter> if none: ")
     if len(sha_string) == 0: return
     sha_string.strip()
     d = make_patch_dict(sha_string)
-    print_patch_dict("", d)
+    print_patch_dict("", d, state['log_fobj'])
     ok = input("enter 'y' if ok, else <enter>")
     if not ok: return
     state['patch_list'] = [d] + state['patch_list']
 
 def do_pop_unapplied(state):
+    print_log("@@sdo_pop_unapplied", (state['log_fobj']))
     if len(state['patch_list']) > 1:
         state['patch_list'] = state['patch_list'][1:]
     else:
         state['patch_list'] = list() # not the worst choice
 
-def pop_applied_patch():
+def pop_applied_patch(state):
+    print_log("@@sdo_pop_applied", (state['log_fobj']))
     os.system("git reset --hard HEAD^")
+    show_short_git_log(state)
 
 def show_short_git_log(state):
-    git_short_log(state['log_depth'], '%<(10) %h  %<(12) %an : %s')
+    print_log("@@show_short_git_log", (state['log_fobj']))
+    fobj = state['log_fobj']
+    git_short_log(state, '%<(10) %h  %<(12) %an : %s')
+
+def _do_bash(state):
+    do_bash(state['log_fobj'])
 
 bp_menu_list = [
     {'prompt' : 'apply next patch', 'action':  apply_next_patch},
