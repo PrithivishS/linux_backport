@@ -104,6 +104,9 @@ def get_current_branch(): # works on git < 2.22
                             shell=True, stdout=subprocess.PIPE)
     return result.stdout.decode("latin-1").strip()
 
-def get_next_branch():
+def get_next_branch(state):
     cmd = "git checkout -b " +  add_or_inc_ver_num(get_current_branch())
-    os.system(cmd)
+    result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
+    s = result.stdout.decode().strip().rstrip()
+    do_git_status(state)
+    print_log(s, state['log_fobj'])
