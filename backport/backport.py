@@ -108,7 +108,6 @@ bp_menu_list = [
     {'prompt' : 'note to log file', 'action' : do_log_note}
 ]
 
-def backport_patches(args, state):
     state['cp_num'] = next_cp_num(args)
     state['pickle_dir'] = args.pickle_dir
     state['pickle_file'] = args.pickle_file
@@ -116,6 +115,7 @@ def backport_patches(args, state):
     state['log_fobj'] = open(args.log_file, 'a')
     state['first_commit'] = args.first_commit
 
+def backport_patches(state):
     current_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print("Startup: Current Time =", current_date_time,
           file = state['log_fobj'])
@@ -143,10 +143,11 @@ parser.add_argument('--first-commit', default = 'HEAD~20',
 
 # Parse the command line arguments
 args = parser.parse_args()
+state = state_init(args)
 
 if args.sha_list:
     state = sha_file_to_pickled_state(args)
 else:
     state = load_pickle_file(args)
-backport_patches(args, state)
+backport_patches(state)
 
