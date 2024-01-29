@@ -9,6 +9,7 @@ import git_utils
 def save_cp(state):
     st = state
     tmp = state['log_fobj']
+    state['log_fobj'] = None
     f = state['pickle_dir'] + "/" + state['pickle_file'] + "." +\
         str(state['cp_num'])
     with open(f, 'wb') as handle:
