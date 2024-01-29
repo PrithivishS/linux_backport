@@ -130,7 +130,7 @@ parser.add_argument('--pickle-num', help='checkpoint to load')
 parser.add_argument('--sha-list',
                     help='File declaring py array of sha(s)')
 parser.add_argument('--log-file', default="~/tmp/backkport.log",
-                    help='checkpoint to load')
+                    help='path to log file')
 parser.add_argument('--pickle-file', default='backport.pickle',
                     help='pickle file to load')
 parser.add_argument('--pickle-dir', default='/tmp',
