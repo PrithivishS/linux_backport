@@ -99,9 +99,8 @@ def load_pickle_file(args):
         return restore_cp(f)
 
 def sha_file_to_pickled_state(args):
-    if not args.sha_list or not args.pickle_dir \
-       or not args.pickle_file or not args.pickle_num:
-        print("use sha_list, pickle_dir, pickle_file, pickle_num")
+    if not args.sha_list:
+        sys.exit("use sha_list")
         return
     
     # as if it wasn't obvious <patch> should be class ...
