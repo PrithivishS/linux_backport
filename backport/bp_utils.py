@@ -90,26 +90,24 @@ def next_cp_num(args):
 #    - otherwise fail since the initial picke file should be created by
 #      sha2pckl
 #
-def load_pickle_file(args):
-    if args.pickle_num:
-        f = args.pickle_dir + "/" + args.pickle_file + "." + args.pickle_num
+def load_pickle_file(state):
+    pd = state['args'].pickle_dir
+    pf = state['args'].pickle_file
+    
+    if state['args'].pickle_num:
+        f = pd + "/" + pf + "." + state['args'].pickle_num
         return restore_cp(f)
     else:
-        max_pickle_num = str(next_cp_num(args) - 1)
-        f = args.pickle_dir + "/" + args.pickle_file + "." + max_pickle_num
+        max_pickle_num = str(next_cp_num(state['args']) - 1)
+        f = pd + "/" + pf + "." + max_pickle_num
         return restore_cp(f)
 
-def sha_file_to_pickled_state(args):
-    if not args.sha_list:
-        sys.exit("use sha_list")
-        return
+def sha_file_to_pickled_state(state):
+    sha_list = state['args'].sha_list
     
     # as if it wasn't obvious <patch> should be class ...
     patch_list = [make_patch_dict(l.strip())
-                  for l in open(args.sha_list,"r")]
+                  for l in open(sha_list,"r")]
 
-    state = {'pickle_dir' : args.pickle_dir,
-             'pickle_file': args.pickle_file,'cp_num': args.pickle_num,
-             'patch_list': patch_list}
+    state ['patch_list'] = patch_list
     save_cp(state)
-    return state

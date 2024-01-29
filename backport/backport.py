@@ -151,8 +151,8 @@ args = parser.parse_args()
 state = state_init(args)
 
 if args.sha_list:
-    state = sha_file_to_pickled_state(args)
+    sha_file_to_pickled_state(state)
 else:
-    state = load_pickle_file(args)
+    load_pickle_file(state)
 backport_patches(state)
 
