@@ -96,11 +96,13 @@ def load_pickle_file(state):
     
     if state['args'].pickle_num:
         f = pd + "/" + pf + "." + state['args'].pickle_num
-        return restore_cp(f)
+        st = restore_cp(f)
     else:
         max_pickle_num = str(next_cp_num(state['args']) - 1)
         f = pd + "/" + pf + "." + max_pickle_num
-        return restore_cp(f)
+        st = restore_cp(f)
+        
+    state['patch_list'] = st['patch_list']
 
 def sha_file_to_pickled_state(state):
     sha_list = state['args'].sha_list
@@ -109,5 +111,5 @@ def sha_file_to_pickled_state(state):
     patch_list = [make_patch_dict(l.strip())
                   for l in open(sha_list,"r")]
 
-    state ['patch_list'] = patch_list
+    state['patch_list'] = patch_list
     save_cp(state)
