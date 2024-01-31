@@ -43,19 +43,19 @@ def apply_next_patch(state):
     save_cp(state)
 
 def show_unapplied_patches(state):
-    print_log("@@show_unapplied_patches", (state['log_fobj']))
+    print_log("@@how_unapplied_patches", (state['log_fobj']))
     print_patch_list("", state['patch_list'], state['log_fobj'])
 
 def do_pdb(state):
-    print_log("@@sdo_pdb", (state['log_fobj']))
+    print_log("@@do_pdb", (state['log_fobj']))
     pdb.set_trace()
 
 def do_checkpoint(state):
-    print_log("@@sdo_checkpoint", (state['log_fobj']))
-    state['log_fobj'] = None #pickle fails if you pickle state containing fobj    save_cp(state)
+    print_log("@@do_checkpoint", (state['log_fobj']))
+    save_cp(state)
 
 def do_push_unapplied(state):
-    print_log("@@sdo_push_unapplied", (state['log_fobj']))
+    print_log("@@do_push_unapplied", (state['log_fobj']))
     sha_string = input("enter SHA1 id or <enter> if none: ")
     if len(sha_string) == 0: return
     sha_string.strip()
@@ -66,14 +66,14 @@ def do_push_unapplied(state):
     state['patch_list'] = [d] + state['patch_list']
 
 def do_pop_unapplied(state):
-    print_log("@@sdo_pop_unapplied", (state['log_fobj']))
+    print_log("@@do_pop_unapplied", (state['log_fobj']))
     if len(state['patch_list']) > 1:
         state['patch_list'] = state['patch_list'][1:]
     else:
         state['patch_list'] = list() # not the worst choice
 
 def pop_applied_patch(state):
-    print_log("@@sdo_pop_applied", (state['log_fobj']))
+    print_log("@@do_pop_applied", (state['log_fobj']))
     os.system("git reset --hard HEAD^")
     show_short_git_log(state)
 
