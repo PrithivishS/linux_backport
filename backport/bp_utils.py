@@ -6,6 +6,12 @@ import glob
 from git_utils import *
 import git_utils
 
+def print_log(s, fobj):
+    print(s)
+    if fobj:
+        print(s, file=fobj)
+        fobj.flush()
+
 def save_cp(state):
     st = state
     tmp = state['log_fobj']
