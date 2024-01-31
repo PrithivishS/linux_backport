@@ -80,8 +80,7 @@ def pop_applied_patch(state):
     show_short_git_log(state)
 
 def show_short_git_log(state):
-    print_log("@@show_short_git_log", (state['log_fobj']))
-    fobj = state['log_fobj']
+    print_log("@@how_short_git_log", (state['log_fobj']))
     git_short_log(state, '%<(10) %h  %<(12) %an : %s')
 
 def _do_bash(state):
