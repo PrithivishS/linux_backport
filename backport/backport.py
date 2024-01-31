@@ -64,6 +64,7 @@ def do_push_unapplied(state):
     ok = input("enter 'y' if ok, else <enter>")
     if not ok: return
     state['patch_list'] = [d] + state['patch_list']
+    do_checkpoint(state)
 
 def do_pop_unapplied(state):
     print_log("@@do_pop_unapplied", (state['log_fobj']))
@@ -71,6 +72,7 @@ def do_pop_unapplied(state):
         state['patch_list'] = state['patch_list'][1:]
     else:
         state['patch_list'] = list() # not the worst choice
+    do_checkpoint(state)
 
 def pop_applied_patch(state):
     print_log("@@do_pop_applied", (state['log_fobj']))
