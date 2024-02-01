@@ -92,6 +92,31 @@ def do_log_note(state):
 
 def do_patch_info(state):
     show_sha_info(state['log_fobj'])
+
+def do_build(state):
+    # if no saved build_cmd
+    #	prompt for it
+    #	save to state
+    # else 
+    #	show build command, ask if they want to change
+    #	save in state if changed
+    if not 'build_cmd' in state:
+        cmd = input("enter build command or <enter> to skip: ")
+        if cmd:
+            state['build_cmd'] = cmd
+    else:
+        cmd = state['build_cmd']
+        print("build command is: " + cmd)
+        tmp = input("enter build command to change or <enter> to use existing: ")
+        if tmp:
+            state['build_cmd'] = tmp
+    # do it
+    if not state['build_cmd']:
+        return
+
+    (ret_code, ret_text) = general_shell_cmd(state['build_cmd'])
+    print_log(ret_text, state['log_fobj'])
+    print("\n** return code = %d **" % (ret_code))
     
 bp_menu_list = [
     {'prompt' : 'apply next patch', 'action':  apply_next_patch},
@@ -110,7 +135,8 @@ bp_menu_list = [
     {'prompt' : 'launch bash', 'action' : _do_bash},
     {'prompt' : 'save checkpoint', 'action' : do_checkpoint},
     {'prompt' : 'note to log file', 'action' : do_log_note},
-    {'prompt' : 'patch_info(sha)', 'action' : do_patch_info}
+    {'prompt' : 'patch_info(sha)', 'action' : do_patch_info},
+    {'prompt' : 'build', 'action' : do_build}
 ]
 
 def state_init(args): # anoter obvious objuect
