@@ -92,6 +92,7 @@ def next_cp_num(args):
 #      sha2pckl
 #
 def load_pickle_file(state):
+    print("loading state")
     pd = state['args'].pickle_dir
     pf = state['args'].pickle_file
     
