@@ -54,13 +54,7 @@ def git_first_containing_tag(sha1):
         return tags[1]
     else:
         return tags[1]
-    
-# should subsume some of the duplicate code below over time
-def general_shell_cmd(cmd):
-    result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
-    return (result.returncode, result.stdout.decode('latin-1'))
-    
-    
+        
 def git_cherry_pick(sha1):
     cmd = "git  cherry-pick " + sha1
     print("* " + sha1)
