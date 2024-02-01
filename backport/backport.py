@@ -94,30 +94,15 @@ def do_patch_info(state):
     show_sha_info(state['log_fobj'])
 
 def do_build(state):
-    # if no saved build_cmd
-    #	prompt for it
-    #	save to state
-    # else 
-    #	show build command, ask if they want to change
-    #	save in state if changed
-    if not 'build_cmd' in state:
-        cmd = input("enter build command or <enter> to skip: ")
-        if cmd:
-            state['build_cmd'] = cmd
-    else:
-        cmd = state['build_cmd']
-        print("build command is: " + cmd)
-        tmp = input("enter build command to change or <enter> to use existing: ")
-        if tmp:
-            state['build_cmd'] = tmp
-    # do it
+    prompt_to_set_or_alter_state('build_cmd', state)
     if not state['build_cmd']:
         return
 
+    # do it
     (ret_code, ret_text) = general_shell_cmd(state['build_cmd'])
     print_log(ret_text, state['log_fobj'])
-    print("\n** return code = %d **" % (ret_code))
-    
+    print_log("\n** return code = %d **\n" % (ret_code), state['log_fobj'])
+
 bp_menu_list = [
     {'prompt' : 'apply next patch', 'action':  apply_next_patch},
     {'prompt' : 'show git status', 'action': do_git_status},
