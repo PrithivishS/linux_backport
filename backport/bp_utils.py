@@ -125,3 +125,21 @@ def show_sha_info(fobj):
     s  = "%s, %s, %s, %s" % (sha, subj, tag, tag_date)
     print_log(s, fobj)
                   
+def prompt_to_set_or_alter_state(key, d):
+    # if no saved value for key
+    #	prompt for it
+    #	save to d
+    # else 
+    #	show saved value, ask if they want to change
+    #	save in d if changed
+    if not key in d:
+        cmd = input("enter %s or <enter> to skip: " % (key))
+        if cmd:
+            d[key] = cmd
+    else:
+        cmd = d[key]
+        print("build command is: " + cmd)
+        tmp = input("enter %s to change or <enter> to use existing: "
+                    % (key))
+        if tmp:
+            d[key] = tmp
