@@ -89,6 +89,9 @@ def _do_bash(state):
 def do_log_note(state):
     s = input("enter text to be appended to the log: ")
     print(s, file = state['log_fobj'])
+
+def do_patch_info(state):
+    show_sha_info(state['log_fobj'])
     
 bp_menu_list = [
     {'prompt' : 'apply next patch', 'action':  apply_next_patch},
@@ -106,7 +109,8 @@ bp_menu_list = [
     {'prompt' : 'launch pdb', 'action' : do_pdb,},
     {'prompt' : 'launch bash', 'action' : _do_bash},
     {'prompt' : 'save checkpoint', 'action' : do_checkpoint},
-    {'prompt' : 'note to log file', 'action' : do_log_note}
+    {'prompt' : 'note to log file', 'action' : do_log_note},
+    {'prompt' : 'patch_info(sha)', 'action' : do_patch_info}
 ]
 
 def state_init(args): # anoter obvious objuect

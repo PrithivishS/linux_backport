@@ -22,6 +22,7 @@ def save_cp(state):
         pickle.dump(st, handle, protocol=pickle.HIGHEST_PROTOCOL)
     state['cp_num']  = int(state['cp_num']) + 1
     state['log_fobj'] = tmp
+    print_log("@@save_cp: " + f, tmp)
 
 def restore_cp(fpath):
     with open(fpath, 'rb') as handle:
@@ -113,3 +114,13 @@ def sha_file_to_pickled_state(state):
 
     state['patch_list'] = patch_list
     save_cp(state)
+
+def show_sha_info(fobj):
+    sha = input("enter sha1(return to exit): ")
+    if not sha: return Nnone
+    subj = git_utils.git_get_subject(sha)
+    tag = git_utils.git_first_containing_tag(sha)
+    tag_date = git_utils.git_get_commit_date(tag)
+    s  = "%s, %s, %s, %s" % (sha, subj, tag, tag_date)
+    print_log(s, fobj)
+                  
