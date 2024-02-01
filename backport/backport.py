@@ -103,25 +103,42 @@ def do_build(state):
     print_log(ret_text, state['log_fobj'])
     print_log("\n** return code = %d **\n" % (ret_code), state['log_fobj'])
 
+def do_backup_branch(state):
+    prompt_to_set_or_alter_state('branch_backup_cmd', state)
+    if not state['branch_backup_cmd']:
+        return
+
+    # do it
+    (ret_code, ret_text) = general_shell_cmd(state['branch_backup_cmd'])
+    print_log(ret_text, state['log_fobj'])
+    print_log("\n** return code = %d **\n" % (ret_code), state['log_fobj'])
+
 bp_menu_list = [
+    #
+    # more important
+    #
     {'prompt' : 'apply next patch', 'action':  apply_next_patch},
     {'prompt' : 'show git status', 'action': do_git_status},
     {'prompt' : 'short_git_log', 'action': show_short_git_log},
     {'prompt' : 'show unapplied patches',
      'action': show_unapplied_patches},
+    {'prompt' : 'patch_info(sha)', 'action' : do_patch_info},
+    {'prompt' : 'build', 'action' : do_build},
+    {'prompt' : 'backup branch', 'action' : do_backup_branch},
+    #
+    # less important
+    #
     {'prompt' : 'push unapplied (changes next)',
      'action' : do_push_unapplied,},
     {'prompt' : 'pop unapplied (changes next)',
      'action' : do_pop_unapplied,},
     {'prompt': 'pop applied patch', 'action' : pop_applied_patch},
-    {'prompt' : 'increment git branch', 'action' :
-     get_next_branch},
     {'prompt' : 'launch pdb', 'action' : do_pdb,},
     {'prompt' : 'launch bash', 'action' : _do_bash},
+    {'prompt' : 'increment git branch', 'action' :
+     get_next_branch},
     {'prompt' : 'save checkpoint', 'action' : do_checkpoint},
-    {'prompt' : 'note to log file', 'action' : do_log_note},
-    {'prompt' : 'patch_info(sha)', 'action' : do_patch_info},
-    {'prompt' : 'build', 'action' : do_build}
+    {'prompt' : 'note to log file', 'action' : do_log_note}
 ]
 
 def state_init(args): # anoter obvious objuect
