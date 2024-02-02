@@ -106,6 +106,7 @@ def load_pickle_file(state):
         st = restore_cp(f)
         
     state['patch_list'] = st['patch_list']
+    state['applied_patch_list'] = st['applied_patch_list']
 
 def sha_file_to_pickled_state(state):
     sha_list = state['args'].sha_list
