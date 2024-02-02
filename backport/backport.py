@@ -190,7 +190,7 @@ parser.add_argument('--pickle-dir', default='~/tmp',
 parser.add_argument('--log-depth', default='10',
                     help='# of commits to show on git log menu item')
 parser.add_argument('--first-commit', default = 'HEAD~20',
-                    help='git log will be first-commit^..HEAD')
+                    help='git log will be first-commit^..HEAD', required=True)
 # Parse the command line arguments
 args = parser.parse_args()
 state = state_init(args)
