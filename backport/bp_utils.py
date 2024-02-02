@@ -104,9 +104,17 @@ def load_pickle_file(state):
         max_pickle_num = str(next_cp_num(state['args']) - 1)
         f = pd + "/" + pf + "." + max_pickle_num
         st = restore_cp(f)
-        
-    state['patch_list'] = st['patch_list']
-    state['applied_patch_list'] = st['applied_patch_list']
+
+    if 'patch_list' in st.keys():
+        state['patch_list'] = st['patch_list']
+    else:
+        print_log("WARNING: pickle file lacks patch_list",
+                  state['log_fobj'])
+    if 'applied_patch_list' in st.keys():
+        state['applied_patch_list'] = st['applied_patch_list']
+    else:
+        print_log("WARNING: pickle file lacks applied_patch_list",
+                  state['log_fobj'])
 
 def sha_file_to_pickled_state(state):
     sha_list = state['args'].sha_list
