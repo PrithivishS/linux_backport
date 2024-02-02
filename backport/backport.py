@@ -13,16 +13,6 @@ from git_utils import *
 from bp_utils import *
 from datetime import datetime
 
-def buildit(fobj):
-    print_log("\n", fobj)
-    print_log("Check that the applied comit:", fobj)
-    print_log("\t1) has no conflicts", fobj)
-    print_log("\t2) builds", fobj)
-    print_log('\n and then enter "git cherry-pick --continue"', fobj)
-    print_log("\nDON'T CONTINUE FROM A NON BUILDING COMMIT\n", fobj)
-    do_bash(fobj)
-    input("<enter> to continue, else <control-c>")
-
 def resolve_conflicts(state):
         # resolve conflicts
     print_log("\n====  CONFLICT RESOLUTION REQUIRED ====\n",
@@ -37,7 +27,7 @@ def apply_next_patch(state):
     print_patch_dict("@@ cherry picking :", patch, state['log_fobj'])
     if git_cherry_pick(patch['sha1']) !=0:
         resolve_conflicts(state)
-    buildit(state['log_fobj'])
+    do_build(state)
 
     state['patch_list'] = patch_list[1:] #pop
     save_cp(state)
@@ -152,7 +142,7 @@ bp_menu_list = [
     {'prompt' : 'show unapplied patches',
      'action': show_unapplied_patches},
     {'prompt' : 'apply next patch', 'action':  apply_next_patch},
-    {'prompt' : 'push pre req by sha', 'action':  do_push_pre_req},
+    {'prompt' : 'push prereq by sha', 'action':  do_push_pre_req},
     {'prompt' : 'build', 'action' : do_build},
     {'prompt' : 'backup branch', 'action' : do_backup_branch},
     #
