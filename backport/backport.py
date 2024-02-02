@@ -130,8 +130,6 @@ def do_push_pre_req(state):
     else:
         print_log("git status not clean. no changes made",
                   state['log_fobj'])
-    
-bp_menu_list = [
 def do_update_applied_patch_list(state):
     state['applied_patch_list'] = git_applied_sha_list(state)
     save_cp(state)
