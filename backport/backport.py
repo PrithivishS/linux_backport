@@ -172,28 +172,6 @@ bp_menu_list = [
     {'prompt' : 'note to log file', 'action' : do_log_note}
 ]
 
-def state_init(args): # anoter obvious objuect
-    state = dict()
-    state['cp_num'] = next_cp_num(args)
-    state['pickle_dir'] = args.pickle_dir
-    state['pickle_file'] = args.pickle_file
-    state['log_depth'] = args.log_depth
-    state['log_fobj'] = open(args.log_file, 'a')
-    state['first_commit'] = args.first_commit
-    state['args'] = args
-    #TBD:, FIXME:  get rid of state fields from args that !change
-    return state
-
-def backport_patches(state):
-    current_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print("Startup: Current Time =", current_date_time,
-          file = state['log_fobj'])
-
-    state['log_fobj'].flush()
-    while True:
-        do_menu_choice(bp_menu_list, state)
-        state['log_fobj'].flush()
-        
 parser = argparse.ArgumentParser()
 parser.add_argument('--pickle-num', help='checkpoint to load')
 parser.add_argument('--sha-list',
