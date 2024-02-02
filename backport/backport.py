@@ -120,7 +120,6 @@ def do_push_pre_req(state):
               state['log_fobj'])
     (ret, tmp) = general_shell_cmd("git status --porcelain")
     if not tmp:
-        pdb.set_trace()
         # "push" tap_sha to unapplied patches
         state['patch_list'] = [make_patch_dict(tap_sha)] + state['patch_list']
         # "push" prq_sha to unapplied patches
