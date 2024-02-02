@@ -134,6 +134,10 @@ def do_push_pre_req(state):
                   state['log_fobj'])
     
 bp_menu_list = [
+def do_save_quit(state):
+    save_cp(state)
+    sys.exit("bye")
+
     #
     # more important
     #
@@ -145,6 +149,7 @@ bp_menu_list = [
     {'prompt' : 'push prereq by sha', 'action':  do_push_pre_req},
     {'prompt' : 'build', 'action' : do_build},
     {'prompt' : 'backup branch', 'action' : do_backup_branch},
+    {'prompt' : 'save state and quit', 'action' : do_save_quit},
     #
     # less important
     #
