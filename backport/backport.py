@@ -113,16 +113,47 @@ def do_backup_branch(state):
     print_log(ret_text, state['log_fobj'])
     print_log("\n** return code = %d **\n" % (ret_code), state['log_fobj'])
 
+def do_push_pre_req(state):
+    # "tap" => "top applied patch"
+    (ret,tap_sha) = general_shell_cmd("git rev-parse --short HEAD")
+    tap_info = show_sha_info(tap_sha)
+    prq_sha = input("enter SHA1 id of prereq patch or <enter> if none: ")
+    prq_info = show_sha_info(prq_sha)
+    print_log("""\n\nThe prequisite you've identified is:
+              \t%s
+    	      \nThe top applied patch on the current branch(tap) is:
+    	      %s
+    	      \nif you proceed, this will happen:
+    	      \ttop applied patch will be pushed to the unapplied patch list
+    	      \tprereq will be pushed to the unapplied patch list
+    	      \ttop applied patch will be 'popped' from the current branch
+	      """ % (tap_info, prq_info)
+              ,
+              state['log_fobj'])
+    (ret, tmp) = general_shell_cmd("git status --porcelain")
+    if not tmp:
+        pdb.set_trace()
+        # "push" tap_sha to unapplied patches
+        state['patch_list'] = [make_patch_dict(tap_sha)] + state['patch_list']
+        # "push" prq_sha to unapplied patches
+        state['patch_list'] = [make_patch_dict(prq_sha)] + state['patch_list']
+        # pop applied patch
+        general_shell_cmd('git reset --hard HEAD^')
+        do_checkpoint(state)
+    else:
+        print_log("git status not clean. no changes made",
+                  state['log_fobj'])
+    
 bp_menu_list = [
     #
     # more important
     #
-    {'prompt' : 'apply next patch', 'action':  apply_next_patch},
     {'prompt' : 'show git status', 'action': do_git_status},
     {'prompt' : 'short_git_log', 'action': show_short_git_log},
     {'prompt' : 'show unapplied patches',
      'action': show_unapplied_patches},
     {'prompt' : 'patch_info(sha)', 'action' : do_patch_info},
+    {'prompt' : 'push pre req by sha', 'action':  do_push_pre_req},
     {'prompt' : 'build', 'action' : do_build},
     {'prompt' : 'backup branch', 'action' : do_backup_branch},
     #
