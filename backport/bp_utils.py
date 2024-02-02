@@ -116,14 +116,19 @@ def sha_file_to_pickled_state(state):
     state['patch_list'] = patch_list
     save_cp(state)
 
-def show_sha_info(fobj):
-    sha = input("enter sha1(return to exit): ")
-    if not sha: return Nnone
+def show_sha_info(sha):
+    if not sha: return ""
     subj = git_utils.git_get_subject(sha)
     tag = git_utils.git_first_containing_tag(sha)
     tag_date = git_utils.git_get_commit_date(tag)
     s  = "%s, %s, %s, %s" % (sha, subj, tag, tag_date)
-    print_log(s, fobj)
+    return s
+                  
+def prompted_show_sha_info(fobj):
+    sha = input("enter sha1(return to exit): ")
+    if not sha: return Nnone
+    print_log(show_sha_info(sha), fobj)
+
                   
 def prompt_to_set_or_alter_state(key, d):
     # if no saved value for key

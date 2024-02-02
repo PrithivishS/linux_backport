@@ -91,7 +91,7 @@ def do_log_note(state):
     print(s, file = state['log_fobj'])
 
 def do_patch_info(state):
-    show_sha_info(state['log_fobj'])
+    prompted_show_sha_info(state['log_fobj'])
 
 def do_build(state):
     prompt_to_set_or_alter_state('build_cmd', state)
