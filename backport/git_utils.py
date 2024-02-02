@@ -109,3 +109,4 @@ def get_next_branch(state):
     s = result.stdout.decode().strip().rstrip()
     do_git_status(state)
     print_log(s, state['log_fobj'])
+

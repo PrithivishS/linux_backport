@@ -153,4 +153,3 @@ def prompt_to_set_or_alter_state(key, d):
 def general_shell_cmd(cmd):
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
     return (result.returncode, result.stdout.decode('latin-1'))
-    

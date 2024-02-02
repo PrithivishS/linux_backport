@@ -59,11 +59,10 @@ def do_push_unapplied(state):
     sha_string = input("enter SHA1 id or <enter> if none: ")
     if len(sha_string) == 0: return
     sha_string.strip()
-    d = make_patch_dict(sha_string)
-    print_patch_dict("", d, state['log_fobj'])
+    print(show_sha_info(sha_string))
     ok = input("enter 'y' if ok, else <enter>")
     if not ok: return
-    state['patch_list'] = [d] + state['patch_list']
+    push_unapplied_patch(sha_string)
     do_checkpoint(state)
 
 def do_pop_unapplied(state):
@@ -152,19 +151,20 @@ bp_menu_list = [
     {'prompt' : 'short_git_log', 'action': show_short_git_log},
     {'prompt' : 'show unapplied patches',
      'action': show_unapplied_patches},
-    {'prompt' : 'patch_info(sha)', 'action' : do_patch_info},
+    {'prompt' : 'apply next patch', 'action':  apply_next_patch},
     {'prompt' : 'push pre req by sha', 'action':  do_push_pre_req},
     {'prompt' : 'build', 'action' : do_build},
     {'prompt' : 'backup branch', 'action' : do_backup_branch},
     #
     # less important
     #
+    {'prompt' : 'patch_info(sha)', 'action' : do_patch_info},
     {'prompt' : 'push unapplied (changes next)',
      'action' : do_push_unapplied,},
     {'prompt' : 'pop unapplied (changes next)',
      'action' : do_pop_unapplied,},
     {'prompt': 'pop applied patch', 'action' : pop_applied_patch},
-    {'prompt' : 'launch pdb', 'action' : do_pdb,},
+    {'prompt' : 'launch pdb', 'action' : do_pdb},
     {'prompt' : 'launch bash', 'action' : _do_bash},
     {'prompt' : 'increment git branch', 'action' :
      get_next_branch},
