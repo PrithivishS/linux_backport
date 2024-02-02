@@ -5,6 +5,7 @@ import importlib
 import glob
 from git_utils import *
 import git_utils
+from datetime import datetime
 
 def print_log(s, fobj):
     print(s)
@@ -166,13 +167,13 @@ def state_init(args): # anoter obvious objuect
     #TBD:, FIXME:  get rid of state fields from args that !change
     return state
 
-def backport_patches(state):
+def backport_patches(state, menu_item_list):
     current_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print("Startup: Current Time =", current_date_time,
           file = state['log_fobj'])
 
     state['log_fobj'].flush()
     while True:
-        do_menu_choice(bp_menu_list, state)
+        do_menu_choice(menu_item_list, state)
         state['log_fobj'].flush()
         

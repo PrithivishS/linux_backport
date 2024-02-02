@@ -11,7 +11,6 @@ import argparse
 import pickle
 from git_utils import *
 from bp_utils import *
-from datetime import datetime
 
 def resolve_conflicts(state):
         # resolve conflicts
@@ -189,5 +188,5 @@ if args.sha_list:
     sha_file_to_pickled_state(state)
 else:
     load_pickle_file(state)
-backport_patches(state)
+backport_patches(state, bp_menu_item_list)
 
