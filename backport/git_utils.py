@@ -110,3 +110,11 @@ def get_next_branch(state):
     do_git_status(state)
     print_log(s, state['log_fobj'])
 
+def git_applied_sha_list(state):
+    range = "%s^..HEAD" % (state['first_commit'])
+    cmd = "git log " + range + " --pretty=tformat:'%<(10) %h'"
+    result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
+    s = result.stdout.decode().strip()
+    s = s.split("\n")
+    return s[: -1]
+

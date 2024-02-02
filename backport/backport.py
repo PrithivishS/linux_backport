@@ -132,6 +132,11 @@ def do_push_pre_req(state):
                   state['log_fobj'])
     
 bp_menu_list = [
+def do_update_applied_patch_list(state):
+    state['applied_patch_list'] = git_applied_sha_list(state)
+    save_cp(state)
+    print_log(state['applied_patch_list'], state['log_fobj'])
+
 def do_save_quit(state):
     save_cp(state)
     sys.exit("bye")
@@ -161,6 +166,8 @@ def do_save_quit(state):
     {'prompt' : 'launch bash', 'action' : _do_bash},
     {'prompt' : 'increment git branch', 'action' :
      get_next_branch},
+    {'prompt' : 'update applied patch_list'
+     , 'action' : do_update_applied_patch_list},
     {'prompt' : 'save checkpoint', 'action' : do_checkpoint},
     {'prompt' : 'note to log file', 'action' : do_log_note}
 ]
