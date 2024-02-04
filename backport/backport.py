@@ -12,8 +12,8 @@ import pickle
 from git_utils import *
 from bp_utils import *
 
-def apply_next_patch(state):
-    print_log("@@apply_next_patch", (state['log_fobj']))
+def menu_action_apply_next_patch(state):
+    print_log("@@menu_action_apply_next_patch", (state['log_fobj']))
     patch_list = state['patch_list']
     patch = patch_list[0]
 
@@ -24,24 +24,24 @@ def apply_next_patch(state):
     if not tmp:
         git_cherry_pick__continue()
         state['patch_list'] = patch_list[1:] #pop
-    do_build(state)
+    menu_action_build(state)
 
     save_cp(state)
 
-def show_unapplied_patches(state):
+def menu_action_unapplied_patches(state):
     print_log("@@how_unapplied_patches", (state['log_fobj']))
     print_patch_list("", state['patch_list'], state['log_fobj'])
 
-def do_pdb(state):
-    print_log("@@do_pdb", (state['log_fobj']))
+def menu_action_pdb(state):
+    print_log("@@menu_action_pdb", (state['log_fobj']))
     pdb.set_trace()
 
-def do_checkpoint(state):
-    print_log("@@do_checkpoint", (state['log_fobj']))
+def menu_action_checkpoint(state):
+    print_log("@@menu_action_checkpoint", (state['log_fobj']))
     save_cp(state)
 
-def do_push_unapplied(state):
-    print_log("@@do_push_unapplied", (state['log_fobj']))
+def menu_action_push_unapplied(state):
+    print_log("@@menu_action_push_unapplied", (state['log_fobj']))
     sha_string = input("enter SHA1 id or <enter> if none: ")
     if len(sha_string) == 0: return
     sha_string.strip()
@@ -49,36 +49,36 @@ def do_push_unapplied(state):
     ok = input("enter 'y' if ok, else <enter>")
     if not ok: return
     push_unapplied_patch(sha_string)
-    do_checkpoint(state)
+    menu_action_checkpoint(state)
 
-def do_pop_unapplied(state):
-    print_log("@@do_pop_unapplied", (state['log_fobj']))
+def menu_action_pop_unapplied(state):
+    print_log("@@menu_action_pop_unapplied", (state['log_fobj']))
     if len(state['patch_list']) > 1:
         state['patch_list'] = state['patch_list'][1:]
     else:
         state['patch_list'] = list() # not the worst choice
-    do_checkpoint(state)
+    menu_action_checkpoint(state)
 
-def pop_applied_patch(state):
+def menu_action_pop_applied(state):
     print_log("@@do_pop_applied", (state['log_fobj']))
     os.system("git reset --hard HEAD^")
-    show_short_git_log(state)
+    menu_action_short_git_log(state)
 
-def show_short_git_log(state):
+def menu_action_short_git_log(state):
     print_log("@@how_short_git_log", (state['log_fobj']))
     git_short_log(state, '%<(10) %h  %<(12) %an : %s')
 
-def _do_bash(state):
+def menu_action_bash(state):
     do_bash(state['log_fobj'])
 
 def do_log_note(state):
     s = input("enter text to be appended to the log: ")
     print(s, file = state['log_fobj'])
 
-def do_patch_info(state):
+def menu_action_patch_info(state):
     prompted_show_sha_info(state['log_fobj'])
 
-def do_build(state):
+def menu_action_build(state):
     prompt_to_set_or_alter_state('build_cmd', state)
     if not state['build_cmd']:
         return
@@ -88,7 +88,7 @@ def do_build(state):
     print_log(ret_text, state['log_fobj'])
     print_log("\n** return code = %d **\n" % (ret_code), state['log_fobj'])
 
-def do_backup_branch(state):
+def menu_action_backup_branch(state):
     prompt_to_set_or_alter_state('branch_backup_cmd', state)
     if not state['branch_backup_cmd']:
         return
@@ -98,7 +98,7 @@ def do_backup_branch(state):
     print_log(ret_text, state['log_fobj'])
     print_log("\n** return code = %d **\n" % (ret_code), state['log_fobj'])
 
-def do_push_pre_req(state):
+def menu_action_push_pre_req(state):
     # "tap" => "top applied patch"
     (ret,tap_sha) = general_shell_cmd("git rev-parse --short HEAD")
     tap_info = show_sha_info(tap_sha)
@@ -123,16 +123,16 @@ def do_push_pre_req(state):
         state['patch_list'] = [make_patch_dict(prq_sha)] + state['patch_list']
         # pop applied patch
         general_shell_cmd('git reset --hard HEAD^')
-        do_checkpoint(state)
+        menu_action_checkpoint(state)
     else:
         print_log("git status not clean. no changes made",
                   state['log_fobj'])
-def do_update_applied_patch_list(state):
+def menu_action_update_applied_patches(state):
     state['applied_patch_list'] = git_applied_sha_list(state)
     save_cp(state)
     print_log(state['applied_patch_list'], state['log_fobj'])
 
-def do_git_logG(state):
+def menu_action_git_logG(state):
     print("""<pattern> : the text to search for
              <tag1>    : a known release tag(ex: v5.4_)
     	     <tag2>    : a known release tag subsequent to tag1""")
@@ -148,32 +148,34 @@ bp_menu_item_list = [
     #
     # more important
     #
-    {'prompt' : 'show git status', 'action': do_git_status},
-    {'prompt' : 'short_git_log', 'action': show_short_git_log},
+    {'prompt' : 'show git status', 'action': menu_action_git_status},
+    {'prompt' : 'short_git_log', 'action': menu_action_short_git_log},
     {'prompt' : 'show unapplied patches',
-     'action': show_unapplied_patches},
-    {'prompt' : 'apply next patch', 'action':  apply_next_patch},
-    {'prompt' : 'push prereq by sha', 'action':  do_push_pre_req},
-    {'prompt' : 'build', 'action' : do_build},
-    {'prompt' : 'backup branch', 'action' : do_backup_branch},
-    {'prompt' : 'find commits referring to pattern', 'action' : do_git_logG},
+     'action': menu_action_unapplied_patches},
+    {'prompt' : 'apply next patch',
+     'action':  menu_action_apply_next_patch},
+    {'prompt' : 'push prereq by sha', 'action':  menu_action_push_pre_req},
+    {'prompt' : 'build', 'action' : menu_action_build},
+    {'prompt' : 'backup branch', 'action' : menu_action_backup_branch},
+    {'prompt' : 'find commits referring to pattern',
+     'action' : menu_action_git_logG},
     #
     # less important
     #
     {'prompt' : 'utility actions', 'sub-menu' : [
-        {'prompt' : 'patch_info(sha)', 'action' : do_patch_info},
+        {'prompt' : 'patch_info(sha)', 'action' : menu_action_patch_info},
         {'prompt' : 'push unapplied (changes next)',
-         'action' : do_push_unapplied,},
+         'action' : menu_action_push_unapplied,},
         {'prompt' : 'pop unapplied (changes next)',
-         'action' : do_pop_unapplied,},
-        {'prompt': 'pop applied patch', 'action' : pop_applied_patch},
-        {'prompt' : 'launch pdb', 'action' : do_pdb},
-        {'prompt' : 'launch bash', 'action' : _do_bash},
+         'action' : menu_action_pop_unapplied,},
+        {'prompt': 'pop applied patch', 'action' : menu_action_pop_applied},
+        {'prompt' : 'launch pdb', 'action' : menu_action_pdb},
+        {'prompt' : 'launch bash', 'action' : menu_action_bash},
         {'prompt' : 'increment git branch', 'action' :
-         get_next_branch},
+         menu_action_next_banch},
         {'prompt' : 'update applied patch_list'
-         , 'action' : do_update_applied_patch_list},
-        {'prompt' : 'save checkpoint', 'action' : do_checkpoint},
+         , 'action' : menu_action_update_applied_patches},
+        {'prompt' : 'save checkpoint', 'action' : menu_action_checkpoint},
         {'prompt' : 'note to log file', 'action' : do_log_note}
         ]
      }
