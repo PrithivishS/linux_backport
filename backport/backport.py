@@ -132,6 +132,17 @@ def do_update_applied_patch_list(state):
     save_cp(state)
     print_log(state['applied_patch_list'], state['log_fobj'])
 
+def do_git_logG(state):
+    print("""<pattern> : the text to search for
+             <tag1>    : a known release tag(ex: v5.4_)
+    	     <tag2>    : a known release tag subsequent to tag1""")
+    tmp = input("\nenter  <pattern> <tag1> <tag2>: ")
+    
+    (pattern, tag1, tag2) = tmp.split()
+    (ret, tmp) = general_shell_cmd("git log --oneline -G%s %s...%s"
+                                   % (pattern, tag1, tag2))
+    print_log(tmp, state['log_fobj'])
+                                   
 
 bp_menu_item_list = [
     #
@@ -145,6 +156,7 @@ bp_menu_item_list = [
     {'prompt' : 'push prereq by sha', 'action':  do_push_pre_req},
     {'prompt' : 'build', 'action' : do_build},
     {'prompt' : 'backup branch', 'action' : do_backup_branch},
+    {'prompt' : 'find commits referring to pattern', 'action' : do_git_logG},
     #
     # less important
     #
