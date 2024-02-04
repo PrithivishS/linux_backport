@@ -68,14 +68,18 @@ def show_menu(menu, state):
 
 def do_menu_choice(menu, state):
     while True:
-        show_menu(menu, state)
-        x = int(input("enter choice: "))
-        if x in range(len(menu)): break
-        else: print("bad input")
-    if 'sub-menu' in menu[x].keys():
-        do_menu_choice(menu[x]['sub-menu'], state)
-    else:
-        menu[x]['action'](state)
+        while True:
+            show_menu(menu, state)
+            x = input("enter choice(<enter> to exit menu): ")
+            if not x: save_cp(state);return
+            x = int(x)
+            if x in range(len(menu)): break
+            else: print("bad input")
+        if 'sub-menu' in menu[x].keys():
+            do_menu_choice(menu[x]['sub-menu'], state)
+        else:
+            menu[x]['action'](state)
+            state['log_fobj'].flush()
 
 def do_bash(fobj):
     print("entering bash", file=fobj);fobj.flush()
@@ -188,7 +192,5 @@ def backport_patches(state, menu_item_list):
           file = state['log_fobj'])
 
     state['log_fobj'].flush()
-    while True:
-        do_menu_choice(menu_item_list, state)
-        state['log_fobj'].flush()
+    do_menu_choice(menu_item_list, state)
         
