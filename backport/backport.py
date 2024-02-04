@@ -180,7 +180,7 @@ bp_menu_item_list = [
         {'prompt' : 'launch pdb', 'action' : menu_action_pdb},
         {'prompt' : 'launch bash', 'action' : menu_action_bash},
         {'prompt' : 'increment git branch', 'action' :
-         menu_action_next_banch},
+         menu_action_next_branch},
         {'prompt' : 'update applied patch_list'
          , 'action' : menu_action_update_applied_patches},
         {'prompt' : 'save checkpoint', 'action' : menu_action_checkpoint},
