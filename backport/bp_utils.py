@@ -68,12 +68,14 @@ def show_menu(menu, state):
 
 def do_menu_choice(menu, state):
     while True:
-        show_menu(menu)
+        show_menu(menu, state)
         x = int(input("enter choice: "))
         if x in range(len(menu)): break
         else: print("bad input")
-
-    menu[x]['action'](state)
+    if 'sub-menu' in menu[x].keys():
+        do_menu_choice(menu[x]['sub-menu'], state)
+    else:
+        menu[x]['action'](state)
 
 def do_bash(fobj):
     print("entering bash", file=fobj);fobj.flush()

@@ -152,20 +152,23 @@ bp_menu_item_list = [
     #
     # less important
     #
-    {'prompt' : 'patch_info(sha)', 'action' : do_patch_info},
-    {'prompt' : 'push unapplied (changes next)',
-     'action' : do_push_unapplied,},
-    {'prompt' : 'pop unapplied (changes next)',
-     'action' : do_pop_unapplied,},
-    {'prompt': 'pop applied patch', 'action' : pop_applied_patch},
-    {'prompt' : 'launch pdb', 'action' : do_pdb},
-    {'prompt' : 'launch bash', 'action' : _do_bash},
-    {'prompt' : 'increment git branch', 'action' :
-     get_next_branch},
-    {'prompt' : 'update applied patch_list'
-     , 'action' : do_update_applied_patch_list},
-    {'prompt' : 'save checkpoint', 'action' : do_checkpoint},
-    {'prompt' : 'note to log file', 'action' : do_log_note},
+    {'prompt' : 'utility actions', 'sub-menu' : [
+        {'prompt' : 'patch_info(sha)', 'action' : do_patch_info},
+        {'prompt' : 'push unapplied (changes next)',
+         'action' : do_push_unapplied,},
+        {'prompt' : 'pop unapplied (changes next)',
+         'action' : do_pop_unapplied,},
+        {'prompt': 'pop applied patch', 'action' : pop_applied_patch},
+        {'prompt' : 'launch pdb', 'action' : do_pdb},
+        {'prompt' : 'launch bash', 'action' : _do_bash},
+        {'prompt' : 'increment git branch', 'action' :
+         get_next_branch},
+        {'prompt' : 'update applied patch_list'
+         , 'action' : do_update_applied_patch_list},
+        {'prompt' : 'save checkpoint', 'action' : do_checkpoint},
+        {'prompt' : 'note to log file', 'action' : do_log_note}
+        ]
+     }
 ]
 
 parser = argparse.ArgumentParser()
