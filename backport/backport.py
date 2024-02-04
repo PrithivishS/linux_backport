@@ -182,8 +182,6 @@ parser.add_argument('--pickle-file', default='backport.pickle',
                     help='pickle file to load')
 parser.add_argument('--pickle-dir', default='~/tmp',
                     help='where to store checkpoints')
-parser.add_argument('--log-depth', default='10',
-                    help='# of commits to show on git log menu item')
 parser.add_argument('--first-commit', default = 'HEAD~20',
                     help='git log will be first-commit^..HEAD', required=True)
 # Parse the command line arguments

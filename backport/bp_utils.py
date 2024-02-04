@@ -169,7 +169,6 @@ def state_init(args): # anoter obvious objuect
     state['cp_num'] = next_cp_num(args)
     state['pickle_dir'] = args.pickle_dir
     state['pickle_file'] = args.pickle_file
-    state['log_depth'] = args.log_depth
     state['log_fobj'] = open(args.log_file, 'a')
     state['first_commit'] = args.first_commit
     state['args'] = args
