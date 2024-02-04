@@ -132,9 +132,6 @@ def do_update_applied_patch_list(state):
     save_cp(state)
     print_log(state['applied_patch_list'], state['log_fobj'])
 
-def do_save_quit(state):
-    save_cp(state)
-    sys.exit("bye")
 
 bp_menu_item_list = [
     #
@@ -148,7 +145,6 @@ bp_menu_item_list = [
     {'prompt' : 'push prereq by sha', 'action':  do_push_pre_req},
     {'prompt' : 'build', 'action' : do_build},
     {'prompt' : 'backup branch', 'action' : do_backup_branch},
-    {'prompt' : 'save state and quit', 'action' : do_save_quit},
     #
     # less important
     #
