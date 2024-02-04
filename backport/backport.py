@@ -69,16 +69,20 @@ def menu_action_short_git_log(state):
     git_short_log(state, '%<(10) %h  %<(12) %an : %s')
 
 def menu_action_bash(state):
+    print_log("@@menu_action_bash", (state['log_fobj']))
     do_bash(state['log_fobj'])
 
-def do_log_note(state):
+def menu_action_log_note(state):
+    print_log("@@menu_action_log_note", (state['log_fobj']))
     s = input("enter text to be appended to the log: ")
     print(s, file = state['log_fobj'])
 
 def menu_action_patch_info(state):
+    print_log("@@menu_action_patch_info", (state['log_fobj']))
     prompted_show_sha_info(state['log_fobj'])
 
 def menu_action_build(state):
+    print_log("@@menu_action_build", (state['log_fobj']))
     prompt_to_set_or_alter_state('build_cmd', state)
     if not state['build_cmd']:
         return
@@ -89,6 +93,7 @@ def menu_action_build(state):
     print_log("\n** return code = %d **\n" % (ret_code), state['log_fobj'])
 
 def menu_action_backup_branch(state):
+    print_log("@@menu_action_backup_branch", (state['log_fobj']))
     prompt_to_set_or_alter_state('branch_backup_cmd', state)
     if not state['branch_backup_cmd']:
         return
@@ -99,6 +104,7 @@ def menu_action_backup_branch(state):
     print_log("\n** return code = %d **\n" % (ret_code), state['log_fobj'])
 
 def menu_action_push_pre_req(state):
+    print_log("@@menu_action_push_pre_req", (state['log_fobj']))
     # "tap" => "top applied patch"
     (ret,tap_sha) = general_shell_cmd("git rev-parse --short HEAD")
     tap_info = show_sha_info(tap_sha)
@@ -128,11 +134,13 @@ def menu_action_push_pre_req(state):
         print_log("git status not clean. no changes made",
                   state['log_fobj'])
 def menu_action_update_applied_patches(state):
+    print_log("@@menu_action_update_applied_patches", (state['log_fobj']))
     state['applied_patch_list'] = git_applied_sha_list(state)
     save_cp(state)
     print_log(state['applied_patch_list'], state['log_fobj'])
 
 def menu_action_git_logG(state):
+    print_log("@@menu_action_git_logG", (state['log_fobj']))
     print("""<pattern> : the text to search for
              <tag1>    : a known release tag(ex: v5.4_)
     	     <tag2>    : a known release tag subsequent to tag1""")
@@ -176,7 +184,7 @@ bp_menu_item_list = [
         {'prompt' : 'update applied patch_list'
          , 'action' : menu_action_update_applied_patches},
         {'prompt' : 'save checkpoint', 'action' : menu_action_checkpoint},
-        {'prompt' : 'note to log file', 'action' : do_log_note}
+        {'prompt' : 'note to log file', 'action' : menu_action_log_note}
         ]
      }
 ]
