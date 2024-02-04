@@ -12,23 +12,20 @@ import pickle
 from git_utils import *
 from bp_utils import *
 
-def resolve_conflicts(state):
-        # resolve conflicts
-    print_log("\n====  CONFLICT RESOLUTION REQUIRED ====\n",
-              state['log_fobj'])
-    do_git_status(state)
-
 def apply_next_patch(state):
     print_log("@@apply_next_patch", (state['log_fobj']))
     patch_list = state['patch_list']
     patch = patch_list[0]
 
     print_patch_dict("@@ cherry picking :", patch, state['log_fobj'])
-    if git_cherry_pick(patch['sha1']) !=0:
-        resolve_conflicts(state)
+    git_cherry_pick(patch['sha1'])
+
+    (ret, tmp) = general_shell_cmd("git status --porcelain")
+    if not tmp:
+        git_cherry_pick__continue()
+        state['patch_list'] = patch_list[1:] #pop
     do_build(state)
 
-    state['patch_list'] = patch_list[1:] #pop
     save_cp(state)
 
 def show_unapplied_patches(state):
