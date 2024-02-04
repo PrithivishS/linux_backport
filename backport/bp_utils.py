@@ -84,6 +84,13 @@ def next_cp_num(args):
         return 1
     return int(L[-1:][0].split(".")[-1:][0]) + 1
 
+def copy_keval_if_present(key, dst_hash, src_hash, state):
+    if key in src_hash.keys():
+        dst_hash[key] = src_hash[key]
+    else:
+        print_log("WARNING: pickle file lacks %s" % (key),
+                  state['log_fobj'])
+        
 #
 # we look for pickle files in this order:
 #
@@ -104,17 +111,12 @@ def load_pickle_file(state):
         max_pickle_num = str(next_cp_num(state['args']) - 1)
         f = pd + "/" + pf + "." + max_pickle_num
         st = restore_cp(f)
-
-    if 'patch_list' in st.keys():
-        state['patch_list'] = st['patch_list']
-    else:
-        print_log("WARNING: pickle file lacks patch_list",
-                  state['log_fobj'])
-    if 'applied_patch_list' in st.keys():
-        state['applied_patch_list'] = st['applied_patch_list']
-    else:
-        print_log("WARNING: pickle file lacks applied_patch_list",
-                  state['log_fobj'])
+        
+    # not an accident that <state> is repeated. it wont always be <dst_hash>
+    copy_keval_if_present('patch_list', state, st, state)
+    copy_keval_if_present('applied_patch_list', state, st, state)
+    copy_keval_if_present('build_cmd', state, st, state)
+    copy_keval_if_present('branch_backup_cmd', state, st, state)
 
 def sha_file_to_pickled_state(state):
     sha_list = state['args'].sha_list
