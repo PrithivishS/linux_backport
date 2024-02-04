@@ -136,9 +136,6 @@ def do_save_quit(state):
     save_cp(state)
     sys.exit("bye")
 
-def xxxx():
-    pass
-
 bp_menu_item_list = [
     #
     # more important
@@ -169,7 +166,6 @@ bp_menu_item_list = [
      , 'action' : do_update_applied_patch_list},
     {'prompt' : 'save checkpoint', 'action' : do_checkpoint},
     {'prompt' : 'note to log file', 'action' : do_log_note},
-    {'prompt' : 'test', 'action' : xxxx}
 ]
 
 parser = argparse.ArgumentParser()
