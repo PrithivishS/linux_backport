@@ -151,7 +151,10 @@ def menu_action_git_logG(state):
                                    % (pattern, tag1, tag2))
     print_log(tmp, state['log_fobj'])
                                    
-
+def menu_action_cherry_pick_continue(state):
+    print_log("@@menu_actioncherry_pick_continue", (state['log_fobj']))
+    git_cherry_pick__continue()
+    
 bp_menu_item_list = [
     #
     # more important
@@ -163,6 +166,8 @@ bp_menu_item_list = [
     {'prompt' : 'apply next patch',
      'action':  menu_action_apply_next_patch},
     {'prompt' : 'push prereq by sha', 'action':  menu_action_push_pre_req},
+    {'prompt' : 'cherry-pick --continue',
+     'action': menu_action_cherry_pick_continue},
     {'prompt' : 'build', 'action' : menu_action_build},
     {'prompt' : 'backup branch', 'action' : menu_action_backup_branch},
     {'prompt' : 'find commits referring to pattern',
