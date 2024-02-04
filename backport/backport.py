@@ -70,7 +70,7 @@ def menu_action_short_git_log(state):
 
 def menu_action_bash(state):
     print_log("@@menu_action_bash", (state['log_fobj']))
-    do_bash(state['log_fobj'])
+    subprocess.run(['bash'])
 
 def menu_action_log_note(state):
     print_log("@@menu_action_log_note", (state['log_fobj']))

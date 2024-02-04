@@ -81,10 +81,6 @@ def do_menu_choice(menu, state):
             menu[x]['action'](state)
             state['log_fobj'].flush()
 
-def do_bash(fobj):
-    print("entering bash", file=fobj);fobj.flush()
-    subprocess.run(['bash'])
-
 def next_cp_num(args):
     pfre = args.pickle_dir + "/" + args.pickle_file + ".*"
     L = glob.glob(pfre)
