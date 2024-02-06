@@ -22,7 +22,6 @@ def menu_action_apply_next_patch(state):
     state['patch_list'] = patch_list[1:] #pop
     
     if git_repo_is_clean():
-        git_cherry_pick__continue()
         menu_action_build(state)
     save_cp(state)
 
