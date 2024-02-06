@@ -177,9 +177,9 @@ bp_menu_item_list = [
     #
     {'prompt' : 'utility actions', 'sub-menu' : [
         {'prompt' : 'patch_info(sha)', 'action' : menu_action_patch_info},
-        {'prompt' : 'push unapplied (changes next)',
+        {'prompt' : 'push unapplied',
          'action' : menu_action_push_unapplied,},
-        {'prompt' : 'pop unapplied (changes next)',
+        {'prompt' : 'pop unapplied',
          'action' : menu_action_pop_unapplied,},
         {'prompt': 'pop applied patch', 'action' : menu_action_pop_applied},
         {'prompt' : 'launch pdb', 'action' : menu_action_pdb},
