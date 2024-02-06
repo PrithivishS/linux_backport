@@ -116,11 +116,13 @@ def menu_action_push_pre_req(state):
     	      \ttop applied patch will be pushed to the unapplied patch list
     	      \tprereq will be pushed to the unapplied patch list
     	      \ttop applied patch will be 'popped' from the current branch
-	      """ % (tap_info, prq_info)
+	      """ % (prq_info, tap_info)
               ,
               state['log_fobj'])
-    (ret, tmp) = general_shell_cmd("git status --porcelain")
-    if not tmp:
+    tmp = input("enter 'y' to proceed: ")
+    if not tmp == 'y': return
+    
+    if git_repo_is_clean():
         # "push" tap_sha to unapplied patches
         state['patch_list'] = [make_patch_dict(tap_sha)] + state['patch_list']
         # "push" prq_sha to unapplied patches
