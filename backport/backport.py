@@ -64,7 +64,7 @@ def menu_action_pop_applied(state):
 
 def menu_action_short_git_log(state):
     print_log("@@how_short_git_log", state)
-    git_short_log(state, '%<(10) %h  %<(12) %an : %s')
+    git_short_log('%<(10) %h  %<(12) %an : %s', state)
 
 def menu_action_bash(state):
     print_log("@@menu_action_bash", state)
