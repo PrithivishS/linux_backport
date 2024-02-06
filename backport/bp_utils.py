@@ -62,8 +62,7 @@ def print_patch_list(msg, patch_list, fobj):
 def show_menu(menu, state):
     for (ix, d) in zip(range(len(menu) + 1), menu):
         print(str(ix) + ": " + menu[ix]['prompt'])
-    (ret, tmp) = general_shell_cmd("git status --porcelain")
-    if tmp:
+    if not git_utils.git_repo_is_clean():
         print_log("\n** working tree UNCLEAN **", state['log_fobj'])
 
 def do_menu_choice(menu, state):
