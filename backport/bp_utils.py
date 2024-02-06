@@ -86,6 +86,13 @@ def do_menu_choice(menu, state):
             menu[x]['action'](state)
             state['log_fobj'].flush()
 
+        # log unapplied and active(on git log) patches after every menu op
+        state['out_dest'] = 'log_only'
+        print_log("menu choice was <%s>" % (x), state)
+        print_patch_list("__PATCH LIST__", state)
+        git_utils.git_short_log('%<(10) %h  %<(12) %an : %s', state)
+        state['out_dest'] = 'both'
+
 def next_cp_num(args):
     pfre = args.pickle_dir + "/" + args.pickle_file + ".*"
     L = glob.glob(pfre)
