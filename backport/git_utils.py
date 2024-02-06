@@ -24,14 +24,14 @@ def menu_action_git_status(state):
                             stdout=subprocess.PIPE)
     s = result.stdout.decode().strip().rstrip()
     s = "\n\n=========\n %s \n=========\n\n" % (s)
-    print_log(s, state['log_fobj'])
+    print_log(s, state)
     
 def git_short_log(state, fmt):
     range = "%s^..HEAD" % (state['first_commit'])
     cmd = "git log " + range + " --pretty=tformat:'%<(10) %h  %<(12) %an : %s'"
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
     s = result.stdout.decode().strip()
-    print_log(s.rstrip("\n"), state['log_fobj'])
+    print_log(s.rstrip("\n"), state)
     
 def git_get_commit_date(commitish):
     cmd = "git log -1 --pretty=format:'%ad' --date=format:'%m/%d/%y' " + commitish
@@ -115,7 +115,7 @@ def menu_action_next_branch(state):
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
     s = result.stdout.decode().strip().rstrip()
     menu_action_git_status(state)
-    print_log(s, state['log_fobj'])
+    print_log(s, state)
 
 def git_applied_sha_list(state):
     range = "%s^..HEAD" % (state['first_commit'])

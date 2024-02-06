@@ -13,11 +13,11 @@ from git_utils import *
 from bp_utils import *
 
 def menu_action_apply_next_patch(state):
-    print_log("@@menu_action_apply_next_patch", (state['log_fobj']))
+    print_log("@@menu_action_apply_next_patch", state)
     patch_list = state['patch_list']
     patch = patch_list[0]
 
-    print_patch_dict("@@ cherry picking :", patch, state['log_fobj'])
+    print_patch_dict("@@ cherry picking :", patch, state)
     git_cherry_pick(patch['sha1'])
     state['patch_list'] = patch_list[1:] #pop
     
@@ -27,19 +27,19 @@ def menu_action_apply_next_patch(state):
     save_cp(state)
 
 def menu_action_unapplied_patches(state):
-    print_log("@@how_unapplied_patches", (state['log_fobj']))
-    print_patch_list("", state['patch_list'], state['log_fobj'])
+    print_log("@@how_unapplied_patches", state)
+    print_patch_list("", state['patch_list'], state)
 
 def menu_action_pdb(state):
-    print_log("@@menu_action_pdb", (state['log_fobj']))
+    print_log("@@menu_action_pdb", state)
     pdb.set_trace()
 
 def menu_action_checkpoint(state):
-    print_log("@@menu_action_checkpoint", (state['log_fobj']))
+    print_log("@@menu_action_checkpoint", state)
     save_cp(state)
 
 def menu_action_push_unapplied(state):
-    print_log("@@menu_action_push_unapplied", (state['log_fobj']))
+    print_log("@@menu_action_push_unapplied", state)
     sha_string = input("enter SHA1 id or <enter> if none: ")
     if len(sha_string) == 0: return
     sha_string.strip()
@@ -50,7 +50,7 @@ def menu_action_push_unapplied(state):
     menu_action_checkpoint(state)
 
 def menu_action_pop_unapplied(state):
-    print_log("@@menu_action_pop_unapplied", (state['log_fobj']))
+    print_log("@@menu_action_pop_unapplied", state)
     if len(state['patch_list']) > 1:
         state['patch_list'] = state['patch_list'][1:]
     else:
@@ -58,51 +58,51 @@ def menu_action_pop_unapplied(state):
     menu_action_checkpoint(state)
 
 def menu_action_pop_applied(state):
-    print_log("@@do_pop_applied", (state['log_fobj']))
+    print_log("@@do_pop_applied", state)
     os.system("git reset --hard HEAD^")
     menu_action_short_git_log(state)
 
 def menu_action_short_git_log(state):
-    print_log("@@how_short_git_log", (state['log_fobj']))
+    print_log("@@how_short_git_log", state)
     git_short_log(state, '%<(10) %h  %<(12) %an : %s')
 
 def menu_action_bash(state):
-    print_log("@@menu_action_bash", (state['log_fobj']))
+    print_log("@@menu_action_bash", state)
     subprocess.run(['bash'])
 
 def menu_action_log_note(state):
-    print_log("@@menu_action_log_note", (state['log_fobj']))
+    print_log("@@menu_action_log_note", state)
     s = input("enter text to be appended to the log: ")
-    print(s, file = state['log_fobj'])
+    print(s, file = state)
 
 def menu_action_patch_info(state):
-    print_log("@@menu_action_patch_info", (state['log_fobj']))
-    prompted_show_sha_info(state['log_fobj'])
+    print_log("@@menu_action_patch_info", state)
+    prompted_show_sha_infostate
 
 def menu_action_build(state):
-    print_log("@@menu_action_build", (state['log_fobj']))
+    print_log("@@menu_action_build", state)
     prompt_to_set_or_alter_state('build_cmd', state)
     if not state['build_cmd']:
         return
 
     # do it
     (ret_code, ret_text) = general_shell_cmd(state['build_cmd'])
-    print_log(ret_text, state['log_fobj'])
-    print_log("\n** return code = %d **\n" % (ret_code), state['log_fobj'])
+    print_log(ret_text, state)
+    print_log("\n** return code = %d **\n" % (ret_code), state)
 
 def menu_action_backup_branch(state):
-    print_log("@@menu_action_backup_branch", (state['log_fobj']))
+    print_log("@@menu_action_backup_branch", state)
     prompt_to_set_or_alter_state('branch_backup_cmd', state)
     if not state['branch_backup_cmd']:
         return
 
     # do it
     (ret_code, ret_text) = general_shell_cmd(state['branch_backup_cmd'])
-    print_log(ret_text, state['log_fobj'])
-    print_log("\n** return code = %d **\n" % (ret_code), state['log_fobj'])
+    print_log(ret_text, state)
+    print_log("\n** return code = %d **\n" % (ret_code), state)
 
 def menu_action_push_pre_req(state):
-    print_log("@@menu_action_push_pre_req", (state['log_fobj']))
+    print_log("@@menu_action_push_pre_req", state)
     # "tap" => "top applied patch"
     (ret,tap_sha) = general_shell_cmd("git rev-parse --short HEAD")
     tap_info = show_sha_info(tap_sha)
@@ -118,7 +118,7 @@ def menu_action_push_pre_req(state):
     	      \ttop applied patch will be 'popped' from the current branch
 	      """ % (prq_info, tap_info)
               ,
-              state['log_fobj'])
+              state)
     tmp = input("enter 'y' to proceed: ")
     if not tmp == 'y': return
     
@@ -132,15 +132,15 @@ def menu_action_push_pre_req(state):
         menu_action_checkpoint(state)
     else:
         print_log("git status not clean. no changes made",
-                  state['log_fobj'])
+                  state)
 def menu_action_update_applied_patches(state):
-    print_log("@@menu_action_update_applied_patches", (state['log_fobj']))
+    print_log("@@menu_action_update_applied_patches", state)
     state['applied_patch_list'] = git_applied_sha_list(state)
     save_cp(state)
-    print_log(state['applied_patch_list'], state['log_fobj'])
+    print_log(state['applied_patch_list'], state)
 
 def menu_action_git_logG(state):
-    print_log("@@menu_action_git_logG", (state['log_fobj']))
+    print_log("@@menu_action_git_logG", state)
     print("""<pattern> : the text to search for
              <tag1>    : a known release tag(ex: v5.4_)
     	     <tag2>    : a known release tag subsequent to tag1""")
@@ -149,10 +149,10 @@ def menu_action_git_logG(state):
     (pattern, tag1, tag2) = tmp.split()
     (ret, tmp) = general_shell_cmd("git log --oneline -G%s %s...%s"
                                    % (pattern, tag1, tag2))
-    print_log(tmp, state['log_fobj'])
+    print_log(tmp, state)
                                    
 def menu_action_cherry_pick_continue(state):
-    print_log("@@menu_actioncherry_pick_continue", (state['log_fobj']))
+    print_log("@@menu_actioncherry_pick_continue", state)
     git_cherry_pick__continue()
     
 bp_menu_item_list = [

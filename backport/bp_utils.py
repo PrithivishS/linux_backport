@@ -7,9 +7,15 @@ from git_utils import *
 import git_utils
 from datetime import datetime
 
-def print_log(s, fobj):
-    print(s)
-    if fobj:
+def get_out_dest(state):
+    if not 'out_dest' in state.keys():
+        state['out_dest'] = 'both'
+    return state['out_dest']
+    
+def print_log(s, state):
+    if get_out_dest(state) == 'both':
+        print(s)
+    if state['log_fobj']:
         print(s, file=fobj)
         fobj.flush()
 
@@ -63,7 +69,7 @@ def show_menu(menu, state):
     for (ix, d) in zip(range(len(menu) + 1), menu):
         print(str(ix) + ": " + menu[ix]['prompt'])
     if not git_utils.git_repo_is_clean():
-        print_log("\n** working tree UNCLEAN **", state['log_fobj'])
+        print_log("\n** working tree UNCLEAN **", state)
 
 def do_menu_choice(menu, state):
     while True:
@@ -93,7 +99,7 @@ def copy_keval_if_present(key, dst_hash, src_hash, state):
         dst_hash[key] = src_hash[key]
     else:
         print_log("WARNING: pickle file lacks %s" % (key),
-                  state['log_fobj'])
+                  state)
         
 #
 # we look for pickle files in this order:
