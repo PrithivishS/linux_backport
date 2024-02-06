@@ -12,7 +12,7 @@ parser.add_argument('--pickle-path', default='/tmp/backport.pickle', help='pickl
 args = parser.parse_args()
 state = restore_cp(args.pickle_path)
 print(str(state))
-print_patch_list("", state['patch_list'])
+print_patch_list("", state)
 
 
 

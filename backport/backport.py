@@ -28,7 +28,7 @@ def menu_action_apply_next_patch(state):
 
 def menu_action_unapplied_patches(state):
     print_log("@@how_unapplied_patches", state)
-    print_patch_list("", state['patch_list'], state)
+    print_patch_list("", state)
 
 def menu_action_pdb(state):
     print_log("@@menu_action_pdb", state)

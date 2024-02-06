@@ -57,13 +57,13 @@ def make_patch_dict(sha1):
            d['tag_date'], d['is_pre_req']))
     return d
 
-def print_patch_list(msg, patch_list, fobj):
+def print_patch_list(msg, state):
     i = 0
-    print_log(">>>>>: %s" % (msg), fobj)
-    for patch in patch_list:
-        print_patch_dict(str(i), patch, fobj)
+    print_log(">>>>>: %s" % (msg), state)
+    for patch in state['patch_list']:
+        print_patch_dict(str(i), patch, state)
         i += 1
-    print_log("<<<<<: %s" % (msg), fobj)
+    print_log("<<<<<: %s" % (msg), state)
 
 def show_menu(menu, state):
     for (ix, d) in zip(range(len(menu) + 1), menu):
