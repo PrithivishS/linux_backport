@@ -131,8 +131,7 @@ def menu_action_push_pre_req(state):
         general_shell_cmd('git reset --hard HEAD^')
         menu_action_checkpoint(state)
     else:
-        print_log("git status not clean. no changes made",
-                  state)
+        print_log("git status not clean. no changes made", state)
 def menu_action_update_applied_patches(state):
     print_log("@@menu_action_update_applied_patches", state)
     state['applied_patch_list'] = git_applied_sha_list(state)

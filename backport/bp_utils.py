@@ -98,8 +98,7 @@ def copy_keval_if_present(key, dst_hash, src_hash, state):
     if key in src_hash.keys():
         dst_hash[key] = src_hash[key]
     else:
-        print_log("WARNING: pickle file lacks %s" % (key),
-                  state)
+        print_log("WARNING: pickle file lacks %s" % (key), state)
         
 #
 # we look for pickle files in this order:
