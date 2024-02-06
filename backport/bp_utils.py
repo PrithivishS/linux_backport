@@ -8,6 +8,7 @@ import git_utils
 from datetime import datetime
 
 def get_out_dest(state):
+    if not state: return ""
     if not 'out_dest' in state.keys():
         state['out_dest'] = 'both'
     return state['out_dest']
@@ -29,7 +30,7 @@ def save_cp(state):
         pickle.dump(st, handle, protocol=pickle.HIGHEST_PROTOCOL)
     state['cp_num']  = int(state['cp_num']) + 1
     state['log_fobj'] = tmp
-    print_log("@@save_cp: " + f, tmp)
+    print_log("@@save_cp: " + f, state)
 
 def restore_cp(fpath):
     with open(fpath, 'rb') as handle:
