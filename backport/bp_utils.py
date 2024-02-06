@@ -16,8 +16,8 @@ def print_log(s, state):
     if get_out_dest(state) == 'both':
         print(s)
     if state['log_fobj']:
-        print(s, file=fobj)
-        fobj.flush()
+        print(s, file=state['log_fobj'])
+        state['log_fobj'].flush()
 
 def save_cp(state):
     st = state
@@ -35,11 +35,11 @@ def restore_cp(fpath):
     with open(fpath, 'rb') as handle:
         return pickle.load(handle)
 
-def print_patch_dict(msg, patch, fobj):  # do we really re-use this?
+def print_patch_dict(msg, patch, state):  # do we really re-use this?
     s = "%s, %s, %s, %s, %s, prq(%s)" % (
         msg, patch['sha1'], patch['subject'], patch['tag'],
               patch['tag_date'], patch['is_pre_req'])
-    print_log(s, fobj)
+    print_log(s, state)
 
 def make_patch_dict(sha1):
     print("lookup %s" % (sha1))
