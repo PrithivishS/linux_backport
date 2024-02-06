@@ -26,7 +26,7 @@ def menu_action_git_status(state):
     s = "\n\n=========\n %s \n=========\n\n" % (s)
     print_log(s, state)
     
-def git_short_log(state, fmt):
+def git_short_log(fmt, state):
     range = "%s^..HEAD" % (state['first_commit'])
     cmd = "git log " + range + " --pretty=tformat:'%<(10) %h  %<(12) %an : %s'"
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
