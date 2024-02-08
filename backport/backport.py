@@ -76,7 +76,7 @@ def menu_action_log_note(state):
 
 def menu_action_patch_info(state):
     print_log("@@menu_action_patch_info", state)
-    prompted_show_sha_infostate
+    prompted_show_sha_info(state)
 
 def menu_action_build(state):
     print_log("@@menu_action_build", state)
