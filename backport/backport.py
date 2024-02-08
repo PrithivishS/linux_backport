@@ -39,13 +39,14 @@ def menu_action_checkpoint(state):
 
 def menu_action_push_unapplied(state):
     print_log("@@menu_action_push_unapplied", state)
-    sha_string = input("enter SHA1 id or <enter> if none: ")
-    if len(sha_string) == 0: return
-    sha_string.strip()
-    print(show_sha_info(sha_string))
+    sha = input("enter SHA1 id or <enter> if none: ")
+    if len(sha) == 0: return
+    sha.strip()
+    print(show_sha_info(sha))
     ok = input("enter 'y' if ok, else <enter>")
     if not ok: return
-    push_unapplied_patch(sha_string)
+
+    state['patch_list'] = [make_patch_dict(sha)] + state['patch_list']
     menu_action_checkpoint(state)
 
 def menu_action_pop_unapplied(state):
