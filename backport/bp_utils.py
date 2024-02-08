@@ -153,10 +153,10 @@ def show_sha_info(sha):
     s  = "%s, %s, %s, %s" % (sha, subj, tag, tag_date)
     return s
                   
-def prompted_show_sha_info(fobj):
+def prompted_show_sha_info(state):
     sha = input("enter sha1(return to exit): ")
     if not sha: return Nnone
-    print_log(show_sha_info(sha), fobj)
+    print_log(show_sha_info(sha), state)
 
                   
 def prompt_to_set_or_alter_state(key, d):
