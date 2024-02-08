@@ -10,6 +10,7 @@ import re
 import argparse
 import sys
 from git_utils import *
+from bp_utils import *
 
 EG_ver="v6.6"
 EG_pretty_fmt=" --pretty=tformat:'%<(10) %h  %<(12) %an : %s: %cd' "
@@ -25,11 +26,8 @@ def show_tag_info(tag):
     return duh.split(" ")[0]
 
 def show_sha_info(sha, subj):
-    if not subj:
-        subj = git_get_subject(sha)
-    tag = git_first_containing_tag(sha)
-    tag_date = git_get_commit_date(tag)
-    print("%s, %s, %s, %s" % (sha, subj, tag, tag_date))
+    tmp = get_sha_info(sha, subj
+    print(tmp)
     
 def main(args):
     if args.subject and args.sha:
