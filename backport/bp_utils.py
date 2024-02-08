@@ -202,3 +202,12 @@ def backport_patches(state, menu_item_list):
     state['log_fobj'].flush()
     do_menu_choice(menu_item_list, state)
         
+def get_sha_info(sha, subj):
+    if not subj:
+        subj = git_utils.git_get_subject(sha)
+
+    tag = git_utils.git_first_containing_tag(sha)
+    tag_date = git_utils.git_get_commit_date(tag)
+    tmp = "%s, %s, %s, %s" % (sha, subj, tag, tag_date)
+    return tmp
+    
