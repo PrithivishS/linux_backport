@@ -125,3 +125,26 @@ def git_applied_sha_list(state):
     s = s.split("\n")
     return s[: -1]
 
+# git log is capable of much more than this function shows
+# the user experience would be better if the caller used this
+# code as an iterator so that the user experience would be more
+# like git log from the command line
+#
+# command line experience: git log --pretty=oneline -Spattern
+#	slight delay
+#       result 1
+#	slight delay
+#       result 2
+#	several minutes go by but no new results are found
+#
+# experience callibng this function
+#	several minutes go by and nothing appears to happen
+#        results show up all at once
+def git_log_search(S_or_G, pattern, tag1, tag2):
+    cmd =  "git log -%s%s" % (S_or_G, pattern)
+    cmd += " --pretty=tformat:'%<(10) %h'"
+    cmd += " %s...%s" % (tag1, tag2)
+    (ret, tmp) = general_shell_cmd(cmd)
+    sha_list = tmp.split("\n")
+    return (ret, cmd, sha_list[:-1])
+    

@@ -140,15 +140,18 @@ def menu_action_update_applied_patches(state):
 
 def menu_action_git_logG(state):
     print_log("@@menu_action_git_logG", state)
-    print("""<pattern> : the text to search for
+    print("""
+    	     <search-type> : 'S' or 'G'
+	     <pattern> : the text to search for
              <tag1>    : a known release tag(ex: v5.4_)
     	     <tag2>    : a known release tag subsequent to tag1""")
-    tmp = input("\nenter  <pattern> <tag1> <tag2>: ")
+    tmp = input("\nenter <search_type> <pattern> <tag1> <tag2>: ")
     
-    (pattern, tag1, tag2) = tmp.split()
-    (ret, tmp) = general_shell_cmd("git log --oneline -G%s %s...%s"
-                                   % (pattern, tag1, tag2))
-    print_log(tmp, state)
+    (S_or_G, pattern, tag1, tag2) = tmp.split()
+    (ret, cmd, sha_list) = git_log_search(S_or_G, pattern, tag1, tag2)
+    print_log("@@git_log: %s" % (cmd), state)
+    for sha in sha_list:
+        print_log(get_sha_info(sha, ''), state)
                                    
 def menu_action_cherry_pick_continue(state):
     print_log("@@menu_actioncherry_pick_continue", state)
