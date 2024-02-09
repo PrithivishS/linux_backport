@@ -178,9 +178,9 @@ bp_menu_item_list = [
     {'prompt' : 'find commits referring to pattern',
      'action' : menu_action_git_logG},
     {'prompt' : 'patch stack actions', 'sub-menu' : [
+        {'prompt' : 'move top applied commit -> unapplied',
+         'action':  move_top_applied_patch_to_unapplied},
         {'prompt' : 'push one prereq by sha', 'action':  menu_action_push_pre_req},
-        {'prompt' : 'push prereq list by sha',
-         'action':  menu_action_push_pre_req_list},
         {'prompt' : 'push unapplied',
          'action' : menu_action_push_unapplied,},
         {'prompt' : 'pop unapplied',
