@@ -37,18 +37,6 @@ def checkpoint(state):
     print_log("@@checkpoint", state)
     save_cp(state)
 
-def push_unapplied(state):
-    print_log("@@push_unapplied", state)
-    sha = input("enter SHA1 id or <enter> if none: ")
-    if len(sha) == 0: return
-    sha.strip()
-    print(show_sha_info(sha))
-    ok = input("enter 'y' if ok, else <enter>")
-    if not ok: return
-
-    state['patch_list'] = [make_patch_dict(sha)] + state['patch_list']
-    checkpoint(state)
-
 def pop_unapplied(state):
     print_log("@@pop_unapplied", state)
     if len(state['patch_list']) > 1:
@@ -183,8 +171,6 @@ bp_menu_item_list = [
          'action':  move_top_applied_patch_to_unapplied},
         {'prompt' : 'push one sha -> unapplied', 'action':  push_one_sha},
         {'prompt' : 'push sha list -> unapplied', 'action':  push_sha_list},
-        {'prompt' : 'push unapplied',
-         'action' : push_unapplied,},
         {'prompt' : 'pop unapplied',
          'action' : pop_unapplied,},
         {'prompt': 'pop applied patch', 'action' : pop_applied}
