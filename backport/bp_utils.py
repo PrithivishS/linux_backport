@@ -220,7 +220,7 @@ def import_sha_list_file(path, action, state):
     
     print_log("@@import_sha_list_file(%s, %s,...)" % (path, action),
               state)
-    legal_actions[action]("fooey")
+
     if not action in legal_actions:
         print_log("error bad action", state['log_fobj'])
         
