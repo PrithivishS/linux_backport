@@ -211,3 +211,24 @@ def get_sha_info(sha, subj):
     tmp = "%s, %s, %s, %s" % (sha, subj, tag, tag_date)
     return tmp
     
+def import_sha_list_file(path, action, state):
+    legal_actions = {
+        'set'     : lambda x: x,
+        'prepend' : lambda x: x + state['patch_list'],
+        'append'  : lambda x: state['patch_list'] + x
+    }
+    
+    print_log("@@import_sha_list_file(%s, %s,...)" % (path, action),
+              state)
+    legal_actions[action]("fooey")
+    if not action in legal_actions:
+        print_log("error bad action", state['log_fobj'])
+        
+    #sha_list = state['args'].sha_list
+    # as if it wasn't obvious <patch> should be class ...
+    patch_list = [make_patch_dict(l.strip())
+                  for l in open(path,"r")]
+
+    state['patch_list'] = legal_actions[action](patch_list)
+    save_cp(state)
+

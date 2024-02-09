@@ -213,7 +213,7 @@ args = parser.parse_args()
 state = state_init(args)
 
 if args.sha_list:
-    sha_file_to_pickled_state(state)
+    import_sha_list_file(state['args'].sha_list, 'set', state)
 else:
     load_pickle_file(state)
 backport_patches(state, bp_menu_item_list)
