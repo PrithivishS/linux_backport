@@ -132,6 +132,17 @@ def menu_action_push_pre_req(state):
         menu_action_checkpoint(state)
     else:
         print_log("git status not clean. no changes made", state)
+
+def menu_action_push_pre_req_list(state):
+    # get the name of the sha file
+    print("enter the path of a file containing one sha per lineor <enter> if none")
+    sha_file = input("sha_file: ")
+    if not sha_file: return
+
+    import_sha_list_file(sha_file, 'prepend', state)
+    pdb.set_trace()
+    pass
+
 def menu_action_update_applied_patches(state):
     print_log("@@menu_action_update_applied_patches", state)
     state['applied_patch_list'] = git_applied_sha_list(state)
@@ -167,7 +178,6 @@ bp_menu_item_list = [
      'action': menu_action_unapplied_patches},
     {'prompt' : 'apply next patch',
      'action':  menu_action_apply_next_patch},
-    {'prompt' : 'push prereq by sha', 'action':  menu_action_push_pre_req},
     {'prompt' : 'cherry-pick --continue',
      'action': menu_action_cherry_pick_continue},
     {'prompt' : 'build', 'action' : menu_action_build},
@@ -179,6 +189,9 @@ bp_menu_item_list = [
     #
     {'prompt' : 'utility actions', 'sub-menu' : [
         {'prompt' : 'patch_info(sha)', 'action' : menu_action_patch_info},
+        {'prompt' : 'push one prereq by sha', 'action':  menu_action_push_pre_req},
+        {'prompt' : 'push prereq list by sha',
+         'action':  menu_action_push_pre_req_list},
         {'prompt' : 'push unapplied',
          'action' : menu_action_push_unapplied,},
         {'prompt' : 'pop unapplied',
@@ -216,5 +229,6 @@ if args.sha_list:
     import_sha_list_file(state['args'].sha_list, 'set', state)
 else:
     load_pickle_file(state)
+pdb.set_trace()    
 backport_patches(state, bp_menu_item_list)
 
