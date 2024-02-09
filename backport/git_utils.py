@@ -19,7 +19,7 @@ def git_get_subject(sha1):
     s= s.rstrip("\n")
     return s
     
-def menu_action_git_status(state):
+def git_status(state):
     result = subprocess.run("git status", shell=True,
                             stdout=subprocess.PIPE)
     s = result.stdout.decode().strip().rstrip()
@@ -110,11 +110,11 @@ def get_current_branch(): # works on git < 2.22
                             shell=True, stdout=subprocess.PIPE)
     return result.stdout.decode("latin-1").strip()
 
-def menu_action_next_branch(state):
+def next_branch(state):
     cmd = "git checkout -b " +  add_or_inc_ver_num(get_current_branch())
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
     s = result.stdout.decode().strip().rstrip()
-    menu_action_git_status(state)
+    git_status(state)
     print_log(s, state)
 
 def git_applied_sha_list(state):
