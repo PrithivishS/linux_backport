@@ -170,7 +170,7 @@ def menu_action_cherry_pick_continue(state):
     
 bp_menu_item_list = [
     #
-    # more important
+    # main menu
     #
     {'prompt' : 'show git status', 'action': menu_action_git_status},
     {'prompt' : 'short_git_log', 'action': menu_action_short_git_log},
@@ -184,11 +184,7 @@ bp_menu_item_list = [
     {'prompt' : 'backup branch', 'action' : menu_action_backup_branch},
     {'prompt' : 'find commits referring to pattern',
      'action' : menu_action_git_logG},
-    #
-    # less important
-    #
-    {'prompt' : 'utility actions', 'sub-menu' : [
-        {'prompt' : 'patch_info(sha)', 'action' : menu_action_patch_info},
+    {'prompt' : 'patch stack actions', 'sub-menu' : [
         {'prompt' : 'push one prereq by sha', 'action':  menu_action_push_pre_req},
         {'prompt' : 'push prereq list by sha',
          'action':  menu_action_push_pre_req_list},
@@ -197,6 +193,13 @@ bp_menu_item_list = [
         {'prompt' : 'pop unapplied',
          'action' : menu_action_pop_unapplied,},
         {'prompt': 'pop applied patch', 'action' : menu_action_pop_applied},
+        ]
+     },
+    #
+    # utility menu
+    #
+    {'prompt' : 'utility actions', 'sub-menu' : [
+        {'prompt' : 'patch_info(sha)', 'action' : menu_action_patch_info},
         {'prompt' : 'launch pdb', 'action' : menu_action_pdb},
         {'prompt' : 'launch bash', 'action' : menu_action_bash},
         {'prompt' : 'increment git branch', 'action' :
