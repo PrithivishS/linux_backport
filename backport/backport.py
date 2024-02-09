@@ -123,8 +123,8 @@ def push_one_sha(state):
     state['patch_list'] = [make_patch_dict(prq_sha)] + state['patch_list']
     checkpoint(state)
 
-def push_pre_req_list(state):
-    print_log("@@push_pre_req_list", state)
+def push_sha_list(state):
+    print_log("@@push_sha_list", state)
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
         return
@@ -182,6 +182,7 @@ bp_menu_item_list = [
         {'prompt' : 'move top applied commit -> unapplied',
          'action':  move_top_applied_patch_to_unapplied},
         {'prompt' : 'push one sha -> unapplied', 'action':  push_one_sha},
+        {'prompt' : 'push sha list -> unapplied', 'action':  push_sha_list},
         {'prompt' : 'push unapplied',
          'action' : push_unapplied,},
         {'prompt' : 'pop unapplied',
