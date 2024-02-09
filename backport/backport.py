@@ -109,35 +109,18 @@ def move_top_applied_patch_to_unapplied():
     
 def menu_action_push_pre_req(state):
     print_log("@@menu_action_push_pre_req", state)
-    # "tap" => "top applied patch"
-    (ret,tap_sha) = general_shell_cmd("git rev-parse --short HEAD")
-    tap_info = show_sha_info(tap_sha)
-    prq_sha = input("enter SHA1 id of prereq patch or <enter> if none: ")
-    prq_info = show_sha_info(prq_sha)
-    print_log("""\n\nThe prequisite you've identified is:
-              \t%s
-    	      \nThe top applied patch on the current branch(tap) is:
-    	      %s
-    	      \nif you proceed, this will happen:
-    	      \ttop applied patch will be pushed to the unapplied patch list
-    	      \tprereq will be pushed to the unapplied patch list
-    	      \ttop applied patch will be 'popped' from the current branch
-	      """ % (prq_info, tap_info)
-              ,
-              state)
-    tmp = input("enter 'y' to proceed: ")
-    if not tmp == 'y': return
-    
-    if git_repo_is_clean():
-        # "push" tap_sha to unapplied patches
-        state['patch_list'] = [make_patch_dict(tap_sha)] + state['patch_list']
-        # "push" prq_sha to unapplied patches
-        state['patch_list'] = [make_patch_dict(prq_sha)] + state['patch_list']
-        # pop applied patch
-        general_shell_cmd('git reset --hard HEAD^')
-        menu_action_checkpoint(state)
-    else:
+
+    if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
+        return
+
+    prq_sha = input("enter SHA1 id of prereq patch or <enter> if none: ")
+    if not prq_sha: return
+    
+    move_top_applied_patch_to_unapplied()
+    # "push" prq_sha to unapplied patches
+    state['patch_list'] = [make_patch_dict(prq_sha)] + state['patch_list']
+    menu_action_checkpoint(state)
 
 def menu_action_push_pre_req_list(state):
     # get the name of the sha file
