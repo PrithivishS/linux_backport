@@ -119,7 +119,6 @@ def menu_action_push_pre_req(state):
     prq_sha = input("enter SHA1 id of prereq patch or <enter> if none: ")
     if not prq_sha: return
     
-    move_top_applied_patch_to_unapplied(state)
     # "push" prq_sha to unapplied patches
     state['patch_list'] = [make_patch_dict(prq_sha)] + state['patch_list']
     menu_action_checkpoint(state)
