@@ -102,6 +102,8 @@ def menu_action_backup_branch(state):
     print_log("\n** return code = %d **\n" % (ret_code), state)
 
 def move_top_applied_patch_to_unapplied(state):
+    if not git_repo_is_clean():
+        print_log("git status not clean. no changes made", state)
     tap_sha = git_top_of_applied_stack_sha()
     # "push" tap_sha to unapplied patches
     state['patch_list'] = [make_patch_dict(tap_sha)] + state['patch_list']
