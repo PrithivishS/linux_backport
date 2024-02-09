@@ -101,6 +101,12 @@ def menu_action_backup_branch(state):
     print_log(ret_text, state)
     print_log("\n** return code = %d **\n" % (ret_code), state)
 
+def move_top_applied_patch_to_unapplied():
+    tap_sha = git_top_of_applied_stack_sha()
+    # "push" tap_sha to unapplied patches
+    state['patch_list'] = [make_patch_dict(tap_sha)] + state['patch_list']
+    git_pop_applied_stack()
+    
 def menu_action_push_pre_req(state):
     print_log("@@menu_action_push_pre_req", state)
     # "tap" => "top applied patch"
