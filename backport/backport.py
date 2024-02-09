@@ -123,6 +123,10 @@ def menu_action_push_pre_req(state):
     menu_action_checkpoint(state)
 
 def menu_action_push_pre_req_list(state):
+    print_log("@@menu_action_push_pre_req_list", state)
+    if not git_repo_is_clean():
+        print_log("git status not clean. no changes made", state)
+        return
     # get the name of the sha file
     print("enter the path of a file containing one sha per lineor <enter> if none")
     sha_file = input("sha_file: ")
