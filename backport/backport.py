@@ -109,8 +109,8 @@ def move_top_applied_patch_to_unapplied(state):
     state['patch_list'] = [make_patch_dict(tap_sha)] + state['patch_list']
     git_pop_applied_stack()
     
-def push_pre_req(state):
-    print_log("@@push_pre_req", state)
+def push_one_sha(state):
+    print_log("@@push_one_sha", state)
 
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
@@ -181,12 +181,12 @@ bp_menu_item_list = [
     {'prompt' : 'patch stack actions', 'sub-menu' : [
         {'prompt' : 'move top applied commit -> unapplied',
          'action':  move_top_applied_patch_to_unapplied},
-        {'prompt' : 'push one prereq by sha', 'action':  push_pre_req},
+        {'prompt' : 'push one sha -> unapplied', 'action':  push_one_sha},
         {'prompt' : 'push unapplied',
          'action' : push_unapplied,},
         {'prompt' : 'pop unapplied',
          'action' : pop_unapplied,},
-        {'prompt': 'pop applied patch', 'action' : pop_applied},
+        {'prompt': 'pop applied patch', 'action' : pop_applied}
         ]
      },
     #
