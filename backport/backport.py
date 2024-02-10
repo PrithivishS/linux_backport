@@ -104,9 +104,10 @@ def push_one_sha(state):
         print_log("git status not clean. no changes made", state)
         return
 
-    prq_sha = input("enter SHA1 id of prereq patch or <enter> if none: ")
+    prq_sha = input("enter SHA1 id of  patch or <enter> if none: ")
     if not prq_sha: return
     
+    print(show_sha_info(prq_sha))
     if not confirm("enter 'y' if ok, else <enter>: ", ['y']):
     	return
     # "push" prq_sha to unapplied patches
