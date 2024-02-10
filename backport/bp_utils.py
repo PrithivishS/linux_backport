@@ -7,6 +7,13 @@ from git_utils import *
 import git_utils
 from datetime import datetime
 
+def confirm(prompt, legal_response_list):
+    tmp = input(prompt)
+    if tmp in legal_response_list:
+        return tmp
+    else:
+        return ''
+    
 def get_out_dest(state):
     if not state: return ""
     if not 'out_dest' in state.keys():
@@ -228,7 +235,8 @@ def import_sha_list_file(path, action, state):
     # as if it wasn't obvious <patch> should be class ...
     patch_list = [make_patch_dict(l.strip())
                   for l in open(path,"r")]
-
+    if not confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
+        return
     state['patch_list'] = legal_actions[action](patch_list)
     save_cp(state)
 

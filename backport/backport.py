@@ -107,6 +107,8 @@ def push_one_sha(state):
     prq_sha = input("enter SHA1 id of prereq patch or <enter> if none: ")
     if not prq_sha: return
     
+    if not confirm("enter 'y' if ok, else <enter>: ", ['y']):
+    	return
     # "push" prq_sha to unapplied patches
     state['patch_list'] = [make_patch_dict(prq_sha)] + state['patch_list']
     checkpoint(state)
