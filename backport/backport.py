@@ -120,13 +120,11 @@ def push_sha_list(state):
         print_log("git status not clean. no changes made", state)
         return
     # get the name of the sha file
-    print("enter the path of a file containing one sha per lineor <enter> if none")
+    print("enter the path of a file containing one sha per line <enter> if none")
     sha_file = input("sha_file: ")
     if not sha_file: return
 
     import_sha_list_file(sha_file, 'prepend', state)
-    pdb.set_trace()
-    pass
 
 def update_applied_patches(state):
     print_log("@@update_applied_patches", state)
