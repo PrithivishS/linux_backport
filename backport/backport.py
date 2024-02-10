@@ -157,23 +157,20 @@ bp_menu_item_list = [
     #
     {'prompt' : 'show git status', 'action': git_status},
     {'prompt' : 'short_git_log', 'action': short_git_log},
-    {'prompt' : 'show unapplied patches',
-     'action': unapplied_patches},
-    {'prompt' : 'apply next patch',
-     'action':  apply_next_patch},
-    {'prompt' : 'cherry-pick --continue',
-     'action': cherry_pick_continue},
+    {'prompt' : 'show unapplied patches','action': unapplied_patches},
+    {'prompt' : 'apply next patch', 'action':  apply_next_patch},
+    {'prompt' : 'cherry-pick --continue', 'action': cherry_pick_continue},
     {'prompt' : 'build', 'action' : build},
     {'prompt' : 'backup branch', 'action' : backup_branch},
-    {'prompt' : 'find commits referring to pattern',
-     'action' : git_logG},
+    {'prompt' : 'find commits referring to pattern', 'action' : git_logG},
     {'prompt' : 'patch stack actions', 'sub-menu' : [
+        {'prompt' : 'short_git_log', 'action': short_git_log},
+        {'prompt' : 'show unapplied patches','action': unapplied_patches},
         {'prompt' : 'move top applied commit -> unapplied',
          'action':  move_top_applied_patch_to_unapplied},
         {'prompt' : 'push one sha -> unapplied', 'action':  push_one_sha},
         {'prompt' : 'push sha list -> unapplied', 'action':  push_sha_list},
-        {'prompt' : 'pop unapplied',
-         'action' : pop_unapplied,},
+        {'prompt' : 'pop unapplied', 'action' : pop_unapplied,},
         {'prompt': 'pop applied patch', 'action' : pop_applied}
         ]
      },
@@ -184,10 +181,9 @@ bp_menu_item_list = [
         {'prompt' : 'patch_info(sha)', 'action' : patch_info},
         {'prompt' : 'launch pdb', 'action' : do_pdb},
         {'prompt' : 'launch bash', 'action' : bash},
-        {'prompt' : 'increment git branch', 'action' :
-         next_branch},
-        {'prompt' : 'update applied patch_list'
-         , 'action' : update_applied_patches},
+        {'prompt' : 'increment git branch', 'action' : next_branch},
+        {'prompt' : 'update applied patch_list',
+         'action' : update_applied_patches},
         {'prompt' : 'save checkpoint', 'action' : checkpoint},
         {'prompt' : 'note to log file', 'action' : log_note}
         ]
