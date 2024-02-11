@@ -4,7 +4,6 @@ import pdb
 import subprocess
 import re
 import fileinput
-import os #FIXME: just to save typing if we land in pdb
 import sys
 import importlib
 import argparse
