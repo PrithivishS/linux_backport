@@ -135,6 +135,7 @@ def update_applied_patches(state):
 
 def git_logG(state):
     print_log("@@git_logG", state)
+    line_fn = lambda line, state: print_log(get_sha_info(line, ''), state)
     print("""
     	     <search-type> : 'S' or 'G'
 	     <pattern> : the text to search for
@@ -143,10 +144,7 @@ def git_logG(state):
     tmp = input("\nenter <search_type> <pattern> <tag1> <tag2>: ")
     
     (S_or_G, pattern, tag1, tag2) = tmp.split()
-    (ret, cmd, sha_list) = git_log_search(S_or_G, pattern, tag1, tag2)
-    print_log("@@git_log: %s" % (cmd), state)
-    for sha in sha_list:
-        print_log(get_sha_info(sha, ''), state)
+    git_log_search(S_or_G, pattern, tag1, tag2, line_fn, state)
                                    
 def cherry_pick_continue(state):
     print_log("@@menu_actioncherry_pick_continue", state)
