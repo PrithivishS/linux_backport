@@ -81,14 +81,14 @@ def build(state):
 
 def backup_branch(state):
     print_log("@@backup_branch", state)
+    line_fn = lambda line, state: print_log(line, state)
     prompt_to_set_or_alter_state('branch_backup_cmd', state)
     if not state['branch_backup_cmd']:
         return
 
     # do it
-    (ret_code, ret_text) = general_shell_cmd(state['branch_backup_cmd'])
-    print_log(ret_text, state)
-    print_log("\n** return code = %d **\n" % (ret_code), state)
+    cmd_args = ' '.join(state['branch_backup_cmd'].split(' ')[1:])
+    out = poll_shell_cmd('git', cmd_args, line_fn, state)
 
 def move_top_applied_patch_to_unapplied(state):
     if not git_repo_is_clean():
