@@ -9,6 +9,8 @@ from datetime import datetime
 import select
 import shutil
 import shlex
+import tempfile
+import difflib
 
 def confirm(prompt, legal_response_list):
     tmp = input(prompt)
@@ -268,3 +270,44 @@ def import_sha_list_file(path, action, state):
     state['patch_list'] = legal_actions[action](patch_list)
     save_cp(state)
 
+def patch_cites_upstream(local_sha):
+    (ret, log_lines) = general_shell_cmd("git log -1 %s" % (local_sha))
+    pat = "(commit )([0-9a-f]+)( upstream)"
+    matches = []
+    log_lines = [l.strip() for l in log_lines.split('\n')]
+    for l in log_lines:
+        match = re.search(pat, l)
+        if match:
+            matches.append(match.group(2))
+
+    if len(matches) == 1:
+        return matches[0] # upstream sha
+    else:
+        return False
+
+def compare_patch_to_upstream(state):
+    if not git_utils.git_repo_is_clean():
+        print_log("git status not clean. no action taken", state)
+        return
+    # prompt for patch to compare
+    s = "enter sha of commit to compare .vs. upstream(<enter> => top patch):"
+    local_sha = input(s)
+    if not local_sha:
+        local_sha = git_utils.git_top_of_applied_stack_sha()
+
+    # check if patch notes upstream
+    upstream_sha = patch_cites_upstream(local_sha)
+    if not upstream_sha:
+        print("no upstream citation found, returning")
+        return
+    
+    
+    # show_diff
+    (ret, local_patch) = general_shell_cmd("git show " + local_sha)
+    (ret, upstream_patch) = general_shell_cmd("git show " + upstream_sha)
+    local_line_list = [x + '\n' for x in local_patch.split('\n')]
+    upstream_line_list = [x + '\n' for x in upstream_patch.split('\n')]
+    sys.stdout.writelines(difflib.unified_diff(upstream_line_list,
+                                               local_line_list))
+    state['log_fobj'].writelines(difflib.unified_diff(upstream_line_list,
+                                                      local_line_list))

@@ -162,6 +162,8 @@ bp_menu_item_list = [
     {'prompt' : 'build', 'action' : build},
     {'prompt' : 'backup branch', 'action' : backup_branch},
     {'prompt' : 'find commits referring to pattern', 'action' : git_logG},
+    {'prompt' : 'compare patch to upstream',
+     'action' : compare_patch_to_upstream},
     {'prompt' : 'patch stack actions', 'sub-menu' : [
         {'prompt' : 'short_git_log', 'action': short_git_log},
         {'prompt' : 'show unapplied patches','action': unapplied_patches},
