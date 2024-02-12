@@ -112,7 +112,8 @@ def next_cp_num(args):
     L.sort()
     if len(L) < 1:
         return 1
-    return int(L[-1:][0].split(".")[-1:][0]) + 1
+    ret = max([int(l.split('.')[-1]) for l in L]) + 1
+    return ret
 
 def copy_keval_if_present(key, dst_hash, src_hash, state):
     if key in src_hash.keys():
@@ -129,17 +130,16 @@ def copy_keval_if_present(key, dst_hash, src_hash, state):
 #      sha2pckl
 #
 def load_pickle_file(state):
-    print("loading state")
     pd = state['args'].pickle_dir
     pf = state['args'].pickle_file
     
     if state['args'].pickle_num:
         f = pd + "/" + pf + "." + state['args'].pickle_num
-        st = restore_cp(f)
     else:
         max_pickle_num = str(next_cp_num(state['args']) - 1)
         f = pd + "/" + pf + "." + max_pickle_num
-        st = restore_cp(f)
+    print_log("loading state: " + f, state)
+    st = restore_cp(f)
         
     # not an accident that <state> is repeated. it wont always be <dst_hash>
     copy_keval_if_present('patch_list', state, st, state)
