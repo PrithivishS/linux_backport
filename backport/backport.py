@@ -153,6 +153,11 @@ def cherry_pick_continue(state):
 def show_top_unapp(state):
     show_top_unapplied_patch(state)
 
+def show_patch_by_sha(state):
+    sha = input("enter sha of patch to be shown: ")
+    (ret, output) = general_shell_cmd("git show " + sha)
+    print_log(output, state)
+
 bp_menu_item_list = [
     #
     # main menu
@@ -175,7 +180,7 @@ bp_menu_item_list = [
         {'prompt' : 'push one sha -> unapplied', 'action':  push_one_sha},
         {'prompt' : 'push sha list -> unapplied', 'action':  push_sha_list},
         {'prompt' : 'pop unapplied', 'action' : pop_unapplied,},
-        {'prompt': 'pop applied patch', 'action' : pop_applied}
+        {'prompt': 'pop applied patch', 'action' : pop_applied},
         ]
      },
     #
@@ -190,7 +195,8 @@ bp_menu_item_list = [
         {'prompt' : 'update applied patch_list',
          'action' : update_applied_patches},
         {'prompt' : 'save checkpoint', 'action' : checkpoint},
-        {'prompt' : 'note to log file', 'action' : log_note}
+        {'prompt' : 'note to log file', 'action' : log_note},
+        {'prompt': 'show_patch_by_sha', 'action' : show_patch_by_sha}
         ]
      }
 ]
