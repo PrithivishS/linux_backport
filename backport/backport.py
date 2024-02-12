@@ -93,6 +93,9 @@ def backup_branch(state):
 def move_top_applied_patch_to_unapplied(state):
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
+    if not confirm("Are you sure? Enter 'y' if ok, else <enter>: ", ['y']):
+    	return
+    
     tap_sha = git_top_of_applied_stack_sha()
     # "push" tap_sha to unapplied patches
     state['patch_list'] = [make_patch_dict(tap_sha)] + state['patch_list']
