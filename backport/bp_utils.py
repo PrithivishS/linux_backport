@@ -311,3 +311,8 @@ def compare_patch_to_upstream(state):
                                                local_line_list))
     state['log_fobj'].writelines(difflib.unified_diff(upstream_line_list,
                                                       local_line_list))
+    
+def show_top_unapplied_patch(state):
+    tap_sha = git_utils.git_top_of_applied_stack_sha()
+    (ret, output) = general_shell_cmd("git show " + tap_sha)
+    print_log(output, state)

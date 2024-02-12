@@ -149,7 +149,10 @@ def git_logG(state):
 def cherry_pick_continue(state):
     print_log("@@menu_actioncherry_pick_continue", state)
     git_cherry_pick__continue()
-    
+
+def show_top_unapp(state):
+    show_top_unapplied_patch(state)
+
 bp_menu_item_list = [
     #
     # main menu
@@ -157,6 +160,7 @@ bp_menu_item_list = [
     {'prompt' : 'show git status', 'action': git_status},
     {'prompt' : 'short_git_log', 'action': short_git_log},
     {'prompt' : 'show unapplied patches','action': unapplied_patches},
+    {'prompt' : 'show top unapplied patch','action': show_top_unapp},
     {'prompt' : 'apply next patch', 'action':  apply_next_patch},
     {'prompt' : 'cherry-pick --continue', 'action': cherry_pick_continue},
     {'prompt' : 'build', 'action' : build},
