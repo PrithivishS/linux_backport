@@ -191,7 +191,7 @@ def prompt_to_set_or_alter_state(key, d):
             d[key] = tmp
             
 # should subsume some of the duplicate code in git_utils.py over time
-def general_shell_cmd(cmd):
+def shell_cmd(cmd):
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
     return (result.returncode, result.stdout.decode('latin-1'))
 
@@ -271,7 +271,7 @@ def import_sha_list_file(path, action, state):
     save_cp(state)
 
 def patch_cites_upstream(local_sha):
-    (ret, log_lines) = general_shell_cmd("git log -1 %s" % (local_sha))
+    (ret, log_lines) = shell_cmd("git log -1 %s" % (local_sha))
     pat = "(commit )([0-9a-f]+)( upstream)"
     matches = []
     log_lines = [l.strip() for l in log_lines.split('\n')]
@@ -303,8 +303,8 @@ def compare_patch_to_upstream(state):
     
     
     # show_diff
-    (ret, local_patch) = general_shell_cmd("git show " + local_sha)
-    (ret, upstream_patch) = general_shell_cmd("git show " + upstream_sha)
+    (ret, local_patch) = shell_cmd("git show " + local_sha)
+    (ret, upstream_patch) = shell_cmd("git show " + upstream_sha)
     local_line_list = [x + '\n' for x in local_patch.split('\n')]
     upstream_line_list = [x + '\n' for x in upstream_patch.split('\n')]
     sys.stdout.writelines(difflib.unified_diff(upstream_line_list,
@@ -314,5 +314,5 @@ def compare_patch_to_upstream(state):
     
 def show_top_unapplied_patch(state):
     tap_sha = git_utils.git_top_of_applied_stack_sha()
-    (ret, output) = general_shell_cmd("git show " + tap_sha)
+    (ret, output) = shell_cmd("git show " + tap_sha)
     print_log(output, state)

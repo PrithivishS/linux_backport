@@ -6,7 +6,7 @@ from bp_utils import *
 EG_pretty_fmt=" --pretty=tformat:'%<(10) %h  %<(12) %an : %s: %cd' "
 
 def git_repo_is_clean():
-    (ret, tmp) = general_shell_cmd("git status --porcelain")
+    (ret, tmp) = shell_cmd("git status --porcelain")
     if tmp:
         return False
     else:
@@ -135,10 +135,10 @@ def git_log_search(S_or_G, pattern, tag1, tag2, line_fn, state):
     return ret
     
 def git_top_of_applied_stack_sha():
-    (ret,tap_sha) = general_shell_cmd("git rev-parse --short HEAD")
+    (ret,tap_sha) = shell_cmd("git rev-parse --short HEAD")
     return tap_sha.rstrip('\n')
 
 def git_pop_applied_stack():
     # pop applied patch
-    general_shell_cmd('git reset --hard HEAD^')
+    shell_cmd('git reset --hard HEAD^')
     

@@ -155,7 +155,7 @@ def show_top_unapp(state):
 
 def show_patch_by_sha(state):
     sha = input("enter sha of patch to be shown: ")
-    (ret, output) = general_shell_cmd("git show " + sha)
+    (ret, output) = shell_cmd("git show " + sha)
     print_log(output, state)
 
 bp_menu_item_list = [
