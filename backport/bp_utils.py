@@ -90,7 +90,11 @@ def do_menu_choice(menu, state):
             show_menu(menu, state)
             x = input("enter choice(<enter> to exit menu): ")
             if not x: save_cp(state);return
-            x = int(x)
+            try:
+                x = int(x)
+            except:
+                print_log("oops", state)
+                continue
             if x in range(len(menu)): break
             else: print("bad input")
         if 'sub-menu' in menu[x].keys():
