@@ -107,6 +107,8 @@ def push_one_sha(state):
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
         return
+    if not confirm("Are you sure you don't need to pop top applied patch? Enter 'y' if ok, else <enter>: ", ['y']):
+    	return
 
     prq_sha = input("enter SHA1 id of  patch or <enter> if none: ")
     if not prq_sha: return
@@ -123,7 +125,10 @@ def push_sha_list(state):
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
         return
-    # get the name of the sha file
+    if not confirm("Are you sure you don't need to pop top applied patch? Enter 'y' if ok, else <enter>: ", ['y']):
+    	return
+
+     # get the name of the sha file
     print("enter the path of a file containing one sha per line <enter> if none")
     sha_file = input("sha_file: ")
     if not sha_file: return
