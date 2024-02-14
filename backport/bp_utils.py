@@ -79,9 +79,9 @@ def print_patch_list(msg, state):
     print_log("<<<<<: %s" % (msg), state)
 
 def top_patch_has_upstream_citation(state):
-    tap_sha = git_utils.git_top_of_applied_stack_sha()
+    tap_sha = git_utils.git_top_of_applied_stack_sha(state)
     if not tap_sha:
-        print_log("*ERROR:* can't find sha of top commit", state)
+        return
     if patch_cites_upstream(tap_sha):
         return True
     else:
@@ -317,7 +317,7 @@ def compare_patch_to_upstream(state):
     s = "enter sha of commit to compare .vs. upstream(<enter> => top patch):"
     local_sha = input(s)
     if not local_sha:
-        local_sha = git_utils.git_top_of_applied_stack_sha()
+        local_sha = git_utils.git_top_of_applied_stack_sha(state)
 
     # check if patch notes upstream
     upstream_sha = patch_cites_upstream(local_sha)
@@ -337,6 +337,7 @@ def compare_patch_to_upstream(state):
                                                       local_line_list))
     
 def show_top_unapplied_patch(state):
-    tap_sha = git_utils.git_top_of_applied_stack_sha()
+    tap_sha = git_utils.git_top_of_applied_stack_sha(state)
     (ret, output) = shell_cmd("git show " + tap_sha)
     print_log(output, state)
+

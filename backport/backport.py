@@ -96,7 +96,7 @@ def move_top_applied_patch_to_unapplied(state):
     if not confirm("Are you sure? Enter 'y' if ok, else <enter>: ", ['y']):
     	return
     
-    tap_sha = git_top_of_applied_stack_sha()
+    tap_sha = git_top_of_applied_stack_sha(state)
     # "push" tap_sha to unapplied patches
     state['patch_list'] = [make_patch_dict(tap_sha)] + state['patch_list']
     git_pop_applied_stack()

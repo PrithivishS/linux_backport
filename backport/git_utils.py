@@ -144,10 +144,11 @@ def git_log_search(S_or_G, pattern, tag1, tag2, line_fn, state):
     ret = poll_shell_cmd('git', cmd_args, line_fn, state)
     return ret
     
-def git_top_of_applied_stack_sha():
+def git_top_of_applied_stack_sha(state):
     (ret,tap_sha) = shell_cmd("git rev-parse --short HEAD")
     if not tap_sha:
-        print("*** something is very wrong. can't find sha of top commit***")
+        print_log("** something is very wrong. can't find sha of top commit**",
+                  state)
     return tap_sha.rstrip('\n')
 
 def git_pop_applied_stack():
