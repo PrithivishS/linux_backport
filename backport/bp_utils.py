@@ -78,11 +78,31 @@ def print_patch_list(msg, state):
         i += 1
     print_log("<<<<<: %s" % (msg), state)
 
+def top_patch_has_upstream_citation(state):
+    tap_sha = git_utils.git_top_of_applied_stack_sha()
+    if not tap_sha:
+        print_log("*ERROR:* can't find sha of top commit", state)
+    if patch_cites_upstream(tap_sha):
+        return True
+    else:
+        return False
+
+    
+def show_menu_trailer(state):
+    trailer = ""
+    if not git_utils.git_repo_is_clean():
+        trailer = "\n** working tree UNCLEAN **"
+        
+    if not top_patch_has_upstream_citation(state):
+        trailer += "** top applied patch lacks 'commit <sha> upstream' **"
+    if trailer:
+        trailer = '\n' + trailer +'\n'
+        print_log(trailer, state)
+        
 def show_menu(menu, state):
     for (ix, d) in zip(range(len(menu) + 1), menu):
         print(str(ix) + ": " + menu[ix]['prompt'])
-    if not git_utils.git_repo_is_clean():
-        print_log("\n** working tree UNCLEAN **", state)
+    show_menu_trailer(state)
 
 def do_menu_choice(menu, state):
     while True:
