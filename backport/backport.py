@@ -229,6 +229,7 @@ bp_menu_item_list = [
         {'prompt' : 'push sha list -> unapplied', 'action':  push_sha_list},
         {'prompt' : 'pop unapplied', 'action' : pop_unapplied,},
         {'prompt': 'pop applied patch', 'action' : pop_applied},
+        {'prompt' : 'show top unapplied patch','action': show_top_unapp},
         ]
      },
     #
