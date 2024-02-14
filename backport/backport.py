@@ -161,8 +161,12 @@ def git_logG(state):
     git_log_search(S_or_G, pattern, tag1, tag2, line_fn, state)
                                    
 def cherry_pick_continue(state):
-    print_log("@@menu_actioncherry_pick_continue", state)
-    git_cherry_pick__continue()
+    if git_repo_is_clean():
+        print_log("repo is clean. can't cherry-pick --continue")
+        return
+    print_log("@@cherry_pick_continue", state)
+    git_cherry_pick_continue()
+
 
 def show_top_unapp(state):
     show_top_unapplied_patch(state)
