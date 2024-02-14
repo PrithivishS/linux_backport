@@ -26,7 +26,7 @@ def show_tag_info(tag):
     return duh.split(" ")[0]
 
 def show_sha_info(sha, subj):
-    tmp = get_sha_info(sha, subj
+    tmp = get_sha_info(sha, subj)
     print(tmp)
     
 def main(args):
