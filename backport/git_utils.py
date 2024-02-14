@@ -78,7 +78,7 @@ def git_reset_hard(sha1):
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
     return result.returncode
     
-def git_cherry_pick__continue():
+def git_cherry_pick_continue():
     cmd = "git  cherry-pick --continue"
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
     return result.returncode
