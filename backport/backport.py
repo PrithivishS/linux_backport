@@ -174,6 +174,19 @@ def cherry_pick_abort(state):
         return
     git_cherry_pick_abort()
 
+def cherry_pick_by_sha(state):
+    print_log("@@cherry_pick_by_sha", state)
+    if not git_repo_is_clean():
+        print_log("repo is unclean. can't cherry-pick by_sha")
+        return
+
+    cp_sha = input("enter SHA1 id of  patch or <enter> if none: ")
+    if not cp_sha: return
+    
+    print(show_sha_info(cp_sha))
+    if not confirm("enter 'y' if ok, else <enter>: ", ['y']):
+    	return
+    git_cherry_pick_by_sha(cp_sha)
 
 def show_top_unapp(state):
     show_top_unapplied_patch(state)
@@ -202,6 +215,8 @@ bp_menu_item_list = [
          'action': cherry_pick_continue},
         {'prompt' : 'cherry-pick -abort',
          'action': cherry_pick_abort},
+        {'prompt' : 'cherry-pick by sha',
+         'action': cherry_pick_by_sha},
     ]},
     {'prompt' : 'patch stack actions', 'sub-menu' : [
         {'prompt' : 'short_git_log', 'action': short_git_log},

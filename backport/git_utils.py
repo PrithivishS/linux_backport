@@ -88,6 +88,11 @@ def git_cherry_pick_abort():
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
     return result.returncode
     
+def git_cherry_pick_by_sha(sha):
+    cmd = "git  cherry-pick " + sha
+    result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
+    return result.returncode
+    
 def find_sha1_by_subject(subject, max_ver):
     fmt = " --pretty=tformat:'%<(10) %h  %<(12) %an : %s: %cd' "
     cmd = "git  log " + max_ver + fmt
