@@ -341,3 +341,13 @@ def show_top_unapplied_patch(state):
     (ret, output) = shell_cmd("git show " + tap_sha)
     print_log(output, state)
 
+def top_cites_upstream_or_confirmed_dont_care(state):
+    tap_sha = git_utils.git_top_of_applied_stack_sha(state)
+
+    if patch_cites_upstream(tap_sha): return True
+
+    print_log("** top patch does not cite upstream **")
+    if onfirm("Enter 'y' to proceed, else <enter>: ", ['y']):
+        return True
+
+    return False

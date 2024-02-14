@@ -13,6 +13,11 @@ from bp_utils import *
 
 def apply_next_patch(state):
     print_log("@@apply_next_patch", state)
+    if not top_cites_upstream_or_confirmed_dont_care(state):
+        print_log("no upstream citation or confirmation of indifference",
+                  state)
+        return
+        
     patch_list = state['patch_list']
     patch = patch_list[0]
 
@@ -46,6 +51,10 @@ def pop_unapplied(state):
 
 def pop_applied(state):
     print_log("@@do_pop_applied", state)
+    if not top_cites_upstream_or_confirmed_dont_care(state):
+        print_log("no upstream citation or confirmation of indifference",
+                  state)
+        return
     os.system("git reset --hard HEAD^")
     short_git_log(state)
 
@@ -104,6 +113,10 @@ def move_top_applied_patch_to_unapplied(state):
 def move_n_pick(state):
     cp_sha = input("enter SHA1 id of  patch or <enter> if none: ")
     if not cp_sha: return
+    if not top_cites_upstream_or_confirmed_dont_care(state):
+        print_log("no upstream citation or confirmation of indifference",
+                  state)
+        return
     move_top_applied_patch_to_unapplied(state)
     git_cherry_pick(cp_sha)
     
@@ -176,10 +189,10 @@ def cherry_pick_abort(state):
 
 def cherry_pick_by_sha(state):
     print_log("@@cherry_pick_by_sha", state)
-    if not git_repo_is_clean():
-        print_log("repo is unclean. can't cherry-pick by_sha")
+    if not top_cites_upstream_or_confirmed_dont_care(state):
+        print_log("no upstream citation or confirmation of indifference",
+                  state)
         return
-
     cp_sha = input("enter SHA1 id of  patch or <enter> if none: ")
     if not cp_sha: return
     
