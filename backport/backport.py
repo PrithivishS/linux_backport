@@ -100,6 +100,12 @@ def move_top_applied_patch_to_unapplied(state):
     # "push" tap_sha to unapplied patches
     state['patch_list'] = [make_patch_dict(tap_sha)] + state['patch_list']
     git_pop_applied_stack()
+
+def move_n_pick(state):
+    cp_sha = input("enter SHA1 id of  patch or <enter> if none: ")
+    if not cp_sha: return
+    move_top_applied_patch_to_unapplied(state)
+    git_cherry_pick(cp_sha)
     
 def push_one_sha(state):
     print_log("@@push_one_sha", state)
@@ -183,6 +189,8 @@ bp_menu_item_list = [
     {'prompt' : 'patch stack actions', 'sub-menu' : [
         {'prompt' : 'short_git_log', 'action': short_git_log},
         {'prompt' : 'show unapplied patches','action': unapplied_patches},
+        {'prompt' : 'move top applied -> unapplied, cherry-pick by sha',
+         'action':  move_n_pick},
         {'prompt' : 'move top applied commit -> unapplied',
          'action':  move_top_applied_patch_to_unapplied},
         {'prompt' : 'push one sha -> unapplied', 'action':  push_one_sha},
