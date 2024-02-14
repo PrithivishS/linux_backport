@@ -146,6 +146,8 @@ def git_log_search(S_or_G, pattern, tag1, tag2, line_fn, state):
     
 def git_top_of_applied_stack_sha():
     (ret,tap_sha) = shell_cmd("git rev-parse --short HEAD")
+    if not tap_sha:
+        print("*** something is very wrong. can't find sha of top commit***")
     return tap_sha.rstrip('\n')
 
 def git_pop_applied_stack():
