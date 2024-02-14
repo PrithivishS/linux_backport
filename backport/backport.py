@@ -167,6 +167,13 @@ def cherry_pick_continue(state):
     print_log("@@cherry_pick_continue", state)
     git_cherry_pick_continue()
 
+def cherry_pick_abort(state):
+    print_log("@@cherry_pick_abort", state)
+    if git_repo_is_clean():
+        print_log("repo is clean. can't cherry-pick --abort")
+        return
+    git_cherry_pick_abort()
+
 
 def show_top_unapp(state):
     show_top_unapplied_patch(state)
@@ -193,6 +200,8 @@ bp_menu_item_list = [
         {'prompt' : 'short_git_log', 'action': short_git_log},
         {'prompt' : 'cherry-pick --continue',
          'action': cherry_pick_continue},
+        {'prompt' : 'cherry-pick -abort',
+         'action': cherry_pick_abort},
     ]},
     {'prompt' : 'patch stack actions', 'sub-menu' : [
         {'prompt' : 'short_git_log', 'action': short_git_log},
