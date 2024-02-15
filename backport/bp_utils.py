@@ -45,8 +45,13 @@ def save_cp(state):
     print_log("@@save_cp: " + f, state)
 
 def restore_cp(fpath):
-    with open(fpath, 'rb') as handle:
-        return pickle.load(handle)
+    try:
+        with open(fpath, 'rb') as handle:
+            return pickle.load(handle)
+    except:
+        print("*WARNING* cannot restore pickle file: " + fpath)
+        if not confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
+            sys.exit
 
 def print_patch_dict(msg, patch, state):  # do we really re-use this?
     s = "%s, %s, %s, %s, %s, prq(%s)" % (
@@ -140,6 +145,8 @@ def next_cp_num(args):
     return ret
 
 def copy_key_val_if_present(key, dst_hash, src_hash, state):
+    if src_hash is None: return
+    
     if key in src_hash.keys():
         dst_hash[key] = src_hash[key]
     else:
