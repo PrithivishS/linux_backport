@@ -76,6 +76,8 @@ def make_patch_dict(sha1):
     return d
 
 def print_patch_list(msg, state):
+    if not 'patch_list' in state:
+        return
     i = 0
     print_log(">>>>>: %s" % (msg), state)
     for patch in state['patch_list']:
