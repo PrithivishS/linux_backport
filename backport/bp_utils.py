@@ -356,8 +356,8 @@ def top_cites_upstream_or_confirmed_dont_care(state):
 
     if patch_cites_upstream(tap_sha): return True
 
-    print_log("** top patch does not cite upstream **")
-    if onfirm("Enter 'y' to proceed, else <enter>: ", ['y']):
+    print_log("** top patch does not cite upstream **", state)
+    if confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
         return True
 
     return False
