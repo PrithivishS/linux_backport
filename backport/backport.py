@@ -220,6 +220,11 @@ def show_patch_by_sha(state):
     (ret, output) = shell_cmd("git show " + sha)
     print_log(output, state)
 
+def shell_one_liner(state):
+    cmd = input("enter shell one liner<enter to cancel>: ")
+    (ret, output) = shell_cmd(cmd)
+    print_log(output, state)
+
 bp_menu_item_list = [
     #
     # main menu
@@ -271,7 +276,8 @@ bp_menu_item_list = [
         {'prompt' : 'note to log file', 'action' : log_note},
         {'prompt': 'show_patch_by_sha', 'action' : show_patch_by_sha}
         ]
-     }
+     },
+    {'prompt' : 'shell one_liner', 'action': shell_one_liner},
 ]
 
 parser = argparse.ArgumentParser()
