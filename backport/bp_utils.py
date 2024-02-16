@@ -255,6 +255,7 @@ def poll_shell_cmd(cmd, shell_args, line_fn, state):
               
 def state_init(args): # anoter obvious objuect
     state = dict()
+    state['patch_list'] = list()
     state['cp_num'] = next_cp_num(args)
     state['pickle_dir'] = args.pickle_dir
     state['pickle_file'] = args.pickle_file
