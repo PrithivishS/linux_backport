@@ -106,7 +106,7 @@ def move_n_pick(state):
     cp_sha = input("enter SHA1 id of  patch or <enter> if none: ")
     if not cp_sha: return
     if not top_cites_upstream_or_confirmed_dont_care(state):
-        print_log("no upstream citation or confirmation of indifference",
+        print_log("no upstream citation or confirmaticbon of indifference",
                   state)
         return
     if not git_repo_is_clean():
