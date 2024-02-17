@@ -362,13 +362,6 @@ def top_cites_upstream_or_confirmed_dont_care(state):
 
     return False
 
-pats = {
-    'undecl-fn' :  {
-        'pat': "(.*error: implicit declaration of function ‘)([a-zA-Z_][a-zA-Z0-9_]*)(’.*)",
-            'group' : 2
-    }
-}
-
 def build(state):
     print_log("@@build", state)
     line_fn = lambda line, state: print_log(line, state)
@@ -382,6 +375,13 @@ def build(state):
     shell_args = ' '.join(L[1:])
     spew = poll_shell_cmd(L[0], shell_args, line_fn, state)
     return spew
+
+pats = {
+    'undecl-fn' :  {
+        'pat': "(.*error: implicit declaration of function ‘)([a-zA-Z_][a-zA-Z0-9_]*)(’.*)",
+            'group' : 2
+    }
+}
 
 def extract_symbols(lines, pat):
     syms = list()
