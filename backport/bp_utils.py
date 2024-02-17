@@ -362,6 +362,13 @@ def top_cites_upstream_or_confirmed_dont_care(state):
 
     return False
 
+pats = {
+    'undecl-fn' :  {
+        'pat': "(.*error: implicit declaration of function ‘)([a-zA-Z_][a-zA-Z0-9_]*)(’.*)",
+            'group' : 2
+    }
+}
+
 def build(state):
     print_log("@@build", state)
     line_fn = lambda line, state: print_log(line, state)
@@ -376,3 +383,36 @@ def build(state):
     spew = poll_shell_cmd(L[0], shell_args, line_fn, state)
     return spew
 
+def extract_symbols(lines, pat):
+    syms = list()
+    matched = list()
+    
+    for l in lines:
+        match = re.search(pat['pat'], l)
+        if match:
+            syms.append(match.group(pat['group']))
+            matched.append(l)
+
+    pdb.set_trace()
+    return (syms, matched)
+
+def needed_symbols(lines):
+    syms = list()
+    errors = [line for line in lines if re.search('.*error: .*', line)]
+    
+    for key in pats.keys():
+        (pat_syms, matched) = extract_symbols(errors, pats[key])
+        syms += pat_syms
+        errors = list(set(errors) - set(matched))
+
+    # uniquify syms
+    syms = set(syms)
+    syms = [sym for sym in syms]
+    pdb.set_trace()
+    return (syms, errors)
+
+def needed_commits(state):
+    spew = build(state)
+    (syms, unmatched) = needed_symbols(spew)
+    pdb.set_trace()
+    print("hi bob")
