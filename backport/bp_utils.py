@@ -380,7 +380,58 @@ pats = {
     'undecl-fn' :  {
         'pat': "(.*error: implicit declaration of function ‘)([a-zA-Z_][a-zA-Z0-9_]*)(’.*)",
             'group' : 2
-    }
+    },
+    'no_mbr' :  {
+        #arch/x86/kvm/../../../virt/kvm/kvm_main.c:2504:29: error: ‘struct kvm_vcpu_stat’ has no member named ‘generic’
+        
+        'pat': "(.*error: ‘struct )([a-zA-Z_][a-zA-Z0-9_]*)(’ has no member named ‘)([a-zA-Z_][a-zA-Z0-9_]*)(.*)",
+            'group' : 2 #actually need grps 2, 4
+    },
+    're_decl_enum' : {
+        'pat' :"(.*error: redeclaration of ‘enum )([a-zA-Z_][a-zA-Z0-9_]*).*",
+        'group' : 2
+        },
+    're_decl_enumeratior' : {
+        'pat' : "(.*error: redeclaration of enumerator ‘)([a-zA-Z_][a-zA-Z0-9_]*)’.*",
+        'group' : 2
+        },
+    'undecl_here' : {
+        'pat' : "(.*error: ‘)([a-zA-Z_][a-zA-Z0-9_]*)’ undeclared here.*",
+        'group' : 2
+        },
+    'invld_use_undef_type' : {
+        'pat' : "(.*error: invalid use of undefined type ‘)(.*)’.*",
+        'group' : 2
+        },
+    'undecl' : {
+        'pat' : "(.*error: ‘)(.*)’ undeclared.*",
+        'group' : 2
+        },
+    'void_not_ignored' : {
+        'pat' : ".*void value not ignored as it ought to be",
+        'group' : None,
+        'dont-care' : True
+        },
+    'stat_non_stat' : {
+        'pat' : ".*static declaration of.*follows non-static declaration",
+        'group' : None,
+        'dont-care' : True
+        },
+    'conflicting_types' : {
+        'pat' : ".*error: conflicting types for.*",
+        'group' : None,
+        'dont-care' : True
+        },
+    'XXX3' : {
+        'pat' : "",
+        'group' : None,
+        'dont-care' : True
+        },
+    'XXX3' : {
+        'pat' : "",
+        'group' : None,
+        'dont-care' : True
+        },
 }
 
 def extract_symbols(lines, pat):
@@ -390,12 +441,22 @@ def extract_symbols(lines, pat):
     for l in lines:
         match = re.search(pat['pat'], l)
         if match:
-            syms.append(match.group(pat['group']))
-            matched.append(l)
+            if 'dont-care' in pat:
+                matched.append(l)
+            else:
+                if not pat['group'] is None:
+                    syms.append(match.group(pat['group']))
+                matched.append(l)
 
-    pdb.set_trace()
     return (syms, matched)
 
+def report_unmatched_errors(errors):
+    if len(errors) == 0: return
+
+    print("\n*** UNMATCHED ERRORS ***\n")
+    
+    for error in errors: print(error)
+    
 def needed_symbols(lines):
     syms = list()
     errors = [line for line in lines if re.search('.*error: .*', line)]
@@ -408,7 +469,8 @@ def needed_symbols(lines):
     # uniquify syms
     syms = set(syms)
     syms = [sym for sym in syms]
-    pdb.set_trace()
+
+    report_unmatched_errors(errors)
     return (syms, errors)
 
 def needed_commits(state):
