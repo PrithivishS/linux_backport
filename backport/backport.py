@@ -80,19 +80,6 @@ def patch_info(state):
     print_log("@@patch_info", state)
     prompted_show_sha_info(state)
 
-def build(state):
-    print_log("@@build", state)
-    line_fn = lambda line, state: print_log(line, state)
-    prompt_to_set_or_alter_state('build_cmd', state)
-    if not state['build_cmd']:
-        return
-
-    # do it, ignore ret text(for now @ least)
-    # assume build_cmd is of the form: <cmd> <arg string>
-    L = state['build_cmd'].split(' ')
-    shell_args = ' '.join(L[1:])
-    poll_shell_cmd(L[0], shell_args, line_fn, state)
-
 def backup_branch(state):
     print_log("@@backup_branch", state)
     line_fn = lambda line, state: print_log(line, state)
