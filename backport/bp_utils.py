@@ -379,33 +379,33 @@ def build(state):
 pats = {
     'undecl-fn' :  {
         'pat': "(.*error: implicit declaration of function ‘)([a-zA-Z_][a-zA-Z0-9_]*)(’.*)",
-            'group' : 2
+            'groups' : [2]
     },
     'no_mbr' :  {
         #arch/x86/kvm/../../../virt/kvm/kvm_main.c:2504:29: error: ‘struct kvm_vcpu_stat’ has no member named ‘generic’
         
         'pat': "(.*error: ‘struct )([a-zA-Z_][a-zA-Z0-9_]*)(’ has no member named ‘)([a-zA-Z_][a-zA-Z0-9_]*)(.*)",
-            'group' : 2 #actually need grps 2, 4
+            'groups' : [2, 4]
     },
     're_decl_enum' : {
         'pat' :"(.*error: redeclaration of ‘enum )([a-zA-Z_][a-zA-Z0-9_]*).*",
-        'group' : 2
+        'groups' : [2]
         },
     're_decl_enumeratior' : {
         'pat' : "(.*error: redeclaration of enumerator ‘)([a-zA-Z_][a-zA-Z0-9_]*)’.*",
-        'group' : 2
+        'groups' : [2]
         },
     'undecl_here' : {
         'pat' : "(.*error: ‘)([a-zA-Z_][a-zA-Z0-9_]*)’ undeclared here.*",
-        'group' : 2
+        'groups' : [2]
         },
     'invld_use_undef_type' : {
         'pat' : "(.*error: invalid use of undefined type ‘)(.*)’.*",
-        'group' : 2
+        'groups' : [2]
         },
     'undecl' : {
         'pat' : "(.*error: ‘)(.*)’ undeclared.*",
-        'group' : 2
+        'groups' : [2]
         },
     'void_not_ignored' : {
         'pat' : ".*void value not ignored as it ought to be",
