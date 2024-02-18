@@ -175,10 +175,9 @@ def load_pickle_file(state):
     st = restore_cp(f)
         
     # not an accident that <state> is repeated. it wont always be <dst_hash>
-    copy_key_val_if_present('patch_list', state, st, state)
-    copy_key_val_if_present('applied_patch_list', state, st, state)
-    copy_key_val_if_present('build_cmd', state, st, state)
-    copy_key_val_if_present('branch_backup_cmd', state, st, state)
+    for key in ['patch_list', 'applied_patch_list', 'build_cmd',
+                'branch_backup_cmd', 'unresolved_syms', 'unmatched_errors']:
+        copy_key_val_if_present(key, state, st, state)
 
 def sha_file_to_pickled_state(state):
     sha_list = state['args'].sha_list
