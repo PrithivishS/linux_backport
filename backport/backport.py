@@ -249,7 +249,11 @@ bp_menu_item_list = [
         ]
      },
     {'prompt' : 'uresolved symbol actions', 'sub-menu' : [
-        {'prompt' : 'build and parse', 'action': get_needed_symbols}
+        {'prompt' : 'build and parse', 'action': get_needed_symbols},
+        {'prompt' : 'short display unresolved syms',
+         'action': short_display_unres_symbols},
+        {'prompt' : 'detailed display unresolved sym by index',
+         'action': detailed_display_unres_symbol_by_index}
     ],
      },
     {'prompt' : 'utility actions', 'sub-menu' : [

@@ -487,3 +487,11 @@ def get_needed_symbols(state):
             return
     spew = build(state)
     _get_needed_symbols(spew, state)
+
+def short_display_unres_symbols(state):
+    unres_syms = state['unresolved_syms']
+    for (i, sym) in zip(range(1, len(unres_syms), 1), unres_syms):
+        print("%d: %s, %s" % (i, sym['tag'], sym['type']))
+
+def detailed_display_unres_symbol_by_index(state):
+    print("burp.2")
