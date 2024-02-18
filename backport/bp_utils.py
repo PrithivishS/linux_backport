@@ -497,7 +497,6 @@ def short_display_unres_symbols_all(state):
     _short_display_unres_symbols(state, False)
 
 def short_display_unres_symbols_unprovided(state):
-    pdb.set_trace()
     _short_display_unres_symbols(state, True)
 
 def detailed_display_unres_symbol_by_index(state):
