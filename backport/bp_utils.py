@@ -107,6 +107,7 @@ def show_menu_trailer(state):
         print_log(trailer, state)
         
 def show_menu(menu, state):
+    print("\n\n==================")
     for (ix, d) in zip(range(len(menu) + 1), menu):
         print(str(ix) + ": " + menu[ix]['prompt'])
     show_menu_trailer(state)
