@@ -487,7 +487,7 @@ def get_needed_symbols(state):
 
 def _short_display_unres_symbols(state, skip_provided):
     unres_syms = state['unresolved_syms']
-    for (i, sym) in zip(range(1, len(unres_syms), 1), unres_syms):
+    for (i, sym) in zip(range(0, len(unres_syms) -1 , 1), unres_syms):
         if 'provided-by' in sym:
             if sym['provided-by']:
                 continue
@@ -501,3 +501,24 @@ def short_display_unres_symbols_unprovided(state):
 
 def detailed_display_unres_symbol_by_index(state):
     print("burp.2")
+
+def set_unres_provider_by_ix(state):
+    unres_syms = state['unresolved_syms']
+    _short_display_unres_symbols(state, True)
+    
+    ix = input("enter of unresolved symbol to set provider for: ")
+    try:
+        ix = int(ix)
+    except:
+        print("oops")
+        return
+    if ix > len(unres_syms) or ix < 0:
+        print_log("index %d out of range" %(ix), state)
+        
+    if not confirm("are you sure?: ", ['y']):
+        return
+    
+    sha = input("enter SHA1 id of  patch providing symbol <enter> if none: ")
+    if not sha: return
+
+    unres_syms[ix]['provided-by'] = sha
