@@ -149,7 +149,8 @@ def git_log_search(S_or_G, pattern, tag1, tag2, line_fn, state):
     cmd += " --pretty=tformat:\'%<(10) %h\'"
     cmd += " %s..%s" % (tag1, tag2)
     (ret, out) = shell_cmd(cmd)
-    print_log(out, state)
+    out = [x.lstrip() for x in out.rstrip("\n").split("\n")]
+    [print_log(show_sha_info(x.lstrip()), state) for x in out]
     return ret
     
 def git_top_of_applied_stack_sha(state):
