@@ -250,10 +250,10 @@ bp_menu_item_list = [
         ]
      },
     {'prompt' : 'uresolved symbol actions', 'sub-menu' : [
-        {'prompt' : 'short display unresolved syms (all)',
-         'action': short_display_unres_symbols_all},
         {'prompt' : 'short display unresolved syms (unprovided)',
          'action': short_display_unres_symbols_unprovided},
+        {'prompt' : 'short display unresolved syms (all)',
+         'action': short_display_unres_symbols_all},
         {'prompt' : 'find commits referring to pattern', 'action' : git_logG},
         {'prompt' : 'set provider by index',
          'action' : set_unres_provider_by_ix},
