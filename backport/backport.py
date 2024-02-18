@@ -88,8 +88,9 @@ def backup_branch(state):
         return
 
     # do it
-    cmd_args = ' '.join(state['branch_backup_cmd'].split(' ')[1:])
-    out = poll_shell_cmd('git', cmd_args, line_fn, state)
+    cmd = "git " + ' '.join(state['branch_backup_cmd'].split(' ')[1:])
+    out = shell_cmd(cmd)
+    print_log(out, state)
 
 def move_top_applied_patch_to_unapplied(state):
     if not git_repo_is_clean():

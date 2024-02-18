@@ -145,10 +145,11 @@ def git_applied_sha_list(state):
 # git log is capable of much more than this function shows
 #
 def git_log_search(S_or_G, pattern, tag1, tag2, line_fn, state): 
-    cmd_args =  "log -%s%s" % (S_or_G, pattern)
-    cmd_args += " --pretty=tformat:\'%<(10) %h\'"
-    cmd_args += " %s...%s" % (tag1, tag2)
-    ret = poll_shell_cmd('git', cmd_args, line_fn, state)
+    cmd =  "git log -%s%s" % (S_or_G, pattern)
+    cmd += " --pretty=tformat:\'%<(10) %h\'"
+    cmd += " %s..%s" % (tag1, tag2)
+    (ret, out) = shell_cmd(cmd)
+    print_log(out, state)
     return ret
     
 def git_top_of_applied_stack_sha(state):
