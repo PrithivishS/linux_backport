@@ -484,10 +484,20 @@ def get_needed_symbols(state):
     spew = build(state)
     _get_needed_symbols(spew, state)
 
-def short_display_unres_symbols(state):
+def _short_display_unres_symbols(state, skip_provided):
     unres_syms = state['unresolved_syms']
     for (i, sym) in zip(range(1, len(unres_syms), 1), unres_syms):
+        if 'provided-by' in sym:
+            if sym['provided-by']:
+                continue
         print("%d: %s, %s" % (i, sym['tag'], sym['type']))
+
+def short_display_unres_symbols_all(state):
+    _short_display_unres_symbols(state, False)
+
+def short_display_unres_symbols_unprovided(state):
+    pdb.set_trace()
+    _short_display_unres_symbols(state, True)
 
 def detailed_display_unres_symbol_by_index(state):
     print("burp.2")
