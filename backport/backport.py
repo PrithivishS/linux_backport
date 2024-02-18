@@ -248,9 +248,10 @@ bp_menu_item_list = [
         {'prompt' : 'show top unapplied patch','action': show_top_unapp},
         ]
      },
-    #
-    # utility menu
-    #
+    {'prompt' : 'uresolved symbol actions', 'sub-menu' : [
+        {'prompt' : 'build and parse', 'action': get_needed_symbols}
+    ],
+     },
     {'prompt' : 'utility actions', 'sub-menu' : [
         {'prompt' : 'patch_info(sha)', 'action' : patch_info},
         {'prompt' : 'launch pdb', 'action' : do_pdb},

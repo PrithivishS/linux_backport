@@ -463,7 +463,7 @@ def report_unmatched_errors(errors):
     
     for error in errors: print(error)
     
-def get_needed_symbols(lines, state):
+def _get_needed_symbols(lines, state):
     syms = list()
     errors = [line for line in lines if re.search('.*error: .*', line)]
     
@@ -481,8 +481,10 @@ def get_needed_symbols(lines, state):
     save_cp(state)
     return (syms, errors)
 
-def get_needed_commits(state):
+def get_needed_symbols(state):
+    print("*WARNING* proceeding will replace state for unresolved syms")
+    print("and unmatched errors")
+    if not confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
+            return
     spew = build(state)
-    get_needed_symbols(spew, state)
-    pdb.set_trace()
-    print("hi bob")
+    _get_needed_symbols(spew, state)
