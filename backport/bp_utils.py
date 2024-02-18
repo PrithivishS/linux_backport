@@ -434,7 +434,7 @@ pats = {
         },
 }
 
-def extract_symbols(lines, pat):
+def extract_symbols(lines, pat_name, pat):
     syms = list()
     matched = list()
     
@@ -444,8 +444,14 @@ def extract_symbols(lines, pat):
             if 'dont-care' in pat:
                 matched.append(l)
             else:
-                if not pat['group'] is None:
-                    syms.append(match.group(pat['group']))
+                if not pat['groups'] is None:
+                    groups = pat['groups']
+                    syms.append({
+                        'tag' : ','.join([match.group(x) for x in groups]),
+                        'type' : pat_name,
+                        'pat' : pat,
+                        'line' : l})
+                        
                 matched.append(l)
 
     return (syms, matched)
@@ -457,24 +463,26 @@ def report_unmatched_errors(errors):
     
     for error in errors: print(error)
     
-def needed_symbols(lines):
+def get_needed_symbols(lines, state):
     syms = list()
     errors = [line for line in lines if re.search('.*error: .*', line)]
     
     for key in pats.keys():
-        (pat_syms, matched) = extract_symbols(errors, pats[key])
+        (pat_syms, matched) = extract_symbols(errors, key, pats[key])
         syms += pat_syms
         errors = list(set(errors) - set(matched))
 
     # uniquify syms
-    syms = set(syms)
-    syms = [sym for sym in syms]
+    input('ENTER A GOOD REASON WHY YOU HAVE NOT UNIQED SYMS')
 
     report_unmatched_errors(errors)
+    state['unresolved_syms'] = syms
+    state['unmatched_errors'] = errors
+    save_cp(state)
     return (syms, errors)
 
-def needed_commits(state):
+def get_needed_commits(state):
     spew = build(state)
-    (syms, unmatched) = needed_symbols(spew)
+    get_needed_symbols(spew, state)
     pdb.set_trace()
     print("hi bob")
