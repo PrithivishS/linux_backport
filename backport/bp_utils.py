@@ -500,28 +500,41 @@ def short_display_unres_symbols_unprovided(state):
     _short_display_unres_symbols(state, True)
 
 def detailed_display_unres_symbol_by_index(state):
-    print("burp.2")
-
-def set_unres_provider_by_ix(state):
     unres_syms = state['unresolved_syms']
-    _short_display_unres_symbols(state, True)
+    short_display_unres_symbols_unprovided(state)
     
-    ix = input("enter of unresolved symbol to set provider for: ")
+    ix = input("enter index of unresolved symbol to for: ")
     try:
         ix = int(ix)
     except:
         print("oops")
         return
+    
+    if ix > len(unres_syms) or ix < 0:
+        print_log("index %d out of range" %(ix), state)
+    print_log(unres_syms[ix], state)
+
+def set_unres_provider_by_ix(state):
+    unres_syms = state['unresolved_syms']
+    short_display_unres_symbols_unprovided(state)
+    
+    ix = input("enter index of unresolved symbol to set provider for: ")
+    try:
+        ix = int(ix)
+    except:
+        print("oops")
+        return
+    
     if ix > len(unres_syms) or ix < 0:
         print_log("index %d out of range" %(ix), state)
         
     if not confirm("are you sure?: ", ['y']):
         return
     
-    sha = input("enter SHA1 id of  patch providing symbol <enter> if none: ")
+    sha = input("enter SHA1 id or comma separated list providing symbol <enter> if none: ")
     if not sha: return
 
-    unres_syms[ix]['provided-by'] = sha
+    unres_syms[ix]['provided-by'] = sha.split(',')
 
 # this and prev function have bothersome amounts of duplicate code
 def delete_unres_sym_by_ix(state):
