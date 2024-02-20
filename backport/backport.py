@@ -33,7 +33,7 @@ def apply_next_patch(state):
 
 def unapplied_patches(state):
     print_log("@@how_unapplied_patches", state)
-    print_patch_list("", state)
+    print_patch_list("", state['patch_list'], state)
 
 def do_pdb(state):
     print_log("@@pdb", state)

@@ -75,16 +75,14 @@ def make_patch_dict(sha1):
            d['tag_date'], d['is_pre_req']))
     return d
 
-def print_patch_list(msg, state):
-    if not 'patch_list' in state:
-        return
+def print_patch_list(msg, patch_list, state):
     i = 0
     print_log(">>>>>: %s" % (msg), state)
-    for patch in state['patch_list']:
+    for patch in patch_list:
         print_patch_dict(str(i), patch, state)
         i += 1
     print_log("<<<<<: %s" % (msg), state)
-
+    
 def top_patch_has_upstream_citation(state):
     tap_sha = git_utils.git_top_of_applied_stack_sha(state)
     if not tap_sha:
@@ -134,7 +132,7 @@ def do_menu_choice(menu, state):
         # log unapplied and active(on git log) patches after every menu op
         state['out_dest'] = 'log_only'
         print_log("menu choice was <%s>" % (x), state)
-        print_patch_list("__PATCH LIST__", state)
+        #print_patch_list("__PATCH LIST__", state['patch_list'], state)
         git_utils.git_short_log('%<(10) %h  %<(12) %an : %s', state)
         state['out_dest'] = 'both'
 
