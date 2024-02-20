@@ -485,11 +485,13 @@ def get_needed_symbols(state):
 
 def _short_display_unres_symbols(state, skip_provided):
     unres_syms = state['unresolved_syms']
-    for (i, sym) in zip(range(0, len(unres_syms) -1 , 1), unres_syms):
-        if 'provided-by' in sym:
+    for (i, sym) in zip(range(0, len(unres_syms) , 1), unres_syms):
+        if skip_provided and 'provided-by' in sym:
             if sym['provided-by']:
+                pdb.set_trace()
                 continue
-        print("%d: %s, %s" % (i, sym['tag'], sym['type']))
+        print("%d: %s, %s, %s" % (i, sym['tag'], sym['type'],
+                                  str(sym['provided-by'])))
 
 def short_display_unres_symbols_all(state):
     _short_display_unres_symbols(state, False)
