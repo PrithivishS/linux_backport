@@ -521,6 +521,26 @@ def set_unres_provider_by_ix(state):
 
     unres_syms[ix]['provided-by'] = sha
 
+# this and prev function have bothersome amounts of duplicate code
+def delete_unres_sym_by_ix(state):
+    unres_syms = state['unresolved_syms']
+    short_display_unres_symbols_all(state)
+    
+    ix = input("enter index of unresolved symbol to delete: ")
+    try:
+        ix = int(ix)
+    except:
+        print("oops")
+        return
+    
+    if ix > len(unres_syms) or ix < 0:
+        print_log("index %d out of range" %(ix), state)
+        
+    if not confirm("are you sure?: ", ['y']):
+        return
+    
+    unres_syms.pop(ix)
+
 def unresolved_syms_to_patch_dict_list(state):
     sha_list = []
 
