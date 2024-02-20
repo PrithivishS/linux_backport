@@ -132,7 +132,7 @@ def do_menu_choice(menu, state):
         # log unapplied and active(on git log) patches after every menu op
         state['out_dest'] = 'log_only'
         print_log("menu choice was <%s>" % (x), state)
-        #print_patch_list("__PATCH LIST__", state['patch_list'], state)
+        #print_patch_list("__PATCH LIST__", state['unapplied_patches'], state)
         git_utils.git_short_log('%<(10) %h  %<(12) %an : %s', state)
         state['out_dest'] = 'both'
 
@@ -174,7 +174,7 @@ def load_pickle_file(state):
     st = restore_cp(f)
         
     # not an accident that <state> is repeated. it wont always be <dst_hash>
-    for key in ['patch_list', 'applied_patch_list', 'build_cmd',
+    for key in ['unapplied_patches', 'applied_patch_list', 'build_cmd',
                 'branch_backup_cmd', 'unresolved_syms', 'unmatched_errors']:
         copy_key_val_if_present(key, state, st, state)
 
@@ -185,7 +185,7 @@ def sha_file_to_pickled_state(state):
     patch_list = [make_patch_dict(l.strip())
                   for l in open(sha_list,"r")]
 
-    state['patch_list'] = patch_list
+    state['unapplied_patches'] = patch_list
     save_cp(state)
 
 def show_sha_info(sha):
@@ -253,7 +253,7 @@ def poll_shell_cmd(cmd, shell_args, line_fn, state):
               
 def state_init(args): # anoter obvious objuect
     state = dict()
-    state['patch_list'] = list()
+    state['unapplied_patches'] = list()
     state['cp_num'] = next_cp_num(args)
     state['pickle_dir'] = args.pickle_dir
     state['pickle_file'] = args.pickle_file
@@ -283,8 +283,8 @@ def get_sha_info(sha, subj):
 def import_sha_list_file(path, action, state):
     legal_actions = {
         'set'     : lambda x: x,
-        'prepend' : lambda x: x + state['patch_list'],
-        'append'  : lambda x: state['patch_list'] + x
+        'prepend' : lambda x: x + state['unapplied_patches'],
+        'append'  : lambda x: state['unapplied_patches'] + x
     }
     
     print_log("@@import_sha_list_file(%s, %s,...)" % (path, action),
@@ -299,7 +299,7 @@ def import_sha_list_file(path, action, state):
                   for l in open(path,"r")]
     if not confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
         return
-    state['patch_list'] = legal_actions[action](patch_list)
+    state['unapplied_patches'] = legal_actions[action](patch_list)
     save_cp(state)
 
 def patch_cites_upstream(local_sha):

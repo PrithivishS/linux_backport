@@ -20,12 +20,12 @@ def apply_next_patch(state):
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
         
-    patch_list = state['patch_list']
+    patch_list = state['unapplied_patches']
     patch = patch_list[0]
 
     print_patch_dict("@@ cherry picking :", patch, state)
     git_cherry_pick(patch['sha1'])
-    state['patch_list'] = patch_list[1:] #pop
+    state['unapplied_patches'] = patch_list[1:] #pop
     
     if git_repo_is_clean():
         build(state)
@@ -33,7 +33,7 @@ def apply_next_patch(state):
 
 def unapplied_patches(state):
     print_log("@@how_unapplied_patches", state)
-    print_patch_list("", state['patch_list'], state)
+    print_patch_list("", state['unapplied_patches'], state)
 
 def do_pdb(state):
     print_log("@@pdb", state)
@@ -45,10 +45,10 @@ def checkpoint(state):
 
 def pop_unapplied(state):
     print_log("@@pop_unapplied", state)
-    if len(state['patch_list']) > 1:
-        state['patch_list'] = state['patch_list'][1:]
+    if len(state['unapplied_patches']) > 1:
+        state['unapplied_patches'] = state['unapplied_patches'][1:]
     else:
-        state['patch_list'] = list() # not the worst choice
+        state['unapplied_patches'] = list() # not the worst choice
     checkpoint(state)
 
 def pop_applied(state):
@@ -100,7 +100,8 @@ def move_top_applied_patch_to_unapplied(state):
     
     tap_sha = git_top_of_applied_stack_sha(state)
     # "push" tap_sha to unapplied patches
-    state['patch_list'] = [make_patch_dict(tap_sha)] + state['patch_list']
+    state['unapplied_patches'] = \
+        [make_patch_dict(tap_sha)] + state['unapplied_patches']
     git_pop_applied_stack()
 
 def move_n_pick(state):
@@ -132,7 +133,8 @@ def push_one_sha(state):
     if not confirm("enter 'y' if ok, else <enter>: ", ['y']):
     	return
     # "push" prq_sha to unapplied patches
-    state['patch_list'] = [make_patch_dict(prq_sha)] + state['patch_list']
+    state['unapplied_patches'] = \
+        [make_patch_dict(prq_sha)] + state['unapplied_patches']
     checkpoint(state)
 
 def push_sha_list(state):
