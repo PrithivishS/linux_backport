@@ -520,3 +520,14 @@ def set_unres_provider_by_ix(state):
     if not sha: return
 
     unres_syms[ix]['provided-by'] = sha
+
+def unresolved_syms_to_patch_dict_list(state):
+    sha_list = []
+
+    for s in state['unresolved_syms']:
+        if 'provided-by' in s:
+            sha_list += s['provided-by']
+    sha_list = list(set(sha_list))
+    patch_list = [make_patch_dict(sha) for sha in sha_list]
+    return patch_list
+
