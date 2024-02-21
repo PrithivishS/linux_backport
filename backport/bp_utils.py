@@ -11,6 +11,7 @@ import shutil
 import shlex
 import tempfile
 import difflib
+from packaging import version
 
 def confirm(prompt, legal_response_list):
     tmp = input(prompt)
@@ -553,3 +554,8 @@ def unresolved_syms_to_patch_dict_list(state):
     patch_list = [make_patch_dict(sha) for sha in sha_list]
     return patch_list
 
+def cmp_tag(patch):
+    return version.parse(patch['tag'])
+
+def sort_all_patches_by_tag(state):
+    state['all_patches'].sort(key=cmp_tag)
