@@ -150,7 +150,9 @@ def push_sha_list(state):
     sha_file = input("sha_file: ")
     if not sha_file: return
 
-    import_sha_list_file(sha_file, 'prepend', state)
+    patches = import_sha_list_file(sha_file, state)
+    state['unapplied_patches'] = patches + state['unapplied_patches']
+    save_cp(state)
 
 def update_applied_patches(state):
     print_log("@@update_applied_patches", state)

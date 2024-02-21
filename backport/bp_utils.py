@@ -282,27 +282,12 @@ def get_sha_info(sha, subj):
     tmp = "%s, %s, %s, %s" % (sha, subj, tag, tag_date)
     return tmp
     
-def import_sha_list_file(path, action, state):
-    legal_actions = {
-        'set'     : lambda x: x,
-        'prepend' : lambda x: x + state['unapplied_patches'],
-        'append'  : lambda x: state['unapplied_patches'] + x
-    }
-    
-    print_log("@@import_sha_list_file(%s, %s,...)" % (path, action),
-              state)
+def import_sha_list_file(path, state):
+    print_log("@@import_sha_list_file(%s...)" % (path), state)
 
-    if not action in legal_actions:
-        print_log("error bad action", state['log_fobj'])
-        
-    #sha_list = state['args'].sha_list
-    # as if it wasn't obvious <patch> should be class ...
     patch_list = [make_patch_dict(l.strip())
                   for l in open(path,"r")]
-    if not confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
-        return
-    state['unapplied_patches'] = legal_actions[action](patch_list)
-    save_cp(state)
+    return patch_list
 
 def patch_cites_upstream(local_sha):
     (ret, log_lines) = shell_cmd("git log -1 %s" % (local_sha))
