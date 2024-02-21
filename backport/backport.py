@@ -219,6 +219,10 @@ bp_menu_item_list = [
     #
     # main menu
     #
+    {'prompt' : 'launch pdb', 'action' : do_pdb},
+    {'prompt' : 'short display unresolved syms (all)',
+     'action': short_display_unres_symbols_all},
+    {'prompt' : '---------------------------------', 'action' : git_status},
     {'prompt' : 'show git status', 'action': git_status},
     {'prompt' : 'short_git_log', 'action': short_git_log},
     {'prompt' : 'show unapplied patches','action': unapplied_patches},
