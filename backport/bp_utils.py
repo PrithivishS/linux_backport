@@ -560,6 +560,14 @@ def sort_all_patches_by_tag(state):
     state['all_patches'].sort(key=cmp_tag)
     
 def show_all_patches(state):
-    for l in ["%s: %s, %s" % (p['sha1'], p['tag'], p['subject'])
-              for p in state['all_patches']]:
-        print(l)
+    sort_all_patches_by_tag(state)
+    L = ["%s: %s, %s" % (p['sha1'], p['tag'], p['subject'])
+              for p in state['all_patches']]
+    for (i, l) in zip(range(0, len(L)), L):
+        print(str(i) + ": " +l)
+        
+def duh(state):
+    i = 0
+    for p in state['all_patches']:
+        print(str(i) + ":" + p['tag'])
+        i += 1
