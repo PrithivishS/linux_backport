@@ -174,8 +174,9 @@ def load_pickle_file(state):
     st = restore_cp(f)
         
     # not an accident that <state> is repeated. it wont always be <dst_hash>
-    for key in ['unapplied_patches', 'applied_patch_list', 'build_cmd',
-                'branch_backup_cmd', 'unresolved_syms', 'unmatched_errors']:
+    for key in ['all_patches', 'unapplied_patches', 'applied_patch_list',
+                'build_cmd', 'branch_backup_cmd', 'unresolved_syms',
+                'unmatched_errors']:
         copy_key_val_if_present(key, state, st, state)
 
 def sha_file_to_pickled_state(state):
@@ -254,6 +255,7 @@ def poll_shell_cmd(cmd, shell_args, line_fn, state):
 def state_init(args): # anoter obvious objuect
     state = dict()
     state['unapplied_patches'] = list()
+    state['all_patches'] = list()
     state['cp_num'] = next_cp_num(args)
     state['pickle_dir'] = args.pickle_dir
     state['pickle_file'] = args.pickle_file
