@@ -255,6 +255,9 @@ bp_menu_item_list = [
         {'prompt' : 'pop unapplied', 'action' : pop_unapplied,},
         {'prompt': 'pop applied patch', 'action' : pop_applied},
         {'prompt' : 'show top unapplied patch','action': show_top_unapp},
+        {'prompt': 'show all patches', 'action' : show_all_patches},
+        {'prompt': 'sort all patches by tag',
+         'action' : sort_all_patches_by_tag },
         ]
      },
     {'prompt' : 'uresolved symbol actions', 'sub-menu' : [
@@ -285,8 +288,6 @@ bp_menu_item_list = [
         {'prompt' : 'save checkpoint', 'action' : checkpoint},
         {'prompt' : 'note to log file', 'action' : log_note},
         {'prompt': 'show_patch_by_sha', 'action' : show_patch_by_sha},
-        {'prompt': 'sort all patches by tag',
-         'action' : sort_all_patches_by_tag }
         ]
      },
     {'prompt' : 'shell one_liner', 'action': shell_one_liner},

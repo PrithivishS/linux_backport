@@ -559,3 +559,8 @@ def cmp_tag(patch):
 
 def sort_all_patches_by_tag(state):
     state['all_patches'].sort(key=cmp_tag)
+    
+def show_all_patches(state):
+    for l in ["%s: %s, %s" % (p['sha1'], p['tag'], p['subject'])
+              for p in state['all_patches']]:
+        print(l)
