@@ -476,7 +476,6 @@ def _short_display_unres_symbols(state, skip_provided):
     for (i, sym) in zip(range(0, len(unres_syms) , 1), unres_syms):
         if skip_provided and 'provided-by' in sym:
             if sym['provided-by']:
-                pdb.set_trace()
                 continue
         print("%d: %s, %s, %s" % (i, sym['tag'], sym['type'],
                                   str(sym['provided-by'])))
