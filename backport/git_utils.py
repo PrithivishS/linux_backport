@@ -150,6 +150,7 @@ def git_log_search(S_or_G, pattern, tag1, tag2, line_fn, state):
     cmd += " %s..%s" % (tag1, tag2)
     (ret, out) = shell_cmd(cmd)
     out = [x.lstrip() for x in out.rstrip("\n").split("\n")]
+    print_log(cmd, state)
     [print_log(show_sha_info(x.lstrip()), state) for x in out]
     return ret
     
