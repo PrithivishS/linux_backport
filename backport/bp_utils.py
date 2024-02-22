@@ -34,7 +34,9 @@ def print_log(s, state):
         state['log_fobj'].flush()
 
 def save_cp(state):
-    if state['args'].no-auto-save == 'y': return
+    if state['args'].no_auto_save == 'y':
+        print_log("** WARNING: auto save disabled **", state)
+        return
     
     st = state
     tmp = state['log_fobj']
