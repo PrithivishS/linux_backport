@@ -185,6 +185,10 @@ def cherry_pick_abort(state):
     if git_repo_is_clean():
         print_log("repo is clean. can't cherry-pick --abort")
         return
+    if not confirm("enter 'y' if ok, else <enter>: ", ['y']):
+    	return
+    if not confirm("enter 'y' if you're really really sure, else <enter>: ", ['y']):
+    	return
     git_cherry_pick_abort()
 
 def cherry_pick_by_sha(state):
@@ -302,6 +306,8 @@ parser.add_argument('--pickle-dir', default='~/tmp',
                     help='where to store checkpoints')
 parser.add_argument('--first-commit', default = 'HEAD~20',
                     help='git log will be first-commit^..HEAD', required=True)
+parser.add_argument('--no-auto-save', default = 'n',
+                    help='for examining pickles')
 # Parse the command line arguments
 args = parser.parse_args()
 state = state_init(args)

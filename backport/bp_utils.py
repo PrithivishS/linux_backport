@@ -34,6 +34,8 @@ def print_log(s, state):
         state['log_fobj'].flush()
 
 def save_cp(state):
+    if state['args'].no-auto-save == 'y': return
+    
     st = state
     tmp = state['log_fobj']
     state['log_fobj'] = None
