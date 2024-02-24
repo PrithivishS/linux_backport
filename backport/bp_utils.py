@@ -465,6 +465,21 @@ def report_unmatched_errors(errors):
     
     for error in errors: print(error)
     
+def uniqify_syms(syms):
+    seen = {}
+    unq = []
+    
+    for sym in syms:
+        tag = sym['tag']
+        if tag not in seen:
+            seen[tag] = sym
+            seen[tag]['count'] = 1
+            unq.append(sym)
+        else:
+            seen[tag]['count'] += 1
+    return unq
+
+
 def _get_needed_symbols(lines, state):
     syms = list()
     errors = [line for line in lines if re.search('.*error: .*', line)]
@@ -474,8 +489,7 @@ def _get_needed_symbols(lines, state):
         syms += pat_syms
         errors = list(set(errors) - set(matched))
 
-    # uniquify syms
-    input('ENTER A GOOD REASON WHY YOU HAVE NOT UNIQED SYMS')
+    syms = uniqify_syms(syms)
 
     report_unmatched_errors(errors)
     state['unresolved_syms'] = syms
