@@ -74,7 +74,7 @@ def bash(state):
 def log_note(state):
     print_log("@@log_note", state)
     s = input("enter text to be appended to the log: ")
-    print(s, file = state)
+    print_log(s, state)
 
 def patch_info(state):
     print_log("@@patch_info", state)
