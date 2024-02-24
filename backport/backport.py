@@ -221,6 +221,15 @@ def shell_one_liner(state):
     (ret, output) = shell_cmd(cmd)
     print_log(output, state)
 
+bp_universal_utils = {'prompt' :"universal utils", 'sub-menu' : [
+        {'prompt' : 'backup branch', 'action' : backup_branch},
+        {'prompt' : 'increment git branch', 'action' : next_branch},
+        {'prompt' : 'note to log file', 'action' : log_note},
+        {'prompt' : 'save checkpoint', 'action' : checkpoint},
+        {'prompt' : 'shell one_liner', 'action': shell_one_liner},
+        {'prompt' : 'enter pdb', 'action' : do_pdb},
+]}
+
 bp_menu_item_list = [
     #
     # main menu
@@ -233,6 +242,7 @@ bp_menu_item_list = [
         {'prompt' : 'build', 'action' : build},
         {'prompt' : 'compare patch to upstream',
          'action' : compare_patch_to_upstream},
+        bp_universal_utils,
         ]},
     {'prompt' : 'cherry pick actions', 'sub-menu' : [
         {'prompt' : 'show git status', 'action': git_status},
@@ -243,6 +253,7 @@ bp_menu_item_list = [
          'action': cherry_pick_abort},
         {'prompt' : 'cherry-pick by sha',
          'action': cherry_pick_by_sha},
+        bp_universal_utils,
     ]},
     {'prompt' : 'patch stack actions', 'sub-menu' : [
         {'prompt' : 'short_git_log', 'action': short_git_log},
@@ -257,8 +268,6 @@ bp_menu_item_list = [
         {'prompt': 'pop applied patch', 'action' : pop_applied},
         {'prompt' : 'show top unapplied patch','action': show_top_unapp},
         {'prompt': 'show all patches', 'action' : show_all_patches},
-        {'prompt' : 'save checkpoint', 'action' : checkpoint},
-        {'prompt' : 'launch pdb', 'action' : do_pdb},
         ]
      },
     {'prompt' : 'uresolved symbol actions', 'sub-menu' : [
@@ -276,22 +285,22 @@ bp_menu_item_list = [
         {'prompt' : 'detailed display unresolved sym by index',
          'action': detailed_display_unres_symbol_by_index},
         {'prompt' : 'build and parse', 'action': get_needed_symbols},
-        {'prompt' : 'launch pdb', 'action' : do_pdb},
-        {'prompt' : 'save checkpoint', 'action' : checkpoint},
+        bp_universal_utils,
     ],
      },
     {'prompt' : 'utility actions', 'sub-menu' : [
         {'prompt' : 'patch_info(sha)', 'action' : patch_info},
-        {'prompt' : 'launch pdb', 'action' : do_pdb},
         {'prompt' : 'launch bash', 'action' : bash},
         {'prompt' : 'increment git branch', 'action' : next_branch},
-        {'prompt' : 'backup branch', 'action' : backup_branch},
         {'prompt' : 'update applied patch_list',
          'action' : update_applied_patches},
-        {'prompt' : 'save checkpoint', 'action' : checkpoint},
-        {'prompt' : 'note to log file', 'action' : log_note},
         {'prompt': 'show_patch_by_sha', 'action' : show_patch_by_sha},
+        {'prompt' : 'backup branch', 'action' : backup_branch},
+        {'prompt' : 'increment git branch', 'action' : next_branch},
+        {'prompt' : 'note to log file', 'action' : log_note},
+        {'prompt' : 'save checkpoint', 'action' : checkpoint},
         {'prompt' : 'shell one_liner', 'action': shell_one_liner},
+        {'prompt' : 'enter pdb', 'action' : do_pdb},
         ]
      },
 ]
