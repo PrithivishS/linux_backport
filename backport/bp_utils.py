@@ -450,6 +450,7 @@ def extract_symbols(lines, pat_name, pat):
                     syms.append({
                         'tag' : ','.join([match.group(x) for x in groups]),
                         'type' : pat_name,
+                        'provided-by' : [],
                         'pat' : pat,
                         'line' : l})
                         
