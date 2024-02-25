@@ -257,12 +257,15 @@ bp_menu_item_list = [
         {'prompt': 'show all patches', 'action' : show_all_patches},
         ]
      },
-    {'prompt' : 'uresolved symbol actions', 'sub-menu' : [
+    {'prompt' : 'unresolved symbol actions', 'sub-menu' : [
         {'prompt' : 'short display unresolved syms (unprovided)',
          'action': short_display_unres_symbols_unprovided},
         {'prompt' : 'short display unresolved syms (all)',
          'action': short_display_unres_symbols_all},
-        {'prompt' : 'find commits referring to pattern', 'action' : git_logG},
+        {'prompt' : 'find commits referring unresolved symbols',
+         'action' : git_logG},
+        {'prompt' : 'show one git log result', 'action': show_one_log_result},
+        {'prompt' : 'show git log completions', 'action': show_log_completions},
         {'prompt' : 'set provider by index',
          'action' : set_unres_provider_by_ix},
         {'prompt' : 'delete unresolved sym by index',

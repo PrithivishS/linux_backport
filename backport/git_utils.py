@@ -143,46 +143,115 @@ def git_applied_sha_list(state):
     s = s.split("\n")
     return s[: -1]
 
-def dummy_thread_fn(msg):
-    print(msg)
+def clip_long_output(s, state):
+    if 'clip_long_output' in state:
+        clip_len = int(state['clip_long_output'])
+        if len(s) > clip_len:
+            s = s[0: clip_len - 1]
+    return s
+
+def show_log_completions(state):
+    try:
+        print(state['git_log_completed'])
+    except:
+        return
     
+    
+def show_one_log_result(state):
+    keys = state['git_log_results'].keys()
+    keys_l = list(keys)
+    
+    for (key, i) in zip(keys, range(len(keys))):
+        print(str(i) + ":" + key)
+        
+    ix = input("enter index <enter to return>: ")
+    if not ix:
+        return
+    try:
+        ix = int(ix)
+    except:
+        print("oops")
+        return
+    
+    if i > len(keys) or ix < 0:
+        return
+
+                
+    key = keys_l[ix]
+    
+    print_log("==== %s ====" % (key), state)
+    
+    sha_out_list = state['git_log_results'][key]
+    for sha in sha_out_list.keys():
+        print_log("== %s ==" % (sha), state)
+        out = clip_long_output(sha_out_list[sha], state)
+        print_log(out, state)
+
 def git_logG(state):
     # https://realpython.com/intro-to-python-threading
     
-    threads = []
+#   threads = []
+    state['git_log_completed'] = list()
     print_log("@@git_logG", state)
     line_fn = lambda line, state: print_log(get_sha_info(line, ''), state)
-    print("""
-    	     <search-type> : 'S' or 'G'
-	     <pattern> : the text to search for
-             <tag1>    : a known release tag(ex: v5.4_)
-    	     <tag2>    : a known release tag subsequent to tag1""")
-    tmp = input("\nenter <search_type> <pattern> <tag1> <tag2>: ")
+    search_type = input("\nenter 'S' or 'G '<enter to return>: ")
+    if search_type != 'S' and search_type != 'G':
+        print("oops")
+        return
     
-    (S_or_G, pattern, tag1, tag2) = tmp.split()
-    for sym in  state['unresolved_syms']:
-        #G halt_poll_fail_hist v6.0 v6.2
-        if sym['provided-by']: continue
-        thrd = threading.Thread(target=dummy_thread_fn, args=(sym['tag'],),
-                                daemon=True)
-        threads.append(thrd)
-        #pdb.set_trace()
+    syms = state['unresolved_syms']
+    needy_syms = [ sym for sym in syms if not sym['provided-by']]
+
+    for sym in needy_syms:
+        #G v6.0 v6.2
+        print("git_log_search for: %s initiated" % (sym['tag']))
+        thrd = threading.Thread(target=git_log_search,
+                                args=(search_type, sym['tag'],
+                                      state['git_log_min_tag'],
+                                      state['git_log_max_tag'],
+                                      line_fn,
+                                      state), daemon=True
+                                )
+#       threads.append(thrd)
         thrd.start()
-    for thrd in threads:
-        thrd.join()
-    pdb.set_trace()
-    git_log_search(S_or_G, pattern, tag1, tag2, line_fn, state)
-                                   
+#        if threads:
+#            for thrd in threads:
+#                thrd.join()
+        print_log("git_logG/exit", state)
+
+def search_commit_for_pattern(search_type, pattern, tag1, tag2, line_fn, state,
+                              sha):
+    #_pdb = pdb.Pdb();_pdb.set_trace()
+    key = search_type + "," + pattern + "," + tag1 +"," + tag2
+    cmd = "git show %s | grep %s" % (sha, pattern)
+    (ret, out) = shell_cmd(cmd)
+
+    if 'git_log_results' not in state:
+        state['git_log_results'] = dict()
+
+    if key not in state['git_log_results']:
+        state['git_log_results'][key] = dict()
+
+    if sha in state['git_log_results'][key]:
+        print("uh-oh")
+    else:
+        state['git_log_results'][key][sha] = out
+
 # git log is capable of much more than this function shows
 #
-def git_log_search(S_or_G, pattern, tag1, tag2, line_fn, state): 
-    cmd =  "git log -%s%s" % (S_or_G, pattern)
+def git_log_search(search_type, pattern, tag1, tag2, line_fn, state): 
+    #_pdb = pdb.Pdb();_pdb.set_trace()
+    cmd =  "git log -%s%s" % (search_type, pattern)
     cmd += " --pretty=tformat:\'%<(10) %h\'"
     cmd += " %s..%s" % (tag1, tag2)
     (ret, out) = shell_cmd(cmd)
     out = [x.lstrip() for x in out.rstrip("\n").split("\n")]
-    print_log(cmd, state)
-    [print_log(show_sha_info(x.lstrip()), state) for x in out]
+
+    for sha in out:
+        search_commit_for_pattern(search_type, pattern, tag1, tag2, line_fn,
+                                  state, sha)
+    key = search_type + "," + pattern + "," + tag1 +"," + tag2
+    state['git_log_completed'].append(key)
     return ret
     
 def git_top_of_applied_stack_sha(state):

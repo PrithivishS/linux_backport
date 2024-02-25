@@ -181,7 +181,8 @@ def load_pickle_file(state):
     # not an accident that <state> is repeated. it wont always be <dst_hash>
     for key in ['all_patches', 'unapplied_patches', 'applied_patch_list',
                 'build_cmd', 'branch_backup_cmd', 'unresolved_syms',
-                'unmatched_errors']:
+                'unmatched_errors', 'git_log_min_tag',
+                'git_log_max_tag', 'git_log_results']:
         copy_key_val_if_present(key, state, st, state)
 
 def sha_file_to_pickled_state(state):
@@ -556,6 +557,7 @@ def set_unres_provider_by_ix(state):
     if not sha: return
 
     unres_syms[ix]['provided-by'] = sha.split(',')
+    save_cp(state)
 
 # this and prev function have bothersome amounts of duplicate code
 def delete_unres_sym_by_ix(state):
