@@ -160,19 +160,6 @@ def update_applied_patches(state):
     save_cp(state)
     print_log(state['applied_patch_list'], state)
 
-def git_logG(state):
-    print_log("@@git_logG", state)
-    line_fn = lambda line, state: print_log(get_sha_info(line, ''), state)
-    print("""
-    	     <search-type> : 'S' or 'G'
-	     <pattern> : the text to search for
-             <tag1>    : a known release tag(ex: v5.4_)
-    	     <tag2>    : a known release tag subsequent to tag1""")
-    tmp = input("\nenter <search_type> <pattern> <tag1> <tag2>: ")
-    
-    (S_or_G, pattern, tag1, tag2) = tmp.split()
-    git_log_search(S_or_G, pattern, tag1, tag2, line_fn, state)
-                                   
 def cherry_pick_continue(state):
     if git_repo_is_clean():
         print_log("repo is clean. can't cherry-pick --continue")

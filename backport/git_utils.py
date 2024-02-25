@@ -2,6 +2,7 @@ import subprocess
 import re
 import os
 from bp_utils import *
+import threading
 
 EG_pretty_fmt=" --pretty=tformat:'%<(10) %h  %<(12) %an : %s: %cd' "
 
@@ -142,6 +143,36 @@ def git_applied_sha_list(state):
     s = s.split("\n")
     return s[: -1]
 
+def dummy_thread_fn(msg):
+    print(msg)
+    
+def git_logG(state):
+    # https://realpython.com/intro-to-python-threading
+    
+    threads = []
+    print_log("@@git_logG", state)
+    line_fn = lambda line, state: print_log(get_sha_info(line, ''), state)
+    print("""
+    	     <search-type> : 'S' or 'G'
+	     <pattern> : the text to search for
+             <tag1>    : a known release tag(ex: v5.4_)
+    	     <tag2>    : a known release tag subsequent to tag1""")
+    tmp = input("\nenter <search_type> <pattern> <tag1> <tag2>: ")
+    
+    (S_or_G, pattern, tag1, tag2) = tmp.split()
+    for sym in  state['unresolved_syms']:
+        #G halt_poll_fail_hist v6.0 v6.2
+        if sym['provided-by']: continue
+        thrd = threading.Thread(target=dummy_thread_fn, args=(sym['tag'],),
+                                daemon=True)
+        threads.append(thrd)
+        #pdb.set_trace()
+        thrd.start()
+    for thrd in threads:
+        thrd.join()
+    pdb.set_trace()
+    git_log_search(S_or_G, pattern, tag1, tag2, line_fn, state)
+                                   
 # git log is capable of much more than this function shows
 #
 def git_log_search(S_or_G, pattern, tag1, tag2, line_fn, state): 
