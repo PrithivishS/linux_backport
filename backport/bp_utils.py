@@ -268,6 +268,7 @@ def state_init(args): # anoter obvious objuect
     state['log_fobj'] = open(args.log_file, 'a')
     state['first_commit'] = args.first_commit
     state['args'] = args
+    state['sha_lists_by_tag'] = dict()
     #TBD:, FIXME:  get rid of state fields from args that !change
     return state
 
@@ -465,19 +466,16 @@ def report_unmatched_errors(errors):
     print("\n*** UNMATCHED ERRORS ***\n")
     
     for error in errors: print(error)
-    
-def uniqify_syms(syms):
+
+def uniqify_dict_list(L, key):
     seen = {}
     unq = []
     
-    for sym in syms:
-        tag = sym['tag']
+    for d in L:
+        tag = d[key]
         if tag not in seen:
-            seen[tag] = sym
-            seen[tag]['count'] = 1
-            unq.append(sym)
-        else:
-            seen[tag]['count'] += 1
+            seen[key] = d
+            unq.append(d)
     return unq
 
 
