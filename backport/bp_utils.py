@@ -627,3 +627,56 @@ def uniqify_dict_list(dict_list, key_list):
         ret.append(_dict)
     return ret
 
+def get_sha_list_by_tag(tag):
+    (ret, out) = shell_cmd(f"git log --pretty=tformat:\'%h\' {tag}")
+    out = out.split("\n")
+    return out
+
+def commit_order_in_tag_sha_list(state, tag, sha):
+    slbt = state['sha_lists_by_tag']
+
+    if tag not in slbt:
+        L = get_sha_list_by_tag(tag)
+        slbt[tag] = L
+    else:
+        L = slbt[tag]
+
+    ix = -1
+    try:
+        ix = len(L) - L.index(sha)
+    except:
+        print(f"\t\tBAD JU-JU: {tag}, {sha}")
+        pdb.set_trace()
+    return ix
+
+def update_rls_tag_order_in_patch_list(patch_list, state):
+    P = state['all_patches']
+    max_tag = sorted([x for x in  {patch['tag'] for patch in P}])[-1]
+    for _p in patch_list:
+        _p['order_in_release'] = \
+            int(commit_order_in_tag_sha_list(state, max_tag,
+                                             _p['sha1']))
+        print("ix: %d, tag:%s, sha: %s, %s" %
+              ( _p['order_in_release'],  _p['tag'], _p['sha1'],
+                _p['subject']))
+        #L
+
+def add_resolvd_patches_to_all_patches(state):
+    L1 = list()
+    syms = [sym for sym in state['unresolved_syms']]
+    for sym in syms:
+        shas = sym['provided-by']
+        for sha in shas:
+            if len(sha) > 12: # FIXME: this must be cleaned up
+                sha = sha[0:12]
+            L1.append(sha)
+    pdb.set_trace()
+    L2 = uniqify_list(L1)
+    P = [make_patch_dict(state, sha) for sha in L2]
+    #
+    pdb.set_trace()
+    for _p in P: state['all_patches'].append(_p)
+    update_rls_tag_order_in_patch_list(state['all_patches'], state)
+    state['all_patches'].sort(key= lambda x: x['order_in_release'])
+    pdb.set_trace()
+    pass
