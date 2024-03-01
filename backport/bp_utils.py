@@ -182,7 +182,7 @@ def load_pickle_file(state):
     for key in ['all_patches', 'unapplied_patches', 'applied_patch_list',
                 'build_cmd', 'branch_backup_cmd', 'unresolved_syms',
                 'unmatched_errors', 'git_log_min_tag',
-                'git_log_max_tag', 'git_log_results']:
+                'git_log_max_tag', 'git_log_results', 'scratchpad']:
         copy_key_val_if_present(key, state, st, state)
 
 def sha_file_to_pickled_state(state):
