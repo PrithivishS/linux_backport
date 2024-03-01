@@ -488,7 +488,7 @@ def _get_needed_symbols(lines, state):
         syms += pat_syms
         errors = list(set(errors) - set(matched))
 
-    syms = uniqify_syms(syms)
+    syms = uniqify_dict_list(syms, tag)
 
     report_unmatched_errors(errors)
     state['unresolved_syms'] = syms
@@ -605,3 +605,15 @@ def duh(state):
     for p in state['all_patches']:
         print(str(i) + ":" + p['tag'])
         i += 1
+def uniqify_dict_list(dict_list, key_list):
+    ret = list()
+    tmp = dict()
+    for _dict in dict_list:
+        key_str = ""
+        for key in key_list:
+            key_str += _dict[key]
+        if key in tmp:
+            continue
+        ret.append(_dict)
+    return ret
+
