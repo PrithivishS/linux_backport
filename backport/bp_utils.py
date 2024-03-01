@@ -608,16 +608,11 @@ def uniqify_dict_list(dict_list, key_list):
         ret.append(_dict)
     return ret
 
-def get_sha_list_by_tag(tag):
-    (ret, out) = shell_cmd(f"git log --pretty=tformat:\'%h\' {tag}")
-    out = out.split("\n")
-    return out
-
 def commit_order_in_tag_sha_list(state, tag, sha):
     slbt = state['sha_lists_by_tag']
 
     if tag not in slbt:
-        L = get_sha_list_by_tag(tag)
+        L = git_utils.get_short_sha_list_by_tag(tag)
         slbt[tag] = L
     else:
         L = slbt[tag]

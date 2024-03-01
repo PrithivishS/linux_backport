@@ -265,3 +265,9 @@ def git_pop_applied_stack():
     # pop applied patch
     shell_cmd('git reset --hard HEAD^')
     
+def get_short_sha_list_by_tag(tag):
+    cmd = f"git log --pretty=tformat:'%h' {tag}"
+    (ret, out) = shell_cmd(cmd)
+    out = out.split("\n")
+    return out
+
