@@ -59,9 +59,9 @@ def restore_cp(fpath):
             sys.exit
 
 def print_patch_dict(msg, patch, state):  # do we really re-use this?
-    s = "%s, %s, %s, %s, %s, prq(%s)" % (
+    s = "%s, %s, %s, %s, %s" % (
         msg, patch['sha1'], patch['subject'], patch['tag'],
-              patch['tag_date'], patch['is_pre_req'])
+              patch['tag_date'])
     print_log(s, state)
 
 def make_patch_dict(state, sha1):
