@@ -584,16 +584,9 @@ def unresolved_syms_to_patch_dict_list(state):
         if 'provided-by' in s:
             sha_list += s['provided-by']
     sha_list = list(set(sha_list))
-    patch_list = [make_patch_dict(sha) for sha in sha_list]
+    patch_list = [make_patch_dict(state, sha) for sha in sha_list]
     return patch_list
 
-def show_all_patches(state):
-    sort_all_patches_by_tag(state)
-    L = ["%s: %s, %s" % (p['sha1'], p['tag'], p['subject'])
-              for p in state['all_patches']]
-    for (i, l) in zip(range(0, len(L)), L):
-        print(str(i) + ": " +l)
-        
 def uniqify_list(L):
     ret = list()
     tmp = dict()
@@ -668,3 +661,12 @@ def add_resolvd_patches_to_all_patches(state):
     state['all_patches'].sort(key= lambda x: x['order_in_release'])
     pdb.set_trace()
     pass
+
+def show_all_patches(state):
+    update_rls_tag_order_in_patch_list(state['all_patches'], state)
+    state['all_patches'].sort(key= lambda x: x['order_in_release'])
+    L = ["%s: %s, %s" % (p['sha1'], p['tag'], p['subject'])
+              for p in state['all_patches']]
+    for (i, l) in zip(range(0, len(L)), L):
+        print(str(i) + ": " +l)
+        
