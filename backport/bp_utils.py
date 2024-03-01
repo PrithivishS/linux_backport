@@ -605,6 +605,16 @@ def duh(state):
     for p in state['all_patches']:
         print(str(i) + ":" + p['tag'])
         i += 1
+
+def uniqify_list(L):
+    ret = list()
+    tmp = dict()
+    for elt in L:
+        if elt in ret:
+            continue
+        ret.append(elt)
+    return ret
+    
 def uniqify_dict_list(dict_list, key_list):
     ret = list()
     tmp = dict()
