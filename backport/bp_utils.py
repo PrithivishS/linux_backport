@@ -587,12 +587,6 @@ def unresolved_syms_to_patch_dict_list(state):
     patch_list = [make_patch_dict(sha) for sha in sha_list]
     return patch_list
 
-def cmp_tag(patch):
-    return version.parse(patch['tag'])
-
-def sort_all_patches_by_tag(state):
-    state['all_patches'].sort(key=cmp_tag)
-    
 def show_all_patches(state):
     sort_all_patches_by_tag(state)
     L = ["%s: %s, %s" % (p['sha1'], p['tag'], p['subject'])
@@ -600,12 +594,6 @@ def show_all_patches(state):
     for (i, l) in zip(range(0, len(L)), L):
         print(str(i) + ": " +l)
         
-def duh(state):
-    i = 0
-    for p in state['all_patches']:
-        print(str(i) + ":" + p['tag'])
-        i += 1
-
 def uniqify_list(L):
     ret = list()
     tmp = dict()
