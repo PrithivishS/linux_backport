@@ -635,7 +635,6 @@ def update_rls_tag_order_in_patch_list(patch_list, state):
         print("ix: %d, tag:%s, sha: %s, %s" %
               ( _p['order_in_release'],  _p['tag'], _p['sha1'],
                 _p['subject']))
-        #L
 
 def add_resolvd_patches_to_all_patches(state):
     L1 = list()
@@ -654,8 +653,6 @@ def add_resolvd_patches_to_all_patches(state):
     for _p in P: state['all_patches'].append(_p)
     update_rls_tag_order_in_patch_list(state['all_patches'], state)
     state['all_patches'].sort(key= lambda x: x['order_in_release'])
-    pdb.set_trace()
-    pass
 
 def show_all_patches(state):
     update_rls_tag_order_in_patch_list(state['all_patches'], state)
