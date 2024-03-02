@@ -75,6 +75,8 @@ def make_patch_dict(state, sha1):
     d['subject'] = git_utils.git_get_subject(sha1)
     d['tag'] = git_utils.git_first_containing_tag(sha1)
     d['tag_date'] = git_utils.git_get_commit_date(d['tag'])
+    d['order_in_release'] = \
+            commit_order_in_tag_sha_list(state, d['tag'], d['sha1'])
     print("%s, %s, %s, %s, prq(%s)" %
           (d['sha1'], d['subject'], d['tag'],
            d['tag_date'], d['is_pre_req']))
