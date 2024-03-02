@@ -191,7 +191,7 @@ def sha_file_to_pickled_state(state):
     sha_list = state['args'].sha_list
     
     # as if it wasn't obvious <patch> should be class ...
-    patch_list = [make_patch_dict(l.strip())
+    patch_list = [make_patch_dict(state, l)
                   for l in open(sha_list,"r")]
 
     state['unapplied_patches'] = patch_list
@@ -294,7 +294,7 @@ def get_sha_info(sha, subj):
 def import_sha_list_file(path, state):
     print_log("@@import_sha_list_file(%s...)" % (path), state)
 
-    patch_list = [make_patch_dict(l.strip())
+    patch_list = [make_patch_dict(state, l)
                   for l in open(path,"r")]
     return patch_list
 
