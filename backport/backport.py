@@ -298,6 +298,7 @@ bp_menu_item_list = [
      },
     {'prompt' : 'enter pdb', 'action' : do_pdb},
     {'prompt' : 'test', 'action' : test},
+    {'prompt': 'show all patches', 'action' : show_all_patches},
 ]
 
 parser = argparse.ArgumentParser()
