@@ -41,6 +41,7 @@ def save_cp(state):
     st = state
     tmp = state['log_fobj']
     state['log_fobj'] = None
+    state['sha_lists_by_tag'] = None #huge  not worth persisting
     f = state['pickle_dir'] + "/" + state['pickle_file'] + "." +\
         str(state['cp_num'])
     with open(f, 'wb') as handle:
@@ -181,12 +182,10 @@ def load_pickle_file(state):
     st = restore_cp(f)
         
     # not an accident that <state> is repeated. it wont always be <dst_hash>
-    for key in ['all_patches', 'unapplied_patches', 'applied_patch_list',
-                'build_cmd', 'branch_backup_cmd', 'unresolved_syms',
-                'unmatched_errors', 'git_log_min_tag',
-                'git_log_max_tag', 'git_log_results', 'scratchpad']:
-        copy_key_val_if_present(key, state, st, state)
-
+    print("is this stupid & useless?  just restore pickle to state?")
+    pdb.set_trace()
+    for key in st.keys():
+        state[key] = st[key]
 def sha_file_to_pickled_state(state):
     sha_list = state['args'].sha_list
     
@@ -272,6 +271,8 @@ def state_init(args): # anoter obvious objuect
     state['args'] = args
     state['sha_lists_by_tag'] = dict()
     #TBD:, FIXME:  get rid of state fields from args that !change
+    state['patch_list_history'] = []
+    state['backport_in_progress'] = False
     return state
 
 def backport_patches(state, menu_item_list):
@@ -279,7 +280,6 @@ def backport_patches(state, menu_item_list):
     print("Startup: Current Time =", current_date_time,
           file = state['log_fobj'])
 
-    state['log_fobj'].flush()
     do_menu_choice(menu_item_list, state)
         
 def get_sha_info(sha, subj):
