@@ -321,8 +321,8 @@ state = state_init(args)
 
 if args.sha_list:
     import_sha_list_file(state['args'].sha_list, 'set', state)
-else:
-    load_pickle_file(state)
+
+state = load_pickle_file(args, state)
 
 backport_patches(state, bp_menu_item_list)
 

@@ -27,6 +27,9 @@ def get_out_dest(state):
     return state['out_dest']
     
 def print_log(s, state):
+    if not state or 'log_fobj' not in state:
+        print("<no logf> " + s)
+        return
     if get_out_dest(state) == 'both':
         print(s)
     if state['log_fobj']:
@@ -58,6 +61,7 @@ def restore_cp(fpath):
         print("*WARNING* cannot restore pickle file: " + fpath)
         if not confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
             sys.exit
+        return None
 
 def print_patch_dict(msg, patch, state):  # do we really re-use this?
     s = "%s, %s, %s, %s, %s" % (
@@ -169,7 +173,7 @@ def copy_key_val_if_present(key, dst_hash, src_hash, state):
 #    - otherwise fail since the initial picke file should be created by
 #      sha2pckl
 #
-def load_pickle_file(state):
+def load_pickle_file(args, state):
     pd = state['args'].pickle_dir
     pf = state['args'].pickle_file
     
@@ -179,13 +183,16 @@ def load_pickle_file(state):
         max_pickle_num = str(next_cp_num(state['args']) - 1)
         f = pd + "/" + pf + "." + max_pickle_num
     print_log("loading state: " + f, state)
-    st = restore_cp(f)
-        
+
+    state = restore_cp(f)
+    if not state: state = state_init()
+    state['log_fobj'] = open(args.log_file, 'a')
+    
     # not an accident that <state> is repeated. it wont always be <dst_hash>
     print("is this stupid & useless?  just restore pickle to state?")
     pdb.set_trace()
-    for key in st.keys():
-        state[key] = st[key]
+    return state
+
 def sha_file_to_pickled_state(state):
     sha_list = state['args'].sha_list
     
@@ -266,7 +273,6 @@ def state_init(args): # anoter obvious objuect
     state['cp_num'] = next_cp_num(args)
     state['pickle_dir'] = args.pickle_dir
     state['pickle_file'] = args.pickle_file
-    state['log_fobj'] = open(args.log_file, 'a')
     state['first_commit'] = args.first_commit
     state['args'] = args
     state['sha_lists_by_tag'] = dict()
@@ -277,8 +283,7 @@ def state_init(args): # anoter obvious objuect
 
 def backport_patches(state, menu_item_list):
     current_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print("Startup: Current Time =", current_date_time,
-          file = state['log_fobj'])
+    print_log("Startup: Current Time = %s" %(current_date_time), state)
 
     do_menu_choice(menu_item_list, state)
         
