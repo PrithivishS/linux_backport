@@ -71,6 +71,7 @@ def make_patch_dict(state, sha1):
     print("lookup %s" % (sha1))
     d = dict()
     d['sha1'] = sha1.lstrip().rstrip()
+    d['sha1'] = d['sha1'][:12]
     d['done'] = False
     d['pre_reqs'] = list()
     d['is_pre_req'] = False
