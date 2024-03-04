@@ -37,14 +37,12 @@ def print_log(s, state):
         state['log_fobj'].flush()
 
 def save_cp(state):
-    if state['args'].no_auto_save == 'y':
-        print_log("** WARNING: auto save disabled **", state)
-        return
-    
     st = state
     tmp = state['log_fobj']
-    state['log_fobj'] = None
-    state['sha_lists_by_tag'] = None #huge  not worth persisting
+    for slot in ['log_fobj', 'args', 'sha_lists_by_tag', 'unresolved_syms',
+                 'unmatched_errors']:
+        state[slot] = None
+
     f = state['pickle_dir'] + "/" + state['pickle_file'] + "." +\
         str(state['cp_num'])
     with open(f, 'wb') as handle:
