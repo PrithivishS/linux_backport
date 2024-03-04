@@ -269,7 +269,7 @@ bp_menu_item_list = [
          'action' : git_logG},
         {'prompt' : 'show one git log result', 'action': show_one_log_result},
         {'prompt' : 'show git log completions', 'action': show_log_completions},
-        {'prompt' : 'set provider by index',
+        {'prompt' : 'set provider(resolve) by index',
          'action' : set_unres_provider_by_ix},
         {'prompt' : 'delete unresolved sym by index',
          'action' : delete_unres_sym_by_ix},
