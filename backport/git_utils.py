@@ -76,11 +76,17 @@ def git_cherry_pick(sha1):
     os.system("git log -5 " + EG_pretty_fmt)
     return result.returncode
     
-def git_reset_hard(sha1):
+def git_reset_hard(sha1, state):
     cmd = "git  reset --hard  " + sha1
+    patch = make_patch_dict(state, sha1)
+    print_patch_dict("\n", patch, state)
     print("about to: " + cmd)
-    input("<enter> to continue, else <control-c>")
+    
+    if not confirm("\nEnter 'y' to proceed, else <enter>: ", ['y']):
+        return -1
+
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
+
     return result.returncode
     
 def git_cherry_pick_continue():
