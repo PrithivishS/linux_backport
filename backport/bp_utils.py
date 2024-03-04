@@ -186,10 +186,9 @@ def load_pickle_file(args, state):
     state = restore_cp(f)
     if not state: state = state_init()
     state['log_fobj'] = open(args.log_file, 'a')
+    state['cp_num'] = next_cp_num(args)
     
-    # not an accident that <state> is repeated. it wont always be <dst_hash>
-    print("is this stupid & useless?  just restore pickle to state?")
-    pdb.set_trace()
+    state['sha_to_patches'] = {p['sha1'] : p for p in state['all_patches']}
     return state
 
 def sha_file_to_pickled_state(state):
@@ -269,7 +268,6 @@ def state_init(args): # anoter obvious objuect
     state = dict()
     state['unapplied_patches'] = list()
     state['all_patches'] = list()
-    state['cp_num'] = next_cp_num(args)
     state['pickle_dir'] = args.pickle_dir
     state['pickle_file'] = args.pickle_file
     state['first_commit'] = args.first_commit
