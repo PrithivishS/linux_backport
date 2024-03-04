@@ -559,6 +559,12 @@ def set_unres_provider_by_ix(state):
     if not sha: return
 
     unres_syms[ix]['provided-by'] = sha.split(',')
+    for sha in sha.split(','):
+        patch = make_patch_dict(state,sha)
+        pdb.set_trace() # remove after we've been through this once
+        patch['provides_for'] = unres_syms[ix]
+        state['all_patches'].append(patch)
+        state['sha_to_patches'] = {p['sha1'] : p for p in state['all_patches']}
     save_cp(state)
 
 # this and prev function have bothersome amounts of duplicate code
@@ -640,24 +646,6 @@ def update_rls_tag_order_in_patch_list(patch_list, state):
               ( _p['order_in_release'],  _p['tag'], _p['sha1'],
                 _p['subject']))
 
-def add_resolvd_patches_to_all_patches(state):
-    L1 = list()
-    syms = [sym for sym in state['unresolved_syms']]
-    for sym in syms:
-        shas = sym['provided-by']
-        for sha in shas:
-            if len(sha) > 12: # FIXME: this must be cleaned up
-                sha = sha[0:12]
-            L1.append(sha)
-    pdb.set_trace()
-    L2 = uniqify_list(L1)
-    P = [make_patch_dict(state, sha) for sha in L2]
-    #
-    pdb.set_trace()
-    for _p in P: state['all_patches'].append(_p)
-    update_rls_tag_order_in_patch_list(state['all_patches'], state)
-    state['all_patches'].sort(key= lambda x: x['order_in_release'])
-
 def show_all_patches(state):
     update_rls_tag_order_in_patch_list(state['all_patches'], state)
     state['all_patches'].sort(key= lambda x: x['order_in_release'])
@@ -666,3 +654,18 @@ def show_all_patches(state):
     for (i, l) in zip(range(0, len(L)), L):
         print(str(i) + ": " +l)
         
+def del_from_all_patches(sha, state):
+    
+    sha = sha[:12] #FIXME we need to do this in one place and one place only
+    try:
+        patch = state['sha_to_patches'][sha]
+        print("found it")
+    except:
+        print("could not find patch with sha %s\n" % (sha))
+    state['all_patches'].remove(patch)
+    state['sha_to_patches'].pop(sha)
+    pdb.set_trace()
+    pass
+
+def test(state):
+    pass
