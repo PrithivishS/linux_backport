@@ -671,3 +671,13 @@ def del_from_all_patches(sha, state):
 
 def test(state):
     pass
+
+def start_backport(state):
+    if state['backport_in_progress']:
+        print("OOPS: backport already in progress")
+        return
+
+    state['backport_in_progress'] = True
+    git_utils.next_branch(state)
+    git_utils.git_reset_hard(state['first_commit'], state)
+    state['unapplied_patches'] = state['all_patches'].copy()

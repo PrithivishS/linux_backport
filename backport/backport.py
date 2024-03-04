@@ -224,6 +224,7 @@ bp_menu_item_list = [
     #
     # main menu
     #
+    {'prompt' : 'start_backport', 'action': start_backport},
     {'prompt' : 'main backport actions', 'sub-menu' : [
         {'prompt' : 'show git status', 'action': git_status},
         {'prompt' : 'short_git_log', 'action': short_git_log},
