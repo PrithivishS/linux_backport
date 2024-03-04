@@ -620,6 +620,9 @@ def uniqify_dict_list(dict_list, key_list):
 
 def commit_order_in_tag_sha_list(state, tag, sha):
     slbt = state['sha_lists_by_tag']
+    if not slbt:
+        print(f"CAN'T FIND RELEASE CONTAINING {sha}")
+        return -1
 
     if tag not in slbt:
         L = git_utils.get_short_sha_list_by_tag(tag)
@@ -627,12 +630,11 @@ def commit_order_in_tag_sha_list(state, tag, sha):
     else:
         L = slbt[tag]
 
-    ix = -1
     try:
         ix = len(L) - L.index(sha)
     except:
-        print(f"\t\tBAD JU-JU: {tag}, {sha}")
-        pdb.set_trace()
+        print(f"CAN'T FIND RELEASE CONTAINING {sha}")
+        return -1
     return ix
 
 def update_rls_tag_order_in_patch_list(patch_list, state):
