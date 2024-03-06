@@ -621,12 +621,13 @@ def uniqify_dict_list(dict_list, key_list):
 def commit_order_in_tag_sha_list(state, tag, sha):
     slbt = state['sha_lists_by_tag']
     if not slbt:
-        print(f"CAN'T FIND RELEASE CONTAINING {sha}")
-        return -1
-
+        print("sha_lists_by_tag not in state")
+        state['sha_lists_by_tag'] = dict()
+        slbt = state['sha_lists_by_tag']
     if tag not in slbt:
         L = git_utils.get_short_sha_list_by_tag(tag)
         slbt[tag] = L
+        state['sha_lists_by_tag']
     else:
         L = slbt[tag]
 
