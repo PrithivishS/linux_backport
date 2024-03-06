@@ -666,10 +666,11 @@ def del_from_all_patches(sha, state):
         print("could not find patch with sha %s\n" % (sha))
     state['all_patches'].remove(patch)
     state['sha_to_patches'].pop(sha)
-    pdb.set_trace()
-    pass
 
 def test(state):
+    pdb.set_trace()
+    _d = make_patch_dict(state, '95a0d01eef7a')
+    pdb.set_trace()
     pass
 
 def start_backport(state):

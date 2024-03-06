@@ -171,9 +171,6 @@ def shell_one_liner(state):
     (ret, output) = shell_cmd(cmd)
     print_log(output, state)
 
-def test(state):
-    add_resolvd_patches_to_all_patches(state)
-    
 bp_universal_utils = {'prompt' :"universal utils", 'sub-menu' : [
         {'prompt' : 'backup branch', 'action' : backup_branch},
         {'prompt' : 'increment git branch', 'action' : next_branch},
