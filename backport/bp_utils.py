@@ -681,3 +681,25 @@ def start_backport(state):
     git_utils.next_branch(state)
     git_utils.git_reset_hard(state['first_commit'], state)
     state['unapplied_patches'] = state['all_patches'].copy()
+def apply_next_patch(state):
+    print_log("@@apply_next_patch", state)
+    if not top_cites_upstream_or_confirmed_dont_care(state):
+        print_log("no upstream citation or confirmation of indifference",
+                  state)
+        return
+    if not git_repo_is_clean():
+        print_log("git status not clean. no changes made", state)
+        
+    patch_list = state['unapplied_patches']
+    patch = patch_list[0]
+
+    print_patch_dict("@@ cherry picking :", patch, state)
+    git_cherry_pick(patch['sha1'])
+    state['unapplied_patches'] = patch_list[1:] #pop
+    
+    if git_repo_is_clean():
+        build(state)
+    else:
+        show_stuff_for_conflict_resolution(state)
+    save_cp(state)
+
