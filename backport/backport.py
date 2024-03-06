@@ -158,23 +158,6 @@ def cherry_pick_abort(state):
     	return
     git_cherry_pick_abort()
 
-def cherry_pick_by_sha(state):
-    print_log("@@cherry_pick_by_sha", state)
-    if not top_cites_upstream_or_confirmed_dont_care(state):
-        print_log("no upstream citation or confirmation of indifference",
-                  state)
-        return
-    if not git_repo_is_clean():
-        print_log("git status not clean. no changes made", state)
-        
-    cp_sha = input("enter SHA1 id of  patch or <enter> if none: ")
-    if not cp_sha: return
-    
-    print(show_sha_info(cp_sha))
-    if not confirm("enter 'y' if ok, else <enter>: ", ['y']):
-    	return
-    git_cherry_pick_by_sha(cp_sha)
-
 def show_top_unapp(state):
     show_top_unapplied_patch(state)
 
