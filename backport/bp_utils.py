@@ -266,6 +266,7 @@ def poll_shell_cmd(cmd, shell_args, line_fn, state):
               
 def state_init(args): # anoter obvious objuect
     state = dict()
+    state['cherry_pick_files'] = "/tmp/cp__files"
     state['unapplied_patches'] = list()
     state['all_patches'] = list()
     state['pickle_dir'] = args.pickle_dir
@@ -683,6 +684,48 @@ def start_backport(state):
     git_utils.next_branch(state)
     git_utils.git_reset_hard(state['first_commit'], state)
     state['unapplied_patches'] = state['all_patches'].copy()
+
+def show_stuff_for_conflict_resolution(state):
+    # parse git status and find sha we're cherry_picking
+    mod_files = []
+    both_mod_files = []
+    (ret, classic_status) = shell_cmd("git status")
+    (ret, porcelain_status) = shell_cmd("git status --porcelain")
+
+    classic_pat = "(.*cherry-picking commit )([a-fA-F0-9]+)(.*)"
+    match = re.search(classic_pat, classic_status)
+    try:
+        cherry_pick_sha = match.group(2)
+    except:
+        print('ERROR: cannot find "cherry-picking commit" in git status output')
+        return
+    
+    # parse git status --porcelain
+    (ret, porcelain_status) = shell_cmd("git status --porcelain")
+    for line in porcelain_status.split("\n")[: -1]:
+        (code, file) = [x for x in line.split(' ') if not x == '']
+        if code == 'M': mod_files.append(file)
+        if code == 'UU': both_mod_files.append(file)
+    #
+    # clean tmp dir
+    shell_cmd("mkdir -p " + state['cherry_pick_files'] + "/" + cherry_pick_sha)
+    
+    # emit patch to temp dir
+    cmd = "git show %s > %s/%s/patch" % (cherry_pick_sha,
+                                         state['cherry_pick_files'],
+                                         cherry_pick_sha)
+    shell_cmd(cmd)
+    
+    # emit both_mod files to "both_mod.".filename
+    for file in both_mod_files:
+        cmd = "git show %s:%s > %s/%s/%s" % (cherry_pick_sha, file,
+                                            state['cherry_pick_files'],
+                                            cherry_pick_sha,
+                                            os.path.split(file)[1])
+        shell_cmd(cmd)
+        
+    # FIXME: maybe later show diff beteween local file and sha version
+    
 def apply_next_patch(state):
     print_log("@@apply_next_patch", state)
     if not top_cites_upstream_or_confirmed_dont_care(state):
