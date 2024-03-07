@@ -81,6 +81,7 @@ def make_patch_dict(state, sha1):
     d['tag_date'] = git_utils.git_get_commit_date(d['tag'])
     d['order_in_release'] = \
             commit_order_in_tag_sha_list(state, d['tag'], d['sha1'])
+    d['downstream'] = None
     print("%s, %s, %s, %s, prq(%s)" %
           (d['sha1'], d['subject'], d['tag'],
            d['tag_date'], d['is_pre_req']))
@@ -143,7 +144,6 @@ def do_menu_choice(menu, state):
         # log unapplied and active(on git log) patches after every menu op
         state['out_dest'] = 'log_only'
         print_log("menu choice was <%s>" % (x), state)
-        #print_patch_list("__PATCH LIST__", state['unapplied_patches'], state)
         git_utils.git_short_log('%<(10) %h  %<(12) %an : %s', state)
         state['out_dest'] = 'both'
 
@@ -188,18 +188,8 @@ def load_pickle_file(args, state):
     state['log_fobj'] = open(args.log_file, 'a')
     state['cp_num'] = next_cp_num(args)
     
-    state['sha_to_patches'] = {p['sha1'] : p for p in state['all_patches']}
+    state['sha_to_patch'] = {p['sha1'] : p for p in state['all_patches']}
     return state
-
-def sha_file_to_pickled_state(state):
-    sha_list = state['args'].sha_list
-    
-    # as if it wasn't obvious <patch> should be class ...
-    patch_list = [make_patch_dict(state, l)
-                  for l in open(sha_list,"r")]
-
-    state['unapplied_patches'] = patch_list
-    save_cp(state)
 
 def show_sha_info(sha):
     if not sha: return ""
@@ -267,7 +257,6 @@ def poll_shell_cmd(cmd, shell_args, line_fn, state):
 def state_init(args): # anoter obvious objuect
     state = dict()
     state['cherry_pick_files'] = "/tmp/cp__files"
-    state['unapplied_patches'] = list()
     state['all_patches'] = list()
     state['pickle_dir'] = args.pickle_dir
     state['pickle_file'] = args.pickle_file
@@ -539,6 +528,27 @@ def detailed_display_unres_symbol_by_index(state):
         print_log("index %d out of range" %(ix), state)
     print_log(unres_syms[ix], state)
 
+def invalidate_patches_if_new_precedents(state):
+    state['all_patches'].sort(key= lambda x: x['order_in_release'])
+    invalidate = False
+    for patch in state['all_patches']:
+        if not patch['downstream']: invalidate = True
+        if invalidate: patch['downstream'] = None
+        
+def add_to_all_patches(patch,state):
+    state['all_patches'].append(patch)
+    state['sha_to_patch'] = {p['sha1'] : p for p in state['all_patches']}
+    invalidate_patches_if_new_precedents(state)
+    save_cp(state)
+
+def add_to_all_patches_by_sha(state):
+     sha = input("enter SHA1 id or comma separated list providing symbol <enter> if none: ")
+     if not sha: return
+    
+     for sha in sha.split(','):
+         patch = make_patch_dict(state, sha)
+         add_to_all_patches(patch, state)
+   
 def set_unres_provider_by_ix(state):
     unres_syms = state['unresolved_syms']
     short_display_unres_symbols_unprovided(state)
@@ -561,12 +571,8 @@ def set_unres_provider_by_ix(state):
 
     unres_syms[ix]['provided-by'] = sha.split(',')
     for sha in sha.split(','):
-        patch = make_patch_dict(state,sha)
-        pdb.set_trace() # remove after we've been through this once
+        add_to_all_patches(state, sha)
         patch['provides_for'] = unres_syms[ix]
-        state['all_patches'].append(patch)
-        state['sha_to_patches'] = {p['sha1'] : p for p in state['all_patches']}
-    save_cp(state)
 
 # this and prev function have bothersome amounts of duplicate code
 def delete_unres_sym_by_ix(state):
@@ -662,12 +668,12 @@ def del_from_all_patches(sha, state):
     
     sha = sha[:12] #FIXME we need to do this in one place and one place only
     try:
-        patch = state['sha_to_patches'][sha]
+        patch = state['sha_to_patch'][sha]
         print("found it")
     except:
         print("could not find patch with sha %s\n" % (sha))
     state['all_patches'].remove(patch)
-    state['sha_to_patches'].pop(sha)
+    del state['sha_to_patch'][sha]
 
 def test(state):
     pdb.set_trace()
@@ -676,6 +682,9 @@ def test(state):
     pass
 
 def start_backport(state):
+    if not git_repo_is_clean():
+        print_log("repo is not clean. bailing out")
+        return
     if state['backport_in_progress']:
         print("OOPS: backport already in progress")
         return
@@ -683,7 +692,6 @@ def start_backport(state):
     state['backport_in_progress'] = True
     git_utils.next_branch(state)
     git_utils.git_reset_hard(state['first_commit'], state)
-    state['unapplied_patches'] = state['all_patches'].copy()
 
 def show_stuff_for_conflict_resolution(state):
     # parse git status and find sha we're cherry_picking
@@ -735,14 +743,14 @@ def apply_next_patch(state):
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
         
-    patch_list = state['unapplied_patches']
-    patch = patch_list[0]
+    patch = show_top_unapp()
 
     print_patch_dict("@@ cherry picking :", patch, state)
     git_cherry_pick(patch['sha1'])
-    state['unapplied_patches'] = patch_list[1:] #pop
     
     if git_repo_is_clean():
+        patch['downstream'] = git_top_of_applied_stack_sha()
+        state['applied_sha_to_patch'][patch['downstream']] = patch
         build(state)
     else:
         show_stuff_for_conflict_resolution(state)

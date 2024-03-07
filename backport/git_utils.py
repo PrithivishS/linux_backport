@@ -267,7 +267,7 @@ def git_top_of_applied_stack_sha(state):
                   state)
     return tap_sha.rstrip('\n')
 
-def git_pop_applied_stack():
+def git_pop_branch_tos():
     # pop applied patch
     shell_cmd('git reset --hard HEAD^')
     

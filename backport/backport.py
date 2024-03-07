@@ -13,7 +13,9 @@ from bp_utils import *
 
 def unapplied_patches(state):
     print_log("@@how_unapplied_patches", state)
-    print_patch_list("", state['unapplied_patches'], state)
+    L = [p for p in state['all_patches'] if not p['downstream']]
+    print_patch_list("", L, state)
+    return L
 
 def do_pdb(state):
     print_log("@@pdb", state)
@@ -23,16 +25,8 @@ def checkpoint(state):
     print_log("@@checkpoint", state)
     save_cp(state)
 
-def pop_unapplied(state):
-    print_log("@@pop_unapplied", state)
-    if len(state['unapplied_patches']) > 1:
-        state['unapplied_patches'] = state['unapplied_patches'][1:]
-    else:
-        state['unapplied_patches'] = list() # not the worst choice
-    checkpoint(state)
-
-def pop_applied(state):
-    print_log("@@do_pop_applied", state)
+def pop_branch_tos(state):    
+    print_log("@@do_pop_branch_tos", state)
     if not top_cites_upstream_or_confirmed_dont_care(state):
         print_log("no upstream citation or confirmation of indifference",
                   state)
@@ -40,7 +34,7 @@ def pop_applied(state):
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
         
-    os.system("git reset --hard HEAD^")
+    git_utils.git_pop_branch_tos_stack()
     short_git_log(state)
 
 def short_git_log(state):
@@ -72,53 +66,26 @@ def backup_branch(state):
     out = shell_cmd(cmd)
     print_log(out, state)
 
-def move_top_applied_patch_to_unapplied(state):
-    if not git_repo_is_clean():
-        print_log("git status not clean. no changes made", state)
-    if not confirm("Are you sure? Enter 'y' if ok, else <enter>: ", ['y']):
-    	return
-    
-    tap_sha = git_top_of_applied_stack_sha(state)
-    # "push" tap_sha to unapplied patches
-    state['unapplied_patches'] = \
-        [make_patch_dict(tap_sha)] + state['unapplied_patches']
-    git_pop_applied_stack()
-
-def move_n_pick(state):
-    cp_sha = input("enter SHA1 id of  patch or <enter> if none: ")
-    if not cp_sha: return
-    if not top_cites_upstream_or_confirmed_dont_care(state):
-        print_log("no upstream citation or confirmaticbon of indifference",
-                  state)
-        return
+def unapply_branch_tos(state):
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
         
-    move_top_applied_patch_to_unapplied(state)
-    git_cherry_pick(cp_sha)
-    
-def push_one_sha(state):
-    print_log("@@push_one_sha", state)
-
-    if not git_repo_is_clean():
-        print_log("git status not clean. no changes made", state)
-        return
-    if not confirm("Are you sure you don't need to pop top applied patch? Enter 'y' if ok, else <enter>: ", ['y']):
+    if not confirm("Are you sure? Enter 'y' if ok, else <enter>: ", ['y']):
     	return
 
-    prq_sha = input("enter SHA1 id of  patch or <enter> if none: ")
-    if not prq_sha: return
-    
-    print(show_sha_info(prq_sha))
-    if not confirm("enter 'y' if ok, else <enter>: ", ['y']):
-    	return
-    # "push" prq_sha to unapplied patches
-    state['unapplied_patches'] = \
-        [make_patch_dict(prq_sha)] + state['unapplied_patches']
-    checkpoint(state)
+    sha = git_top_of_applied_stack_sha(state)
+    patch = state['applied_sha_to_patch']
+    downstream_sha = patch['downstream']
+    patch['downstream'] = None
+    del state['applied_sha_to_patch'][downstream_sha]
 
-def push_sha_list(state):
-    print_log("@@push_sha_list", state)
+    git_utils.git_pop_branch_tos()
+    del state['downstream_sha_to_patch'][downstream_sha]
+
+    return
+
+def add_sha_list_to_all_patches(state):
+    print_log("@@add_sha_list_to_all_patches", state)
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
         return
@@ -131,14 +98,8 @@ def push_sha_list(state):
     if not sha_file: return
 
     patches = import_sha_list_file(sha_file, state)
-    state['unapplied_patches'] = patches + state['unapplied_patches']
-    save_cp(state)
-
-def update_applied_patches(state):
-    print_log("@@update_applied_patches", state)
-    state['applied_patch_list'] = git_applied_sha_list(state)
-    save_cp(state)
-    print_log(state['applied_patch_list'], state)
+    for patch in import_sha_list_file(sha_file, state):
+        add_to_all_patches(patch, state)
 
 def cherry_pick_continue(state):
     if git_repo_is_clean():
@@ -146,6 +107,14 @@ def cherry_pick_continue(state):
         return
     print_log("@@cherry_pick_continue", state)
     git_cherry_pick_continue()
+    if git_repo_is_clean():
+        patch['downstream'] = git_top_of_applied_stack_sha(state)
+        state['applied_sha_to_patch'][patch['downstream']] = patch
+        plh = state['patch_list_history']
+        plh.append(list())
+        plhe = plh[-1]
+        for patch in state['all_patches']:
+            plhe.append(patch)
 
 def cherry_pick_abort(state):
     print_log("@@cherry_pick_abort", state)
@@ -159,7 +128,7 @@ def cherry_pick_abort(state):
     git_cherry_pick_abort()
 
 def show_top_unapp(state):
-    show_top_unapplied_patch(state)
+    print_patch_list("", unapplied_patches(state)[:1])
 
 def show_patch_by_sha(state):
     sha = input("enter sha of patch to be shown: ")
@@ -204,21 +173,23 @@ bp_menu_item_list = [
          'action': cherry_pick_abort},
         {'prompt' : 'cherry-pick by sha',
          'action': cherry_pick_by_sha},
+        {'prompt' : 'add patch by sha',
+         'action' : add_to_all_patches_by_sha},
         bp_universal_utils,
     ]},
     {'prompt' : 'patch stack actions', 'sub-menu' : [
         {'prompt' : 'short_git_log', 'action': short_git_log},
         {'prompt' : 'show unapplied patches','action': unapplied_patches},
-        {'prompt' : 'move top applied -> unapplied, cherry-pick by sha',
-         'action':  move_n_pick},
-        {'prompt' : 'move top applied commit -> unapplied',
-         'action':  move_top_applied_patch_to_unapplied},
-        {'prompt' : 'push one sha -> unapplied', 'action':  push_one_sha},
-        {'prompt' : 'push sha list -> unapplied', 'action':  push_sha_list},
-        {'prompt' : 'pop unapplied', 'action' : pop_unapplied,},
-        {'prompt': 'pop applied patch', 'action' : pop_applied},
+        {'prompt' : 'unapply branch tos',
+         'action':  unapply_branch_tos},
+        {'prompt' : 'add sha list to all patches',
+         'action':  add_sha_list_to_all_patches},
+        {'prompt': 'pop cur branch top of stack', 'action' : pop_branch_tos},
         {'prompt' : 'show top unapplied patch','action': show_top_unapp},
         {'prompt': 'show all patches', 'action' : show_all_patches},
+        {'prompt' : 'add patch by sha',
+         'action' : add_to_all_patches_by_sha},
+        bp_universal_utils,
         ]
      },
     {'prompt' : 'unresolved symbol actions', 'sub-menu' : [
@@ -246,8 +217,6 @@ bp_menu_item_list = [
         {'prompt' : 'patch_info(sha)', 'action' : patch_info},
         {'prompt' : 'launch bash', 'action' : bash},
         {'prompt' : 'increment git branch', 'action' : next_branch},
-        {'prompt' : 'update applied patch_list',
-         'action' : update_applied_patches},
         {'prompt': 'show_patch_by_sha', 'action' : show_patch_by_sha},
         {'prompt' : 'backup branch', 'action' : backup_branch},
         {'prompt' : 'increment git branch', 'action' : next_branch},
