@@ -103,7 +103,6 @@ def top_patch_has_upstream_citation(state):
         return True
     else:
         return False
-
     
 def show_menu_trailer(state):
     trailer = ""
