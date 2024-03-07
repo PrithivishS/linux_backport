@@ -6,6 +6,12 @@ import threading
 
 EG_pretty_fmt=" --pretty=tformat:'%<(10) %h  %<(12) %an : %s: %cd' "
 
+# should subsume some of the duplicate code in git_utils.py over time
+def shell_cmd(cmd):
+    result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
+    return (result.returncode, result.stdout.decode('latin-1'))
+
+
 def git_repo_is_clean():
     (ret, tmp) = shell_cmd("git status --porcelain")
     if tmp:
