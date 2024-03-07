@@ -750,7 +750,7 @@ def apply_next_patch(state):
     
     if git_repo_is_clean():
         patch['downstream'] = git_top_of_applied_stack_sha()
-        state['applied_sha_to_patch'][patch['downstream']] = patch
+        state['downstream_sha_to_patch'][patch['downstream']] = patch
         build(state)
     else:
         show_stuff_for_conflict_resolution(state)
@@ -760,7 +760,7 @@ def cherry_pick_by_sha(state):
     print_log("@@cherry_pick_by_sha", state)
     if not confirm("""THIS IS OBSOLETE AND DANGEROUS\n
                    if you really must use it, update state[
-                   'all_patches', 'applied_sha_to_patch']\n
+                   'all_patches', 'downstream_sha_to_patch']\n
                    are you sure?: """, ['y']):
     	return
     if not top_cites_upstream_or_confirmed_dont_care(state):
@@ -845,10 +845,10 @@ def unapply_branch_tos(state):
     	return
 
     sha = git_top_of_applied_stack_sha(state)
-    patch = state['applied_sha_to_patch']
+    patch = state['downstream_sha_to_patch']
     downstream_sha = patch['downstream']
     patch['downstream'] = None
-    del state['applied_sha_to_patch'][downstream_sha]
+    del state['downstream_sha_to_patch'][downstream_sha]
 
     git_utils.git_pop_branch_tos()
     del state['downstream_sha_to_patch'][downstream_sha]
@@ -880,7 +880,7 @@ def cherry_pick_continue(state):
     git_cherry_pick_continue()
     if git_repo_is_clean():
         patch['downstream'] = git_top_of_applied_stack_sha(state)
-        state['applied_sha_to_patch'][patch['downstream']] = patch
+        state['downstream_sha_to_patch'][patch['downstream']] = patch
         plh = state['patch_list_history']
         plh.append(list())
         plhe = plh[-1]
