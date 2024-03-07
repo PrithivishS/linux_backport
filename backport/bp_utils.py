@@ -758,15 +758,15 @@ def apply_next_patch(state):
 
 def cherry_pick_by_sha(state):
     print_log("@@cherry_pick_by_sha", state)
-    if not confirm("""THIS IS OBSOLETE AND DANGEROUS\n\n
-                   if you really must use it, update state[\n
+    if not confirm("""THIS IS OBSOLETE AND DANGEROUS\n
+                   if you really must use it, update state[
                    'all_patches', 'applied_sha_to_patch']\n
                    are you sure?: """, ['y']):
     	return
     if not top_cites_upstream_or_confirmed_dont_care(state):
         print_log("no upstream citation or confirmation of indifference",
                   state)
-        return
+        returnn
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
         
@@ -781,3 +781,134 @@ def cherry_pick_by_sha(state):
         show_stuff_for_conflict_resolution(state)
     save_cp(state)
 
+## stuff moved out of backport.py <BEGIN>
+def unapplied_patches(state):
+    print_log("@@how_unapplied_patches", state)
+    L = [p for p in state['all_patches'] if not p['downstream']]
+    print_patch_list("", L, state)
+    return L
+
+def do_pdb(state):
+    print_log("@@pdb", state)
+    pdb.set_trace()
+
+def checkpoint(state):
+    print_log("@@checkpoint", state)
+    save_cp(state)
+
+def pop_branch_tos(state):    
+    print_log("@@do_pop_branch_tos", state)
+    if not top_cites_upstream_or_confirmed_dont_care(state):
+        print_log("no upstream citation or confirmation of indifference",
+                  state)
+        return
+    if not git_repo_is_clean():
+        print_log("git status not clean. no changes made", state)
+        
+    git_utils.git_pop_branch_tos_stack()
+    short_git_log(state)
+
+def short_git_log(state):
+    print_log("@@how_short_git_log", state)
+    git_short_log('%<(10) %h  %<(12) %an : %s', state)
+
+def bash(state):
+    print_log("@@bash", state)
+    subprocess.run(['bash'])
+
+def log_note(state):
+    print_log("@@log_note", state)
+    s = input("enter text to be appended to the log: ")
+    print_log(s, state)
+
+def patch_info(state):
+    print_log("@@patch_info", state)
+    prompted_show_sha_info(state)
+
+def backup_branch(state):
+    print_log("@@backup_branch", state)
+    line_fn = lambda line, state: print_log(line, state)
+    prompt_to_set_or_alter_state('branch_backup_cmd', state)
+    if not state['branch_backup_cmd']:
+        return
+
+    # do it
+    cmd = "git " + ' '.join(state['branch_backup_cmd'].split(' ')[1:])
+    out = shell_cmd(cmd)
+    print_log(out, state)
+
+def unapply_branch_tos(state):
+    if not git_repo_is_clean():
+        print_log("git status not clean. no changes made", state)
+        
+    if not confirm("Are you sure? Enter 'y' if ok, else <enter>: ", ['y']):
+    	return
+
+    sha = git_top_of_applied_stack_sha(state)
+    patch = state['applied_sha_to_patch']
+    downstream_sha = patch['downstream']
+    patch['downstream'] = None
+    del state['applied_sha_to_patch'][downstream_sha]
+
+    git_utils.git_pop_branch_tos()
+    del state['downstream_sha_to_patch'][downstream_sha]
+
+    return
+
+def add_sha_list_to_all_patches(state):
+    print_log("@@add_sha_list_to_all_patches", state)
+    if not git_repo_is_clean():
+        print_log("git status not clean. no changes made", state)
+        return
+    if not confirm("Are you sure you don't need to pop top applied patch? Enter 'y' if ok, else <enter>: ", ['y']):
+    	return
+
+     # get the name of the sha file
+    print("enter the path of a file containing one sha per line <enter> if none")
+    sha_file = input("sha_file: ")
+    if not sha_file: return
+
+    patches = import_sha_list_file(sha_file, state)
+    for patch in import_sha_list_file(sha_file, state):
+        add_to_all_patches(patch, state)
+
+def cherry_pick_continue(state):
+    if git_repo_is_clean():
+        print_log("repo is clean. can't cherry-pick --continue")
+        return
+    print_log("@@cherry_pick_continue", state)
+    git_cherry_pick_continue()
+    if git_repo_is_clean():
+        patch['downstream'] = git_top_of_applied_stack_sha(state)
+        state['applied_sha_to_patch'][patch['downstream']] = patch
+        plh = state['patch_list_history']
+        plh.append(list())
+        plhe = plh[-1]
+        for patch in state['all_patches']:
+            plhe.append(patch)
+
+def cherry_pick_abort(state):
+    print_log("@@cherry_pick_abort", state)
+    if git_repo_is_clean():
+        print_log("repo is clean. can't cherry-pick --abort")
+        return
+    if not confirm("enter 'y' if ok, else <enter>: ", ['y']):
+    	return
+    if not confirm("enter 'y' if you're really really sure, else <enter>: ", ['y']):
+    	return
+    git_cherry_pick_abort()
+
+def show_top_unapp(state):
+    print_patch_list("", unapplied_patches(state)[:1])
+
+def show_patch_by_sha(state):
+    sha = input("enter sha of patch to be shown: ")
+    (ret, output) = shell_cmd("git show " + sha)
+    print_log(output, state)
+
+def shell_one_liner(state):
+    cmd = input("enter shell one liner<enter to cancel>: ")
+    (ret, output) = shell_cmd(cmd)
+    print_log(output, state)
+
+## stuff moved out of backport.py <END>
