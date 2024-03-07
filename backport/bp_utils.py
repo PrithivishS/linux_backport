@@ -625,6 +625,7 @@ def uniqify_dict_list(dict_list, key_list):
     return ret
 
 def commit_order_in_tag_sha_list(state, tag, sha):
+    if not tag: return -1
     slbt = state['sha_lists_by_tag']
     if not slbt:
         print("sha_lists_by_tag not in state")
