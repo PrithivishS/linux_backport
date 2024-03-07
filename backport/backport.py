@@ -1,14 +1,6 @@
 #!/usr/bin/python3
 
-import pdb
-import subprocess
-import re
-import fileinput
-import sys
-import importlib
 import argparse
-import pickle
-from git_utils import *
 from bp_utils import *
 
 bp_universal_utils = {'prompt' :"universal utils", 'sub-menu' : [
