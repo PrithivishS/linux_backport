@@ -24,8 +24,7 @@ bp_menu_item_list = [
     #
     # main menu
     #
-    {'prompt' : 'start_backport', 'action': start_backport},
-    {'prompt' : 'main backport actions', 'sub-menu' : [
+     {'prompt' : 'main backport actions', 'sub-menu' : [
         {'prompt' : 'show git status', 'action': git_status},
         {'prompt' : 'short_git_log', 'action': short_git_log},
         {'prompt' : 'show unapplied patches','action': unapplied_patches},
@@ -92,6 +91,7 @@ bp_menu_item_list = [
         {'prompt' : 'note to log file', 'action' : log_note},
         {'prompt' : 'save checkpoint', 'action' : checkpoint},
         {'prompt' : 'shell one_liner', 'action': shell_one_liner},
+        {'prompt' : 'start_backport', 'action': start_backport},
         {'prompt' : 'enter pdb', 'action' : do_pdb},
         ]
      },
