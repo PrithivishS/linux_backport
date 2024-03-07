@@ -171,8 +171,6 @@ bp_menu_item_list = [
          'action': cherry_pick_continue},
         {'prompt' : 'cherry-pick -abort',
          'action': cherry_pick_abort},
-        {'prompt' : 'cherry-pick by sha',
-         'action': cherry_pick_by_sha},
         {'prompt' : 'add patch by sha',
          'action' : add_to_all_patches_by_sha},
         bp_universal_utils,
@@ -226,6 +224,11 @@ bp_menu_item_list = [
         {'prompt' : 'enter pdb', 'action' : do_pdb},
         ]
      },
+    {'prompt' : 'obsolete, should not be used', 'sub-menu' : [
+        {'prompt' : 'cherry-pick by sha',
+         'action': cherry_pick_by_sha},
+    ],
+    },
     {'prompt' : 'enter pdb', 'action' : do_pdb},
     {'prompt' : 'test', 'action' : test},
     {'prompt': 'show all patches', 'action' : show_all_patches},
