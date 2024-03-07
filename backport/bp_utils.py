@@ -758,6 +758,11 @@ def apply_next_patch(state):
 
 def cherry_pick_by_sha(state):
     print_log("@@cherry_pick_by_sha", state)
+    if not confirm("""THIS IS OBSOLETE AND DANGEROUS\n\n
+                   if you really must use it, update state[\n
+                   'all_patches', 'applied_sha_to_patch']\n
+                   are you sure?: """, ['y']):
+    	return
     if not top_cites_upstream_or_confirmed_dont_care(state):
         print_log("no upstream citation or confirmation of indifference",
                   state)
@@ -769,8 +774,6 @@ def cherry_pick_by_sha(state):
     if not cp_sha: return
     
     print(show_sha_info(cp_sha))
-    if not confirm("enter 'y' if ok, else <enter>: ", ['y']):
-    	return
     git_cherry_pick_by_sha(cp_sha)
     if not git_repo_is_clean():
         build(state)
