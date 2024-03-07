@@ -183,7 +183,7 @@ def load_pickle_file(args, state):
     print_log("loading state: " + f, state)
 
     state = restore_cp(f)
-    if not state: state = state_init()
+    if not state: state = state_init(args)
     state['log_fobj'] = open(args.log_file, 'a')
     state['cp_num'] = next_cp_num(args)
     
