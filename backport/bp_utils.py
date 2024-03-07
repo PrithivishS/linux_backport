@@ -682,7 +682,7 @@ def test(state):
     pass
 
 def start_backport(state):
-    if not git_repo_is_clean():
+    if not git_utils.git_repo_is_clean():
         print_log("repo is not clean. bailing out")
         return
     if state['backport_in_progress']:
