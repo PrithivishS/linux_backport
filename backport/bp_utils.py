@@ -742,12 +742,17 @@ def apply_next_patch(state):
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
         
-    patch = show_top_unapp()
+    L = [p for p in state['all_patches'] if not p['downstream']]
+    if len(L) == 0:
+        print_log("THERE ARE NO PATCHES TO APPLY", state)
+        return
+    patch = L[0]
 
     print_patch_dict("@@ cherry picking :", patch, state)
     git_cherry_pick(patch['sha1'])
     
     if git_repo_is_clean():
+        pdb.set_trace()
         patch['downstream'] = git_top_of_applied_stack_sha()
         state['downstream_sha_to_patch'][patch['downstream']] = patch
         build(state)
