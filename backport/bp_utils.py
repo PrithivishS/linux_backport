@@ -726,7 +726,7 @@ def show_stuff_for_conflict_resolution(state):
                                             cherry_pick_sha,
                                             os.path.split(file)[1])
         shell_cmd(cmd)
-        cmd = "git blame %s^ --:%s > %s/%s/prev.blame.%s" % (
+        cmd = "git blame %s^ -- %s > %s/%s/prev.blame.%s" % (
             cherry_pick_sha, file, state['cherry_pick_files'],
             cherry_pick_sha, os.path.split(file)[1])
         shell_cmd(cmd)
