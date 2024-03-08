@@ -903,7 +903,7 @@ def cherry_pick_abort(state):
     git_cherry_pick_abort()
 
 def show_top_unapp(state):
-    print_patch_list("", unapplied_patches(state)[:1])
+    print_patch_list("", unapplied_patches(state)[:1], state)
 
 def show_patch_by_sha(state):
     sha = input("enter sha of patch to be shown: ")
