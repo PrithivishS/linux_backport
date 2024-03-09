@@ -83,8 +83,6 @@ def git_cherry_pick(sha1):
     
 def git_reset_hard(sha1, state):
     cmd = "git  reset --hard  " + sha1
-    patch = make_patch_dict(state, sha1)
-    print_patch_dict("\n", patch, state)
     print("about to: " + cmd)
     
     if not confirm("\nEnter 'y' to proceed, else <enter>: ", ['y']):
