@@ -529,10 +529,41 @@ def invalidate_patches_if_new_precedents(state):
         if not patch['downstream']: invalidate = True
         if invalidate: patch['downstream'] = None
         
+def reset_branch_to_last_commit_not_preceding_invalidated(state):
+    # look for the last "applied" patchdownstream set) not followed by a commit
+    # with downstream == None
+    #
+    # if there are no such patches, then use the base commit 
+    #
+    # that is the commit that we want to reset the branch to
+    #
+    # MUST call invalidate_patches_if_new_precedents() before calling this
+    #      function
+
+    first_unapplied_patch = [ p for p in state['all_patches']
+                              if not p['downstream']][0]
+
+    if first_unapplied_patch == state['all_patches'][0]:
+        reset_to_sha = state['first_commit']
+    else:
+        pdb.set_trace()
+        reset_to_sha = state['all_patches'][ix - 1]['sha1']
+        if state['all_patches'][ix - 1]:
+            print_log("SOMETHING IS VERY, VERY WRONG. Entering pdb", state)
+            pdb.set_trace()
+        
+    patch = make_patch_dict(state, reset_to_sha)
+    print_patch_dict("\n", patch, state)
+    if confirm("about to reset --hard to this commit\nEnter 'y' to proceed, else <enter>: ", ['y']):
+        return
+
+    git_reset_hard(reset_to_sha, state)
+    
 def add_to_all_patches(patch,state):
     state['all_patches'].append(patch)
     state['sha_to_patch'] = {p['sha1'] : p for p in state['all_patches']}
     invalidate_patches_if_new_precedents(state)
+    reset_branch_to_last_commit_not_preceding_invalidated(state)
     save_cp(state)
 
 def add_to_all_patches_by_sha(state):
