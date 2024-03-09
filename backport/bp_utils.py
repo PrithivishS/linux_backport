@@ -563,6 +563,7 @@ def add_to_all_patches(patch,state):
     state['all_patches'].append(patch)
     state['sha_to_patch'] = {p['sha1'] : p for p in state['all_patches']}
     invalidate_patches_if_new_precedents(state)
+    git_cherry_pick_abort() # don't bother to check if we're cherry picking
     reset_branch_to_last_commit_not_preceding_invalidated(state)
     save_cp(state)
 
