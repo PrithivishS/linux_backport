@@ -17,7 +17,7 @@ bp_menu_item_list = [
     # main menu
     #
      {'prompt' : 'main backport actions', 'sub-menu' : [
-        {'prompt' : 'show git status', 'action': git_status},
+        {'prompt' : 'show git status', 'action': do_git_status},
         {'prompt' : 'short_git_log', 'action': short_git_log},
         {'prompt' : 'show unapplied patches','action': unapplied_patches},
         {'prompt' : 'apply next patch', 'action':  apply_next_patch},
@@ -27,7 +27,7 @@ bp_menu_item_list = [
         bp_universal_utils,
         ]},
     {'prompt' : 'cherry pick actions', 'sub-menu' : [
-        {'prompt' : 'show git status', 'action': git_status},
+        {'prompt' : 'show git status', 'action': do_git_status},
         {'prompt' : 'short_git_log', 'action': short_git_log},
         {'prompt' : 'cherry-pick --continue',
          'action': cherry_pick_continue},

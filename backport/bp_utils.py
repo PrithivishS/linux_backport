@@ -916,3 +916,10 @@ def shell_one_liner(state):
     print_log(output, state)
 
 ## stuff moved out of backport.py <END>
+
+def git_status_log(state):
+    s = git_utils.git_status(state)
+    
+def do_git_status(state):
+    s = git_status()
+    print_log(s, state)

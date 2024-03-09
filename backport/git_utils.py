@@ -1,7 +1,6 @@
 import subprocess
 import re
 import os
-from bp_utils import *
 import threading
 
 EG_pretty_fmt=" --pretty=tformat:'%<(10) %h  %<(12) %an : %s: %cd' "
@@ -26,12 +25,12 @@ def git_get_subject(sha1):
     s= s.rstrip("\n")
     return s
     
-def git_status(state):
+def git_status():
     result = subprocess.run("git status", shell=True,
                             stdout=subprocess.PIPE)
     s = result.stdout.decode().strip().rstrip()
     s = "\n\n=========\n %s \n=========\n\n" % (s)
-    print_log(s, state)
+    return s
     
 def git_short_log(fmt, state):
     commit_range = "%s^..HEAD" % (state['first_commit'])
