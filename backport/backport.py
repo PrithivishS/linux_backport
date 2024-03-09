@@ -17,12 +17,12 @@ bp_menu_item_list = [
     # main menu
     #
      {'prompt' : 'main backport actions', 'sub-menu' : [
-        {'prompt' : 'show git status', 'action': do_git_status},
-        {'prompt' : 'short_git_log', 'action': short_git_log},
-        {'prompt' : 'show unapplied patches','action': unapplied_patches},
-        {'prompt' : 'apply next patch', 'action':  apply_next_patch},
-        {'prompt' : 'build', 'action' : build},
-        {'prompt' : 'compare patch to upstream',
+         {'prompt' : 'show git status', 'action': do_git_status},
+         {'prompt' : 'short_git_log', 'action': short_git_log},
+         {'prompt' : 'show unapplied patches','action': unapplied_patches},
+         {'prompt' : 'apply next patch', 'action':  apply_next_patch},
+         {'prompt' : 'build', 'action' : build},
+         {'prompt' : 'compare patch to upstream',
          'action' : compare_patch_to_upstream},
         bp_universal_utils,
         ]},
