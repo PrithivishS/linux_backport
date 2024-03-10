@@ -24,6 +24,7 @@ bp_menu_item_list = [
          {'prompt' : 'apply next patch', 'action':  apply_next_patch},
          {'prompt' : 'add patch by sha',
           'action' : add_to_all_patches_by_sha},
+         {'prompt' : 'show one git log result', 'action': show_one_log_result},
          {'prompt' : 'build', 'action' : build},
          {'prompt' : 'compare patch to upstream',
          'action' : compare_patch_to_upstream},
@@ -61,7 +62,7 @@ bp_menu_item_list = [
         {'prompt' : 'short display unresolved syms (all)',
          'action': short_display_unres_symbols_all},
         {'prompt' : 'find commits referring unresolved symbols',
-         'action' : git_logG},
+         'action' : git_logG_syms},
         {'prompt' : 'show one git log result', 'action': show_one_log_result},
         {'prompt' : 'show git log completions', 'action': show_log_completions},
         {'prompt' : 'set provider(resolve) by index',
@@ -98,6 +99,8 @@ bp_menu_item_list = [
     {'prompt' : 'enter pdb', 'action' : do_pdb},
     {'prompt' : 'test', 'action' : test},
     {'prompt': 'show all patches', 'action' : show_all_patches},
+    {'prompt' : 'find commits referring to pattern',
+     'action' : git_logG_simple},
 ]
 
 parser = argparse.ArgumentParser()

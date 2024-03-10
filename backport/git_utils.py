@@ -197,12 +197,50 @@ def show_one_log_result(state):
         out = clip_long_output(sha_out_list[sha], state)
         print_log(out, state)
 
-def git_logG(state):
+def git_log_tag(state, min_max):
+    if min_max == "min":
+        key = 'git_log_min_tag'
+    elif min_max == "max":
+        key = 'git_log_max_tag'
+    else:
+        print("bad input")
+        return None
+    if key not in state:
+        val = input("enter release tag for %s: " % (key))
+        state[key] = val
+        return val
+    else:
+        return state[key]
+    
+def git_logG_simple(state):
+    # https://realpython.com/intro-to-python-threading
+
+    state['git_log_completed'] = list()
+    print_log("@@git_logG_simple", state)
+    line_fn = lambda line, state: print_log(get_sha_info(line, ''), state)
+
+    (search_type, pattern) = input("\nenter 'S' or 'G', <pattern> <enter to return>: ").split(' ')
+    if not pattern: return
+                    
+    if search_type != 'S' and search_type != 'G':
+        print("oops")
+        return
+
+    min = git_log_tag(state, 'min')
+    max = git_log_tag(state, 'max')
+    thrd = threading.Thread(target=git_log_search,
+                            args = (search_type, pattern, min, max, line_fn,
+                                    state),
+                            daemon=True)
+    thrd.start()
+    print_log("git_logG_syms/exit", state)
+    
+def git_logG_syms(state):
     # https://realpython.com/intro-to-python-threading
     
 #   threads = []
     state['git_log_completed'] = list()
-    print_log("@@git_logG", state)
+    print_log("@@git_logG_syms", state)
     line_fn = lambda line, state: print_log(get_sha_info(line, ''), state)
     search_type = input("\nenter 'S' or 'G '<enter to return>: ")
     if search_type != 'S' and search_type != 'G':
@@ -215,25 +253,25 @@ def git_logG(state):
     for sym in needy_syms:
         #G v6.0 v6.2
         print("git_log_search for: %s initiated" % (sym['tag']))
+        min = git_log_tag(state, 'min')
+        max = git_log_tag(state, 'max')
         thrd = threading.Thread(target=git_log_search,
-                                args=(search_type, sym['tag'],
-                                      state['git_log_min_tag'],
-                                      state['git_log_max_tag'],
-                                      line_fn,
-                                      state), daemon=True
-                                )
-#       threads.append(thrd)
+                                args = (search_type, sym['tag'], min, max,
+                                        line_fn, state),
+                                daemon=True)
+
+        #       threads.append(thrd)
         thrd.start()
 #        if threads:
 #            for thrd in threads:
 #                thrd.join()
-        print_log("git_logG/exit", state)
+        print_log("git_logG_syms/exit", state)
 
 def search_commit_for_pattern(search_type, pattern, tag1, tag2, line_fn, state,
                               sha):
-    #_pdb = pdb.Pdb();_pdb.set_trace()
     key = search_type + "," + pattern + "," + tag1 +"," + tag2
     cmd = "git show %s | grep %s" % (sha, pattern)
+    #_pdb = pdb.Pdb();_pdb.set_trace()
     (ret, out) = shell_cmd(cmd)
 
     if 'git_log_results' not in state:
@@ -250,11 +288,11 @@ def search_commit_for_pattern(search_type, pattern, tag1, tag2, line_fn, state,
 # git log is capable of much more than this function shows
 #
 def git_log_search(search_type, pattern, tag1, tag2, line_fn, state): 
-    #_pdb = pdb.Pdb();_pdb.set_trace()
     cmd =  "git log -%s%s" % (search_type, pattern)
     cmd += " --pretty=tformat:\'%<(10) %h\'"
     cmd += " %s..%s" % (tag1, tag2)
     (ret, out) = shell_cmd(cmd)
+    #_pdb = pdb.Pdb();_pdb.set_trace()
     out = [x.lstrip() for x in out.rstrip("\n").split("\n")]
 
     for sha in out:
