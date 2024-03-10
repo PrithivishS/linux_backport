@@ -2,6 +2,7 @@ import subprocess
 import re
 import os
 import threading
+from print_log import *
 
 EG_pretty_fmt=" --pretty=tformat:'%<(10) %h  %<(12) %an : %s: %cd' "
 

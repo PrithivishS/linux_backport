@@ -12,6 +12,7 @@ import shlex
 import tempfile
 import difflib
 from packaging import version
+import print_log
 
 def confirm(prompt, legal_response_list):
     tmp = input(prompt)
