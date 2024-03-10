@@ -546,7 +546,6 @@ def reset_branch_to_last_commit_not_preceding_invalidated(state):
     if first_unapplied_patch == state['all_patches'][0]:
         reset_to_sha = state['first_commit']
     else:
-        pdb.set_trace()
         reset_to_sha = state['all_patches'][ix - 1]['sha1']
         if state['all_patches'][ix - 1]:
             print_log("SOMETHING IS VERY, VERY WRONG. Entering pdb", state)
@@ -556,8 +555,8 @@ def reset_branch_to_last_commit_not_preceding_invalidated(state):
     print_patch_dict("\n", patch, state)
     if confirm("about to reset --hard to this commit\nEnter 'y' to proceed, else <enter>: ", ['y']):
         return
-
-    git_reset_hard(reset_to_sha, state)
+    if git_top_of_applied_stack_sha(state) != state['first_commit']:
+        git_reset_hard(reset_to_sha, state)
     
 def add_to_all_patches(patch,state):
     state['all_patches'].append(patch)
