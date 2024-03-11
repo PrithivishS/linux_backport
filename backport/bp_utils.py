@@ -265,6 +265,8 @@ def state_init(args): # anoter obvious objuect
     #TBD:, FIXME:  get rid of state fields from args that !change
     state['patch_list_history'] = []
     state['backport_in_progress'] = False
+    state['sha_to_patch'] = dict()
+    state['downstream_sha_to_patch'] = dict()
     return state
 
 def backport_patches(state, menu_item_list):
@@ -719,7 +721,7 @@ def start_backport(state):
     git_utils.next_branch(state)
     git_utils.git_reset_hard(state['first_commit'], state)
 
-def show_stuff_for_conflict_resolution(state):
+def active_cherry_pick_sha(state):
     # parse git status and find sha we're cherry_picking
     mod_files = []
     both_mod_files = []
@@ -730,9 +732,15 @@ def show_stuff_for_conflict_resolution(state):
     match = re.search(classic_pat, classic_status)
     try:
         cherry_pick_sha = match.group(2)
+        return cherry_pick_sha
     except:
-        print('ERROR: cannot find "cherry-picking commit" in git status output')
+        return None
         return
+     
+def show_stuff_for_conflict_resolution(state):
+    cherry_pick_sha = active_cherry_pick_sha(state)
+    if not cherry_pick_sha:
+        print_log("uh-oh", state)
     
     # parse git status --porcelain
     (ret, porcelain_status) = shell_cmd("git status --porcelain")
@@ -908,14 +916,19 @@ def add_sha_list_to_all_patches(state):
         add_to_all_patches(patch, state)
 
 def cherry_pick_continue(state):
-    if git_repo_is_clean():
-        print_log("repo is clean. can't cherry-pick --continue")
+    pdb.set_trace()
+    cherry_pick_sha = active_cherry_pick_sha(state)
+    if not cherry_pick_sha:
+        print_log("No cherry-pick in progress. can't cherry-pick --continue",
+                  state)
         return
+    patch = state['sha_to_patch'][cherry_pick_sha]
     print_log("@@cherry_pick_continue", state)
     git_cherry_pick_continue()
     if git_repo_is_clean():
-        patch['downstream'] = git_top_of_applied_stack_sha(state)
-        state['downstream_sha_to_patch'][patch['downstream']] = patch
+        downstream_sha = git_top_of_applied_stack_sha(state)
+        patch['downstream'] = downstream_sha
+        state['downstream_sha_to_patch'][downstream_sha] = patch
         plh = state['patch_list_history']
         plh.append(list())
         plhe = plh[-1]
@@ -925,7 +938,7 @@ def cherry_pick_continue(state):
 def cherry_pick_abort(state):
     print_log("@@cherry_pick_abort", state)
     if git_repo_is_clean():
-        print_log("repo is clean. can't cherry-pick --abort")
+        print_log("repo is clean. can't cherry-pick --abort", state)
         return
     if not confirm("enter 'y' if ok, else <enter>: ", ['y']):
     	return
