@@ -722,8 +722,6 @@ def start_backport(state):
 
 def active_cherry_pick_sha(state):
     # parse git status and find sha we're cherry_picking
-    mod_files = []
-    both_mod_files = []
     (ret, classic_status) = shell_cmd("git status")
     (ret, porcelain_status) = shell_cmd("git status --porcelain")
 
@@ -743,6 +741,8 @@ def show_stuff_for_conflict_resolution(state):
     
     # parse git status --porcelain
     (ret, porcelain_status) = shell_cmd("git status --porcelain")
+    mod_files = []
+    both_mod_files = []
     for line in porcelain_status.split("\n")[: -1]:
         (code, file) = [x for x in line.split(' ') if not x == '']
         if code == 'M': mod_files.append(file)
