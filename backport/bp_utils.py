@@ -61,11 +61,17 @@ def restore_cp(fpath):
         if not confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
             sys.exit
         return None
+    
+def patch_status(patch, state):
+    if patch['downstream']: return 'applied'
+    if patch['sha1'] == active_cherry_pick_sha(state):
+        return "cherry-pick active"
+    return "unapplied"
 
 def print_patch_dict(msg, patch, state):  # do we really re-use this?
-    s = "%s, %s, %s, %s, %s" % (
+    s = "%s, %s, %s, %s, %s, %s" % (
         msg, patch['sha1'], patch['subject'], patch['tag'],
-              patch['tag_date'])
+              patch['tag_date'], patch_status(patch, state))
     print_log(s, state)
 
 def make_patch_dict(state, sha1):
@@ -680,17 +686,10 @@ def update_rls_tag_order_in_patch_list(patch_list, state):
         _p['order_in_release'] = \
             int(commit_order_in_tag_sha_list(state, max_tag,
                                              _p['sha1']))
-        print("ix: %d, tag:%s, sha: %s, %s" %
-              ( _p['order_in_release'],  _p['tag'], _p['sha1'],
-                _p['subject']))
-
 def show_all_patches(state):
     update_rls_tag_order_in_patch_list(state['all_patches'], state)
     state['all_patches'].sort(key= lambda x: x['order_in_release'])
-    L = ["%s: %s, %s" % (p['sha1'], p['tag'], p['subject'])
-              for p in state['all_patches']]
-    for (i, l) in zip(range(0, len(L)), L):
-        print(str(i) + ": " +l)
+    print_patch_list("all patches", state['all_patches'], state)
         
 def del_from_all_patches(sha, state):
     

@@ -22,6 +22,7 @@ bp_menu_item_list = [
          {'prompt' : 'short_git_log', 'action': short_git_log},
          {'prompt' : 'show unapplied patches','action': unapplied_patches},
          {'prompt' : 'apply next patch', 'action':  apply_next_patch},
+        {'prompt': 'show all patches', 'action' : show_all_patches},
          {'prompt' : 'add patch by sha',
           'action' : add_to_all_patches_by_sha},
          {'prompt' : 'show one git log result', 'action': show_one_log_result},
