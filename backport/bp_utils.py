@@ -814,10 +814,11 @@ def cherry_pick_by_sha(state):
                    'all_patches', 'downstream_sha_to_patch']\n
                    are you sure?: """, ['y']):
     	return
-    if not top_cites_upstream_or_confirmed_dont_care(state):
-        print_log("no upstream citation or confirmation of indifference",
-                  state)
-        returnn
+    #
+    #if not top_cites_upstream_or_confirmed_dont_care(state):
+    #    print_log("no upstream citation or confirmation of indifference",
+    #              state)
+    #   return
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
         
