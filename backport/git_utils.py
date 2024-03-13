@@ -199,6 +199,13 @@ def show_one_log_result(state):
         out = clip_long_output(sha_out_list[sha], state)
         print_log(out, state)
 
+def delete_one_log_result(state):
+    key = get_log_result_key_by_index(state)
+    
+    print_log("==== %s ====" % (key), state)
+    
+    del state['git_log_results'][key]
+
 def git_log_tag(state, min_max):
     if min_max == "min":
         key = 'git_log_min_tag'
