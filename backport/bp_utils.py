@@ -1019,3 +1019,12 @@ def show_one_log_result(state):
         out = clip_long_output(sha_out_list[sha], state)
         print_log(out, state)
 
+def delete_one_log_result(state):
+    key = get_log_result_key_by_index(state)
+    if not key: return
+    
+    print_log("==== %s ====" % (key), state)
+    
+    del state['git_log_results'][key]
+
+    
