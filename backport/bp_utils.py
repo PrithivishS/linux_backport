@@ -925,7 +925,6 @@ def add_sha_list_to_all_patches(state):
         add_to_all_patches(patch, state)
 
 def cherry_pick_continue(state):
-    pdb.set_trace()
     cherry_pick_sha = active_cherry_pick_sha(state)
     if not cherry_pick_sha:
         print_log("No cherry-pick in progress. can't cherry-pick --continue",
