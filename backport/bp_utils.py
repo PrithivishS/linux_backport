@@ -115,8 +115,8 @@ def show_menu_trailer(state):
     if not git_utils.git_repo_is_clean():
         trailer = "\n** working tree UNCLEAN **"
         
-    if not top_patch_has_upstream_citation(state):
-        trailer += "** top applied patch lacks 'commit <sha> upstream' **"
+    #if not top_patch_has_upstream_citation(state):
+    #    trailer += "** top applied patch lacks 'commit <sha> upstream' **"
     if trailer:
         trailer = '\n' + trailer +'\n'
         print_log(trailer, state)
