@@ -166,39 +166,6 @@ def show_log_completions(state):
     except:
         return
 
-def get_log_result_key_by_index(state):
-    keys = state['git_log_results'].keys()
-    keys_l = list(keys)
-    
-    for (key, i) in zip(keys, range(len(keys))):
-        print(str(i) + ":" + key)
-        
-    ix = input("enter index <enter to return>: ")
-    if not ix:
-        return
-    try:
-        ix = int(ix)
-    except:
-        print("oops")
-        return
-    
-    if i > len(keys) or ix < 0:
-        return
-          
-    key = keys_l[ix]
-    return key
-    
-def show_one_log_result(state):
-    key = get_log_result_key_by_index(state)
-    
-    print_log("==== %s ====" % (key), state)
-    
-    sha_out_list = state['git_log_results'][key]
-    for sha in sha_out_list.keys():
-        print_log("== %s ==" % (sha), state)
-        out = clip_long_output(sha_out_list[sha], state)
-        print_log(out, state)
-
 def delete_one_log_result(state):
     key = get_log_result_key_by_index(state)
     

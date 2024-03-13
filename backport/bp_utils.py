@@ -68,10 +68,13 @@ def patch_status(patch, state):
         return "cherry-pick active"
     return "unapplied"
 
-def print_patch_dict(msg, patch, state):  # do we really re-use this?
+def patch_dict_to_string(msg, patch, state):
     s = "%s, %s, %s, %s, %s, %s" % (
         msg, patch['sha1'], patch['subject'], patch['tag'],
               patch['tag_date'], patch_status(patch, state))
+
+def print_patch_dict(msg, patch, state):  # do we really re-use this?
+    s = patch_dict_to_string(msg, patch, state)
     print_log(s, state)
 
 def make_patch_dict(state, sha1):
@@ -92,6 +95,11 @@ def make_patch_dict(state, sha1):
           (d['sha1'], d['subject'], d['tag'],
            d['tag_date']))
     return d
+
+def sha_to_dict_string(state, sha):
+    _d = make_patch_dict(state, sha)
+    s = patch_dict_to_string("", _d, state)
+    return s
 
 def print_patch_list(msg, patch_list, state):
     i = 0
@@ -975,3 +983,39 @@ def git_status_log(state):
 def do_git_status(state):
     s = git_status()
     print_log(s, state)
+
+def get_log_result_key_by_index(state):
+    keys = state['git_log_results'].keys()
+    keys_l = list(keys)
+    
+    for (key, i) in zip(keys, range(len(keys))):
+        print(str(i) + ":" + key)
+        
+    ix = input("enter index <enter to return>: ")
+    if not ix:
+        return
+    try:
+        ix = int(ix)
+    except:
+        print("oops")
+        return
+    
+    if i > len(keys) or ix < 0:
+        return
+          
+    key = keys_l[ix]
+    return key
+    
+def show_one_log_result(state):
+    key = get_log_result_key_by_index(state)
+    if not key: return
+    
+    print_log("==== %s ====" % (key), state)
+    
+    sha_out_list = state['git_log_results'][key]
+    for sha in sha_out_list.keys():
+        _d = make_patch_dict(state,sha)
+        print_log("== %s ==" % (sha_to_dict_string(state, sha)), state)
+        out = clip_long_output(sha_out_list[sha], state)
+        print_log(out, state)
+
