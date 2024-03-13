@@ -165,9 +165,8 @@ def show_log_completions(state):
         print(state['git_log_completed'])
     except:
         return
-    
-    
-def show_one_log_result(state):
+
+def get_log_result_key_by_index(state):
     keys = state['git_log_results'].keys()
     keys_l = list(keys)
     
@@ -185,9 +184,12 @@ def show_one_log_result(state):
     
     if i > len(keys) or ix < 0:
         return
-
-                
+          
     key = keys_l[ix]
+    return key
+    
+def show_one_log_result(state):
+    key = get_log_result_key_by_index(state)
     
     print_log("==== %s ====" % (key), state)
     
