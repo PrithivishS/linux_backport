@@ -800,8 +800,7 @@ def apply_next_patch(state):
     git_cherry_pick(patch['sha1'])
     
     if git_repo_is_clean():
-        pdb.set_trace()
-        patch['downstream'] = git_top_of_applied_stack_sha()
+        patch['downstream'] = git_top_of_applied_stack_sha(state)
         state['downstream_sha_to_patch'][patch['downstream']] = patch
         build(state)
     else:
