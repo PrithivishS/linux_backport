@@ -218,7 +218,7 @@ def show_sha_info(sha):
                   
 def prompted_show_sha_info(state):
     sha = input("enter sha1(return to exit): ")
-    if not sha: return Nnone
+    if not sha: return None
     print_log(show_sha_info(sha), state)
 
                   
@@ -733,7 +733,7 @@ def test(state):
 
 def start_backport(state):
     if not git_utils.git_repo_is_clean():
-        print_log("repo is not clean. bailing out")
+        print_log("repo is not clean. bailing out", state)
         return
     if state['backport_in_progress']:
         print("OOPS: backport already in progress")
