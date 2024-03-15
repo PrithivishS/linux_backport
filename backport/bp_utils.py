@@ -545,6 +545,17 @@ def invalidate_patches_if_new_precedents(state):
         if not patch['downstream']: invalidate = True
         if invalidate: patch['downstream'] = None
         
+def git_reset_hard(sha1, state):
+    cmd = "git  reset --hard  " + sha1
+    print("about to: " + cmd)
+    
+    if not confirm("\nEnter 'y' to proceed, else <enter>: ", ['y']):
+        return -1
+
+    result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
+
+    return result.returncode
+    
 def reset_branch_to_last_commit_not_preceding_invalidated(state):
     # look for the last "applied" patchdownstream set) not followed by a commit
     # with downstream == None
@@ -726,7 +737,7 @@ def start_backport(state):
 
     state['backport_in_progress'] = True
     git_utils.next_branch(state)
-    git_utils.git_reset_hard(state['first_commit'], state)
+    git_reset_hard(state['first_commit'], state)
 
 def active_cherry_pick_sha(state):
     # parse git status and find sha we're cherry_picking
