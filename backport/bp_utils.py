@@ -577,6 +577,7 @@ def reset_branch_to_last_commit_not_preceding_invalidated(state):
     if first_unapplied_patch == state['all_patches'][0]:
         reset_to_sha = state['first_commit']
     else:
+        ix = state['all_patches'].index(first_unapplied_patch)
         reset_to_sha = state['all_patches'][ix - 1]['sha1']
         if state['all_patches'][ix - 1]:
             print_log("SOMETHING IS VERY, VERY WRONG. Entering pdb", state)
@@ -790,6 +791,12 @@ def show_stuff_for_conflict_resolution(state):
 
         # show git blame for previous rev of this file
         cmd = "git blame %s^ -- %s > %s/%s/prev.blame.%s" % (
+            cherry_pick_sha, file, state['cherry_pick_files'],
+            cherry_pick_sha, os.path.split(file)[1])
+        shell_cmd(cmd)
+
+        # show contents for previous rev of this file
+        cmd = "git show %s^ -- %s > %s/%s/prev.blame.%s" % (
             cherry_pick_sha, file, state['cherry_pick_files'],
             cherry_pick_sha, os.path.split(file)[1])
         shell_cmd(cmd)
