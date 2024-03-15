@@ -123,6 +123,9 @@ def show_menu_trailer(state):
     trailer = ""
     if not git_utils.git_repo_is_clean():
         trailer = "\n** working tree UNCLEAN **"
+
+    if active_cherry_pick_sha(state):
+        trailer = "\n** active cherry-pick ** "
         
     #if not top_patch_has_upstream_citation(state):
     #    trailer += "** top applied patch lacks 'commit <sha> upstream' **"
