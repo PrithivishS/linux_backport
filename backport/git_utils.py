@@ -125,13 +125,13 @@ def get_current_branch(): # works on git < 2.22
     return result.stdout.decode("latin-1").strip()
 
 def next_branch(state):
-    if not git_utils.git_repo_is_clean():
+    if not git_repo_is_clean():
         print_log("git status not clean. no action taken", state)
         return
     cmd = "git checkout -b " +  add_or_inc_ver_num(get_current_branch())
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
     s = result.stdout.decode().strip().rstrip()
-    git_status(state)
+    git_status()
     print_log(s, state)
 
 def git_applied_sha_list(state):
