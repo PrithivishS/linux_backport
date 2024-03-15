@@ -72,6 +72,7 @@ def patch_dict_to_string(msg, patch, state):
     s = "%s, %s, %s, %s, %s, %s" % (
         msg, patch['sha1'], patch['subject'], patch['tag'],
               patch['tag_date'], patch_status(patch, state))
+    return s
 
 def print_patch_dict(msg, patch, state):  # do we really re-use this?
     s = patch_dict_to_string(msg, patch, state)
