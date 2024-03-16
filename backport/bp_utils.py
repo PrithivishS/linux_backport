@@ -204,7 +204,6 @@ def load_pickle_file(args, state):
     if not state: state = state_init(args)
     state['log_fobj'] = open(args.log_file, 'a')
     state['cp_num'] = next_cp_num(args)
-    
     state['sha_to_patch'] = {p['sha1'] : p for p in state['all_patches']}
     return state
 
