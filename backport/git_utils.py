@@ -280,3 +280,7 @@ def get_short_sha_list_by_tag(tag):
     out = out.split("\n")
     return out
 
+def git_get_conflicts():
+    cmd = "git diff --diff-filter=U"
+    (ret, out) = shell_cmd(cmd)
+    return out
