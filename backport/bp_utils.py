@@ -778,40 +778,76 @@ def show_stuff_for_conflict_resolution(state):
     
     # emit both_mod files to "both_mod.".filename
     for file in both_mod_files:
+        #show current rev
         cmd = "git show %s:%s > %s/%s/%s" % (cherry_pick_sha, file,
                                             state['cherry_pick_files'],
                                             cherry_pick_sha,
                                             os.path.split(file)[1])
         shell_cmd(cmd)
-
-        # show git blame for previous rev of this file
-        cmd = "git blame %s^ -- %s > %s/%s/prev.blame.%s" % (
-            cherry_pick_sha, file, state['cherry_pick_files'],
-            cherry_pick_sha, os.path.split(file)[1])
-        shell_cmd(cmd)
-
-        # show contents for previous rev of this file
-        cmd = "git show %s^ -- %s > %s/%s/prev.blame.%s" % (
-            cherry_pick_sha, file, state['cherry_pick_files'],
-            cherry_pick_sha, os.path.split(file)[1])
-        shell_cmd(cmd)
-
+        
         #git blame for current rev
         cmd = "git blame %s -- %s > %s/%s/blame.%s" % (
             cherry_pick_sha, file, state['cherry_pick_files'],
             cherry_pick_sha, os.path.split(file)[1])
         shell_cmd(cmd)
         
-
+        # show contents for previous rev of this file
+        cmd = "git show %s^ -- %s > %s/%s/prev.%s" % (
+            cherry_pick_sha, file, state['cherry_pick_files'],
+            cherry_pick_sha, os.path.split(file)[1])
+        shell_cmd(cmd)
         
-    # FIXME: maybe later show diff beteween local file and sha version
+        # show git blame for previous rev of this file
+        cmd = "git blame %s^ -- %s > %s/%s/prev.blame.%s" % (
+            cherry_pick_sha, file, state['cherry_pick_files'],
+            cherry_pick_sha, os.path.split(file)[1])
+        shell_cmd(cmd)
+        
+def cherry_pick_by_sha(state, cp_sha):
+    print_log("@@cherry_pick_by_sha", state)
+    pdb.set_trace()
+    if not git_repo_is_clean():
+        print_log("git status not clean. no changes made", state)
+    save_cp(state)
     
+def cherry_pick_complete(state, patch):
+    patch['prev_downstream'] = patch['downstream']
+    patch['downstream'] = git_top_of_applied_stack_sha(state)
+    state['downstream_sha_to_patch'][patch['downstream']] = patch
+    build(state)
+    
+def try_to_reuse_old_conflict_resolution(patch, state):
+    if not active_cherry_pick_sha(state):
+        # we can't use a prev resolution if there is no conflict
+        # and we can't have a conflict if not in cherry-pick
+        return False
+    
+    patch['prev_conflicts'] = patch['conflicts']
+    patch['conflicts'] = git_get_conflicts()
+
+    if (patch['prev_downstream'] and
+        patch['conflicts'] == patch['prev_conflicts']):
+        pdb.set_trace() #FIXME
+        # abort current cherry pick
+        git_cherry_pick_abort()
+        # cherry-pick prev downstream
+        cherry_pick_by_sha(patch['prev_downstream'])
+                           
+        if git_repo_is_clean():
+            return True
+        else:
+            return False
+
+    else:
+        return False # can't use old resolution
+        
 def apply_next_patch(state):
     print_log("@@apply_next_patch", state)
     if not top_cites_upstream_or_confirmed_dont_care(state):
         print_log("no upstream citation or confirmation of indifference",
                   state)
         return
+    
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
         
