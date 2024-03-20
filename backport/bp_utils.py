@@ -757,7 +757,33 @@ def active_cherry_pick_sha(state):
         return cherry_pick_sha
     except:
         return None
-     
+    
+def generate_per_file_conflict_resolution_info(cherry_pick_sha, file, state):
+    #show current rev
+    cmd = "git show %s:%s > %s/%s/%s" % (cherry_pick_sha, file,
+                                         state['cherry_pick_files'],
+                                         cherry_pick_sha,
+                                         os.path.split(file)[1])
+    shell_cmd(cmd)
+    
+    #git blame for current rev
+    cmd = "git blame %s -- %s > %s/%s/blame.%s" % (
+        cherry_pick_sha, file, state['cherry_pick_files'],
+        cherry_pick_sha, os.path.split(file)[1])
+    shell_cmd(cmd)
+    
+    # show contents for previous rev of this file
+    cmd = "git show %s^ -- %s > %s/%s/prev.%s" % (
+        cherry_pick_sha, file, state['cherry_pick_files'],
+        cherry_pick_sha, os.path.split(file)[1])
+    shell_cmd(cmd)
+    
+    # show git blame for previous rev of this file
+    cmd = "git blame %s^ -- %s > %s/%s/prev.blame.%s" % (
+        cherry_pick_sha, file, state['cherry_pick_files'],
+        cherry_pick_sha, os.path.split(file)[1])
+    shell_cmd(cmd)
+    
 def show_stuff_for_conflict_resolution(state):
     cherry_pick_sha = active_cherry_pick_sha(state)
     if not cherry_pick_sha:
@@ -783,30 +809,7 @@ def show_stuff_for_conflict_resolution(state):
     
     # emit both_mod files to "both_mod.".filename
     for file in both_mod_files:
-        #show current rev
-        cmd = "git show %s:%s > %s/%s/%s" % (cherry_pick_sha, file,
-                                            state['cherry_pick_files'],
-                                            cherry_pick_sha,
-                                            os.path.split(file)[1])
-        shell_cmd(cmd)
-        
-        #git blame for current rev
-        cmd = "git blame %s -- %s > %s/%s/blame.%s" % (
-            cherry_pick_sha, file, state['cherry_pick_files'],
-            cherry_pick_sha, os.path.split(file)[1])
-        shell_cmd(cmd)
-        
-        # show contents for previous rev of this file
-        cmd = "git show %s^ -- %s > %s/%s/prev.%s" % (
-            cherry_pick_sha, file, state['cherry_pick_files'],
-            cherry_pick_sha, os.path.split(file)[1])
-        shell_cmd(cmd)
-        
-        # show git blame for previous rev of this file
-        cmd = "git blame %s^ -- %s > %s/%s/prev.blame.%s" % (
-            cherry_pick_sha, file, state['cherry_pick_files'],
-            cherry_pick_sha, os.path.split(file)[1])
-        shell_cmd(cmd)
+        generate_per_file_conflict_resolution_info(cherry_pick_sha, file, state)
         
 def cherry_pick_by_sha(state, cp_sha):
     print_log("@@cherry_pick_by_sha", state)
