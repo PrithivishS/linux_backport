@@ -578,9 +578,6 @@ def reset_branch_to_last_commit_not_preceding_invalidated(state):
     else:
         ix = state['all_patches'].index(first_unapplied_patch)
         reset_to_sha = state['all_patches'][ix - 1]['sha1']
-        if state['all_patches'][ix - 1]:
-            print_log("SOMETHING IS VERY, VERY WRONG. Entering pdb", state)
-            pdb.set_trace()
         
     patch = make_patch_dict(state, reset_to_sha)
     print_patch_dict("\n", patch, state)
