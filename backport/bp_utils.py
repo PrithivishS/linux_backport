@@ -873,28 +873,6 @@ def apply_next_patch(state):
         show_stuff_for_conflict_resolution(state)
     save_cp(state)
 
-def cherry_pick_by_sha(state):
-    print_log("@@cherry_pick_by_sha", state)
-    if not confirm("""THIS IS OBSOLETE AND DANGEROUS\n
-                   if you really must use it, update state[
-                   'all_patches', 'downstream_sha_to_patch']\n
-                   are you sure?: """, ['y']):
-    	return
-    #
-    #if not top_cites_upstream_or_confirmed_dont_care(state):
-    #    print_log("no upstream citation or confirmation of indifference",
-    #              state)
-    #   return
-    if not git_repo_is_clean():
-        print_log("git status not clean. no changes made", state)
-        
-    cp_sha = input("enter SHA1 id of  patch or <enter> if none: ")
-    if not cp_sha: return
-    
-    print(show_sha_info(cp_sha))
-    git_cherry_pick_by_sha(cp_sha)
-    if not git_repo_is_clean():
-        build(state)
     else:
         show_stuff_for_conflict_resolution(state)
     save_cp(state)
