@@ -92,6 +92,9 @@ def make_patch_dict(state, sha1):
     d['order_in_release'] = \
             commit_order_in_tag_sha_list(state, d['tag'], d['sha1'])
     d['downstream'] = None
+    d['prev_downstream'] = None
+    d['conflicts'] = ""
+    d['prev_conflicts'] = ""
     print("%s, %s, %s, %s" %
           (d['sha1'], d['subject'], d['tag'],
            d['tag_date']))
