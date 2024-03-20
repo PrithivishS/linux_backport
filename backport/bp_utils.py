@@ -866,15 +866,11 @@ def apply_next_patch(state):
     git_cherry_pick(patch['sha1'])
     
     if git_repo_is_clean():
-        patch['downstream'] = git_top_of_applied_stack_sha(state)
-        state['downstream_sha_to_patch'][patch['downstream']] = patch
-        build(state)
+        cherry_pick_complete(state, patch)
     else:
         show_stuff_for_conflict_resolution(state)
-    save_cp(state)
-
-    else:
-        show_stuff_for_conflict_resolution(state)
+        if try_to_reuse_old_conflict_resolution(patch, state):
+            cherry_pick_complete(state, patch)
     save_cp(state)
 
 ## stuff moved out of backport.py <BEGIN>
