@@ -755,7 +755,6 @@ def active_cherry_pick_sha(state):
         return cherry_pick_sha
     except:
         return None
-        return
      
 def show_stuff_for_conflict_resolution(state):
     cherry_pick_sha = active_cherry_pick_sha(state)

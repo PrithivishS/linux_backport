@@ -36,6 +36,7 @@ bp_menu_item_list = [
          {'prompt' : 'cherry-pick -abort', 'action': cherry_pick_abort},
          {'prompt' : 'compare patch to upstream',
          'action' : compare_patch_to_upstream},
+         {'prompt' : 'hackery','action' : hackery},
         bp_universal_utils,
         ]},
     {'prompt' : 'cherry pick actions', 'sub-menu' : [
@@ -152,11 +153,6 @@ bp_menu_item_list = [
         {'prompt': 'show all patches', 'action' : show_all_patches},
         {'prompt': 'show_patch_by_sha', 'action' : show_patch_by_sha},
     ]},
-    {'prompt' : 'obsolete, should not be used', 'sub-menu' : [
-        {'prompt' : 'cherry-pick by sha',
-         'action': cherry_pick_by_sha},
-    ],
-    },
     {'prompt' : 'enter pdb', 'action' : do_pdb},
     {'prompt' : 'test', 'action' : test},
     {'prompt': 'show all patches', 'action' : show_all_patches},
