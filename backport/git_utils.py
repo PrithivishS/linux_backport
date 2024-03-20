@@ -271,8 +271,8 @@ def git_pop_branch_tos():
     # pop applied patch
     shell_cmd('git reset --hard HEAD^')
     
-def get_short_sha_list_by_tag(tag):
-    cmd = f"git log --pretty=tformat:'%h' {tag}"
+def get_short_sha_list_by_key(key):
+    cmd = f"git log --pretty=tformat:'%h' {key}"
     (ret, out) = shell_cmd(cmd)
     out = out.split("\n")
     return out
