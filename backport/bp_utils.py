@@ -873,7 +873,6 @@ def apply_next_patch(state):
             cherry_pick_complete(state, patch)
     save_cp(state)
 
-## stuff moved out of backport.py <BEGIN>
 def unapplied_patches(state):
     print_log("@@how_unapplied_patches", state)
     L = [p for p in state['all_patches'] if not p['downstream']]
@@ -1006,8 +1005,6 @@ def shell_one_liner(state):
     cmd = input("enter shell one liner<enter to cancel>: ")
     (ret, output) = shell_cmd(cmd)
     print_log(output, state)
-
-## stuff moved out of backport.py <END>
 
 def git_status_log(state):
     s = git_utils.git_status(state)
