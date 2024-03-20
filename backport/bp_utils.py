@@ -549,7 +549,9 @@ def invalidate_patches_if_new_precedents(state):
     invalidate = False
     for patch in state['all_patches']:
         if not patch['downstream']: invalidate = True
-        if invalidate: patch['downstream'] = None
+        if invalidate:
+            patch['prev_downstream'] = patch['downstream']
+            patch['downstream'] = None
         
 def git_reset_hard(sha1, state):
     cmd = "git  reset --hard  " + sha1
