@@ -276,4 +276,7 @@ def get_short_sha_list_by_tag(tag):
     (ret, out) = shell_cmd(cmd)
     out = out.split("\n")
     return out
+    (ret, out) = shell_cmd(cmd)
+    out = out.split("\n")
+    return out
 
