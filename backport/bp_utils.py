@@ -795,9 +795,39 @@ def generate_per_file_conflict_resolution_info(cherry_pick_sha, file, state):
         cherry_pick_sha, os.path.split(file)[1])
     shell_cmd(cmd)
     
+def add_commits_touching_file_to_all_patches(patch, file, state):
+    if not experimental_feature_enabled(
+            state,
+            'add_commits_touching_file_to_all_patches'):
+        return
+    
+    min = state['git_log_min_tag']
+    max = patch['tag']
+    cmd = f"git log --pretty=tformat:'%h' {min}..{max} {file}"
+    (ret, out) = shell_cmd(cmd)
+    sha_list = uniqify_list(out.split("\n"))
+    patch_list = list()
+    for sha in sha_list:
+        if sha not in state['all_patches']:
+            p = make_patch_dict(state, sha)
+            patch_list.append(p)
+
+    print_patch_list("", patch_list, state)
+    print("ABOUT TO ENTER THESE %d PATCHES IN state['all_patches']" %
+          len(patch_list))
+    if not confirm("enter 'y' if ok, else <enter>: ", ['y']):
+    	return
+    
+    for p in patch_list:
+        add_to_all_patches(p, state)
+    reset_branch_to_last_commit_not_preceding_invalidated(state)
+
+    pdb.set_trace()
+    return out
+
 def show_stuff_for_conflict_resolution(state):
-    cherry_pick_sha = active_cherry_pick_sha(state)
-    if not cherry_pick_sha:
+    cp_sha = active_cp_sha(state)
+    if not cp_sha:
         print_log("uh-oh", state)
     
     # parse git status --porcelain
@@ -810,17 +840,20 @@ def show_stuff_for_conflict_resolution(state):
         if code == 'UU': both_mod_files.append(file)
     #
     # clean tmp dir
-    shell_cmd("mkdir -p " + state['cherry_pick_files'] + "/" + cherry_pick_sha)
+    shell_cmd("mkdir -p " + state['cherry_pick_files'] + "/" + cp_sha)
     
     # emit patch to temp dir
-    cmd = "git show %s > %s/%s/patch" % (cherry_pick_sha,
+    cmd = "git show %s > %s/%s/patch" % (cp_sha,
                                          state['cherry_pick_files'],
-                                         cherry_pick_sha)
+                                         cp_sha)
     shell_cmd(cmd)
     
     # emit both_mod files to "both_mod.".filename
     for file in both_mod_files:
-        generate_per_file_conflict_resolution_info(cherry_pick_sha, file, state)
+        generate_per_file_conflict_resolution_info(cp_sha, file, state)
+        patch = state['sha_to_patch'][cp_sha]
+        add_commits_touching_file_to_all_patches(patch, file, state)
+                                                 
         
 def cherry_pick_by_sha(state, cp_sha):
     print_log("@@cherry_pick_by_sha", state)
@@ -1079,32 +1112,3 @@ def hackery(state):
         patch['downstream'] = None
         patch['prev_downstream'] = None
         
-def add_commits_touching_file_to_all_patches(patch, file, state):
-    if not experimental_feature_enabled(
-            state,
-            'add_commits_touching_file_to_all_patches'):
-        return
-    
-    min = state['git_log_min_tag']
-    max = patch['tag']
-    cmd = f"git log --pretty=tformat:'%h' {min}..{max} {file}"
-    (ret, out) = shell_cmd(cmd)
-    sha_list = uniqify_list(out.split("\n"))
-    patch_list = list()
-    for sha in sha_list:
-        if sha not in state['all_patches']:
-            p = make_patch_dict(state, sha)
-            patch_list.append(p)
-
-    print_patch_list("", patch_list, state)
-    print("ABOUT TO ENTER THESE %d PATCHES IN state['all_patches']" %
-          len(patch_list))
-    if not confirm("enter 'y' if ok, else <enter>: ", ['y']):
-    	return
-    
-    for p in patch_list:
-        add_to_all_patches(p, state)
-
-    pdb.set_trace()
-    return out
-
