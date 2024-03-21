@@ -1076,3 +1076,32 @@ def hackery(state):
         patch['downstream'] = None
         patch['prev_downstream'] = None
         
+def add_commits_touching_file_to_all_patches(patch, file, state):
+    if not experimental_feature_enabled(
+            state,
+            'add_commits_touching_file_to_all_patches'):
+        return
+    
+    min = state['git_log_min_tag']
+    max = patch['tag']
+    cmd = f"git log --pretty=tformat:'%h' {min}..{max} {file}"
+    (ret, out) = shell_cmd(cmd)
+    sha_list = uniqify_list(out.split("\n"))
+    patch_list = list()
+    for sha in sha_list:
+        if sha not in state['all_patches']:
+            p = make_patch_dict(state, sha)
+            patch_list.append(p)
+
+    print_patch_list("", patch_list, state)
+    print("ABOUT TO ENTER THESE %d PATCHES IN state['all_patches']" %
+          len(patch_list))
+    if not confirm("enter 'y' if ok, else <enter>: ", ['y']):
+    	return
+    
+    for p in patch_list:
+        add_to_all_patches(p, state)
+
+    pdb.set_trace()
+    return out
+
