@@ -726,6 +726,17 @@ def del_from_all_patches(sha, state):
         print("could not find patch with sha %s\n" % (sha))
     state['all_patches'].remove(patch)
     del state['sha_to_patch'][sha]
+    
+def experimental_feature_enabled(state, name):
+    msg = "no soup for you: %s" % (name)
+    try:
+        if state['experimental'][name]:
+            return True
+        print(msg)
+        return False
+    except:
+        print(msg)
+        return False
 
 def test(state):
     pdb.set_trace()
