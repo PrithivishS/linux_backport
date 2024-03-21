@@ -740,8 +740,6 @@ def experimental_feature_enabled(state, name):
 
 def test(state):
     pdb.set_trace()
-    _d = make_patch_dict(state, '95a0d01eef7a')
-    pdb.set_trace()
     pass
 
 def start_backport(state):
