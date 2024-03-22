@@ -817,19 +817,19 @@ def add_commits_touching_file_to_all_patches(patch, file, state):
     print_patch_list("", patch_list, state)
     print("ABOUT TO ENTER THESE %d PATCHES IN state['all_patches']" %
           len(patch_list))
+
     if not confirm("enter 'y' if ok, else <enter>: ", ['y']):
     	return
     
     for p in patch_list:
         add_to_all_patches(p, state)
 
-    pdb.set_trace()
     after_add_to_all_patches(state)
 
     return out
 
 def show_stuff_for_conflict_resolution(state):
-    cp_sha = active_cp_sha(state)
+    cp_sha = active_cherry_pick_sha(state)
     if not cp_sha:
         print_log("uh-oh", state)
     
