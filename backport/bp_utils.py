@@ -121,18 +121,20 @@ def top_patch_has_upstream_citation(state):
         return False
     
 def show_menu_trailer(state):
-    trailer = ""
+    trailer = "\n\n%d commits (%d applied)" % (len(state['all_patches']),
+                                           sum(1 for p
+                                               in state['all_patches']
+                                               if p['downstream']))
     if not git_utils.git_repo_is_clean():
-        trailer = "\n** working tree UNCLEAN **"
+        trailer += "\n** working tree UNCLEAN **"
 
     if active_cherry_pick_sha(state):
-        trailer = "\n** active cherry-pick ** "
+        trailer += "\n** active cherry-pick ** "
         
     #if not top_patch_has_upstream_citation(state):
     #    trailer += "** top applied patch lacks 'commit <sha> upstream' **"
     if trailer:
-        trailer = '\n' + trailer +'\n'
-        print_log(trailer, state)
+        print_log(trailer + "\n", state)
         
 def show_menu(menu, state):
     print("\n\n==================")
