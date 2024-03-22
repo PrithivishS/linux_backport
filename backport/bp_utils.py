@@ -801,11 +801,8 @@ def generate_per_file_conflict_resolution_info(cherry_pick_sha, file, state):
     shell_cmd(cmd)
     
 def add_commits_touching_file_to_all_patches(patch, file, state):
-    if not experimental_feature_enabled(
-            state,
-            'add_commits_touching_file_to_all_patches'):
-        return
-    
+    if active_cherry_pick_sha(state):
+        git_cherry_pick_abort()
     min = state['git_log_min_tag']
     max = patch['tag']
     cmd = f"git log --pretty=tformat:'%h' {min}..{max} {file}"
