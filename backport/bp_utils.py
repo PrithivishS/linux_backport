@@ -594,8 +594,12 @@ def reset_branch_to_last_commit_not_preceding_invalidated(state):
 def add_to_all_patches(patch,state):
     state['all_patches'].append(patch)
     state['sha_to_patch'] = {p['sha1'] : p for p in state['all_patches']}
+
+def after_add_to_all_patches(state):
+    pdb.set_trace()
     invalidate_patches_if_new_precedents(state)
-    git_cherry_pick_abort() # don't bother to check if we're cherry picking
+    reset_branch_to_last_commit_not_preceding_invalidated(state)
+    reset_branch_to_last_commit_not_preceding_invalidated(state)         
     save_cp(state)
 
 def add_to_all_patches_by_sha(state):
@@ -605,7 +609,9 @@ def add_to_all_patches_by_sha(state):
      for sha in sha.split(','):
          patch = make_patch_dict(state, sha)
          add_to_all_patches(patch, state)
-     reset_branch_to_last_commit_not_preceding_invalidated(state)         
+         
+     after_add_to_all_patches(state)
+     
    
 def set_unres_provider_by_ix(state):
     unres_syms = state['unresolved_syms']
@@ -631,8 +637,7 @@ def set_unres_provider_by_ix(state):
     for sha in sha.split(','):
         add_to_all_patches(state, sha)
         patch['provides_for'] = unres_syms[ix]
-    reset_branch_to_last_commit_not_preceding_invalidated(state)
-
+    after_add_to_all_patches(state)
 
 # this and prev function have bothersome amounts of duplicate code
 def delete_unres_sym_by_ix(state):
@@ -820,9 +825,10 @@ def add_commits_touching_file_to_all_patches(patch, file, state):
     
     for p in patch_list:
         add_to_all_patches(p, state)
-    reset_branch_to_last_commit_not_preceding_invalidated(state)
 
     pdb.set_trace()
+    after_add_to_all_patches(state)
+
     return out
 
 def show_stuff_for_conflict_resolution(state):
@@ -1009,7 +1015,7 @@ def add_sha_list_to_all_patches(state):
     patches = import_sha_list_file(sha_file, state)
     for patch in import_sha_list_file(sha_file, state):
         add_to_all_patches(patch, state)
-    reset_branch_to_last_commit_not_preceding_invalidated(state)
+    after_add_to_all_patches(state)
 
 def cherry_pick_continue(state):
     cherry_pick_sha = active_cherry_pick_sha(state)
