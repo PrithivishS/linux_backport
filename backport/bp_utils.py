@@ -95,9 +95,7 @@ def make_patch_dict(state, sha1):
     d['prev_downstream'] = None
     d['conflicts'] = ""
     d['prev_conflicts'] = ""
-    print("%s, %s, %s, %s" %
-          (d['sha1'], d['subject'], d['tag'],
-           d['tag_date']))
+
     return d
 
 def sha_to_dict_string(state, sha):
