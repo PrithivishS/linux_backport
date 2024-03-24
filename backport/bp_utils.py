@@ -807,17 +807,37 @@ def generate_per_file_conflict_resolution_info(cherry_pick_sha, file, state):
     shell_cmd(cmd)
     
 def add_commits_touching_file_to_all_patches(patch, file, state):
-    if active_cherry_pick_sha(state):
-        git_cherry_pick_abort()
     min = state['git_log_min_tag']
     max = patch['tag']
     cmd = f"git log --pretty=tformat:'%h' {min}..{max} {file}"
     (ret, out) = shell_cmd(cmd)
     sha_list = uniqify_list(out.split("\n"))
     patch_list = list()
+    prompt_every_time = True
+    ix = 0
+    
     for sha in sha_list:
         if sha not in state['all_patches']:
             p = make_patch_dict(state, sha)
+            # confirm if they want this commit
+            if prompt_every_time:
+                prompt = get_menu_trailer(state)
+                prompt += "\n==== pre-requisite review(%d/%d): %s ===\n" % (
+                    ix, len(sha_list), file)
+                prompt += patch_dict_to_string("", p, state)
+                prompt += "add to patch list??\n"
+                prompt += "\t'y': add this patch\n"
+                prompt += "\t'*': add this and following patches\n"
+                prompt += "\t'!': DONT add this or following patches\n"
+                prompt += "\n"
+                ans = confirm(prompt, ['y', '*', '!' ])
+                ix += 1
+                if not ans:
+                    continue
+                if ans == "*":
+                    prompt_every_time = False
+                if ans == "!":
+                    return
             patch_list.append(p)
 
     print_patch_list("", patch_list, state)
@@ -830,6 +850,8 @@ def add_commits_touching_file_to_all_patches(patch, file, state):
     for p in patch_list:
         add_to_all_patches(p, state)
 
+    if active_cherry_pick_sha(state):
+        git_cherry_pick_abort()
     after_add_to_all_patches(state)
 
     return out
