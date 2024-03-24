@@ -120,7 +120,7 @@ def top_patch_has_upstream_citation(state):
     else:
         return False
     
-def show_menu_trailer(state):
+def get_menu_trailer(state):
     trailer = "\n\n%d commits (%d applied)" % (len(state['all_patches']),
                                            sum(1 for p
                                                in state['all_patches']
@@ -134,8 +134,14 @@ def show_menu_trailer(state):
     #if not top_patch_has_upstream_citation(state):
     #    trailer += "** top applied patch lacks 'commit <sha> upstream' **"
     if trailer:
-        print_log(trailer + "\n", state)
+        trailer += '\n'
         
+    return trailer
+
+        
+def show_menu_trailer(state):
+    print(get_menu_trailer(state))
+    
 def show_menu(menu, state):
     print("\n\n==================")
     for (ix, d) in zip(range(len(menu) + 1), menu):
