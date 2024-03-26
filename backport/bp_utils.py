@@ -780,32 +780,28 @@ def active_cherry_pick_sha(state):
     except:
         return None
     
-def generate_per_file_conflict_resolution_info(cherry_pick_sha, file, state):
-    #show current rev
+def generate_blame_files(sha, file, state):
+    dir = state['cherry_pick_files'] + '/' + sha
+    fbase = os.path.split(file)[1]
+    for _sha in ['HEAD', sha]:
+        for sfx in  ['^', '']:
+            SHA = _sha + sfx
+            cmd = f"git blame {SHA} -- {file} > {dir}/{SHA}.{fbase}"
+            print(cmd)
+            shell_cmd(cmd)
+
+def show_patch(cherry_pick_sha, file, state):
     cmd = "git show %s:%s > %s/%s/%s" % (cherry_pick_sha, file,
                                          state['cherry_pick_files'],
                                          cherry_pick_sha,
+
                                          os.path.split(file)[1])
     shell_cmd(cmd)
     
-    #git blame for current rev
-    cmd = "git blame %s -- %s > %s/%s/blame.%s" % (
-        cherry_pick_sha, file, state['cherry_pick_files'],
-        cherry_pick_sha, os.path.split(file)[1])
-    shell_cmd(cmd)
-    
-    # show contents for previous rev of this file
-    cmd = "git show %s^ -- %s > %s/%s/prev.%s" % (
-        cherry_pick_sha, file, state['cherry_pick_files'],
-        cherry_pick_sha, os.path.split(file)[1])
-    shell_cmd(cmd)
-    
-    # show git blame for previous rev of this file
-    cmd = "git blame %s^ -- %s > %s/%s/prev.blame.%s" % (
-        cherry_pick_sha, file, state['cherry_pick_files'],
-        cherry_pick_sha, os.path.split(file)[1])
-    shell_cmd(cmd)
-    
+def generate_conflict_resolution_files(cherry_pick_sha, file, state):
+    show_patch(cherry_pick_sha, file, state)
+    generate_blame_files(cherry_pick_sha, file, state)
+
 def add_commits_touching_file_to_all_patches(patch, file, state):
     min = state['git_log_min_tag']
     max = patch['tag']
