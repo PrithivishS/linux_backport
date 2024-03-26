@@ -25,6 +25,8 @@ bp_menu_item_list = [
          {'prompt' : 'patch_info(sha)', 'action' : patch_info},
          {'prompt' : 'find commits referring to pattern',
          'action' : git_logG_simple},
+         {'prompt' : 'find commits touching "both modified" files',
+          'action' : both_mod_commits},
          {'prompt' : 'add patch by sha',
           'action' : add_to_all_patches_by_sha},
          {'prompt' : 'show one git log result', 'action': show_one_log_result},

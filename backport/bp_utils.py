@@ -1152,3 +1152,13 @@ def hackery(state):
         patch['downstream'] = None
         patch['prev_downstream'] = None
         
+def both_mod_commits(state):
+    (cp_patch,
+     both_mod_files,
+     mod_files) = parse_cherry_pick_conflict(state)
+
+    if not cp_patch:
+        return
+
+    for file in both_mod_files:
+        add_commits_touching_file_to_all_patches(cppatch, file, state)
