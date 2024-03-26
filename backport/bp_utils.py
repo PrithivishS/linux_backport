@@ -848,6 +848,7 @@ def add_commits_touching_file_to_all_patches(patch, file, state):
 
     if active_cherry_pick_sha(state):
         git_cherry_pick_abort()
+        
     after_add_to_all_patches(state)
 
     return out
