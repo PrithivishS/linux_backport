@@ -1161,4 +1161,4 @@ def both_mod_commits(state):
         return
 
     for file in both_mod_files:
-        add_commits_touching_file_to_all_patches(cppatch, file, state)
+        add_commits_touching_file_to_all_patches(cp_patch, file, state)
