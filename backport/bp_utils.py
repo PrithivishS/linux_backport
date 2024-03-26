@@ -853,11 +853,14 @@ def add_commits_touching_file_to_all_patches(patch, file, state):
 
     return out
 
-def show_stuff_for_conflict_resolution(state):
+def parse_cherry_pick_conflict(state):
     cp_sha = active_cherry_pick_sha(state)
     if not cp_sha:
-        print_log("uh-oh", state)
-    
+        print_log("no active cherry-pick", state)
+        return (None, None, None)
+         
+    cp_patch = state['sha_to_patch'][cp_sha]        
+
     # parse git status --porcelain
     (ret, porcelain_status) = shell_cmd("git status --porcelain")
     mod_files = []
@@ -866,7 +869,19 @@ def show_stuff_for_conflict_resolution(state):
         (code, file) = [x for x in line.split(' ') if not x == '']
         if code == 'M': mod_files.append(file)
         if code == 'UU': both_mod_files.append(file)
-    #
+
+    return (cp_patch, both_mod_files, mod_files)
+
+def show_stuff_for_conflict_resolution(state):
+    (cp_patch,
+     both_mod_files,
+     mod_files) = parse_cherry_pick_conflict(state)
+
+    if not cp_patch:
+        return
+    
+    cp_sha = cp_patch['sha1']
+    
     # clean tmp dir
     shell_cmd("mkdir -p " + state['cherry_pick_files'] + "/" + cp_sha)
     
@@ -878,11 +893,8 @@ def show_stuff_for_conflict_resolution(state):
     
     # emit both_mod files to "both_mod.".filename
     for file in both_mod_files:
-        generate_per_file_conflict_resolution_info(cp_sha, file, state)
-        patch = state['sha_to_patch'][cp_sha]
-        add_commits_touching_file_to_all_patches(patch, file, state)
-                                                 
-        
+        generate_conflict_resolution_files(cp_sha, file, state)
+
 def cherry_pick_by_sha(state, cp_sha):
     print_log("@@cherry_pick_by_sha", state)
     pdb.set_trace()
