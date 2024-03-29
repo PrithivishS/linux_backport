@@ -811,24 +811,31 @@ def generate_conflict_resolution_files(cherry_pick_sha, file, state):
     show_patch(cherry_pick_sha, file, state)
     generate_blame_files(cherry_pick_sha, file, state)
 
-def add_commits_touching_file_to_all_patches(patch, file, state):
+def get_sorted_patch_list_from_sha_list(patch, file, state):
     min = state['git_log_min_tag']
-    max = patch['tag']
+    max = patch['sha1']
     cmd = f"git log --pretty=tformat:'%h' {min}..{max} {file}"
     (ret, out) = shell_cmd(cmd)
-    sha_list = uniqify_list(out.split("\n"))
-    patch_list = list()
+    sha_list = uniqify_list(out.split("\n"))[:-1]
+    patch_list = [make_patch_dict(state, sha) for sha in sha_list]
+    patch_list.sort(key= lambda x: x['order_in_release'])
+    print_patch_list("", patch_list, state)
+    return patch_list
+
+def add_commits_touching_file_to_all_patches(patch, file, state):
+    patch_list = get_sorted_patch_list_from_sha_list(patch, file, state)
     prompt_every_time = True
     ix = 0
     
-    for sha in sha_list:
+    for patch in patch_list:
+        sha = patch['sha1']
         if sha not in state['all_patches']:
             p = make_patch_dict(state, sha)
             # confirm if they want this commit
             if prompt_every_time:
                 prompt = get_menu_trailer(state)
                 prompt += "\n==== pre-requisite review(%d/%d): %s ===\n" % (
-                    ix, len(sha_list), file)
+                    ix, len(patch_list), file)
                 prompt += patch_dict_to_string("", p, state)
                 prompt += "add to patch list??\n"
                 prompt += "\t'y': add this patch\n"
