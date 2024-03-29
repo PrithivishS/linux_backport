@@ -3,6 +3,7 @@ import re
 import os
 import threading
 from print_log import *
+import pdb
 
 EG_pretty_fmt=" --pretty=tformat:'%<(10) %h  %<(12) %an : %s: %cd' "
 
@@ -172,7 +173,6 @@ def git_log_tag(state, min_max):
     
 def git_logG_simple(state):
     # https://realpython.com/intro-to-python-threading
-
     state['git_log_completed'] = list()
     print_log("@@git_logG_simple", state)
     line_fn = lambda line, state: print_log(get_sha_info(line, ''), state)
@@ -186,6 +186,7 @@ def git_logG_simple(state):
 
     min = git_log_tag(state, 'min')
     max = git_log_tag(state, 'max')
+    print("launching asynchronous git log task")
     thrd = threading.Thread(target=git_log_search,
                             args = (search_type, pattern, min, max, line_fn,
                                     state),
@@ -213,6 +214,7 @@ def git_logG_syms(state):
         print("git_log_search for: %s initiated" % (sym['tag']))
         min = git_log_tag(state, 'min')
         max = git_log_tag(state, 'max')
+        print("launching asynchronous git log task")
         thrd = threading.Thread(target=git_log_search,
                                 args = (search_type, sym['tag'], min, max,
                                         line_fn, state),
