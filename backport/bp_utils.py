@@ -767,6 +767,15 @@ def start_backport(state):
     git_utils.next_branch(state)
     git_reset_hard(state['first_commit'], state)
 
+def restart_backport(state):
+    if active_cherry_pick_sha(state):
+        git_cherry_pick_abort()
+
+    state['backport_in_progress'] = False
+    git_utils.next_branch(state)
+    git_reset_hard(state['first_commit'], state)
+    start_backport(state)
+
 def active_cherry_pick_sha(state):
     # parse git status and find sha we're cherry_picking
     (ret, classic_status) = shell_cmd("git status")
