@@ -1,6 +1,6 @@
 import git_utils as git
 
-def get_menu_trailer(state): #: core, @ui
+def get_menu_trailer(state):
     trailer = "\n\n%d commits (%d applied)" % (len(state['all_patches']),
                                            sum(1 for p
                                                in state['all_patches']
@@ -19,16 +19,16 @@ def get_menu_trailer(state): #: core, @ui
     return trailer
 
         
-def show_menu_trailer(state): #: core, @ui
+def show_menu_trailer(state):
     print(get_menu_trailer(state))
     
-def show_menu(menu, state): #: core, @ui
+def show_menu(menu, state):
     print("\n\n==================")
     for (ix, d) in zip(range(len(menu) + 1), menu):
         print(str(ix) + ": " + menu[ix]['prompt'])
     show_menu_trailer(state)
 
-def do_menu_choice(menu, state): #: core, @ui
+def do_menu_choice(menu, state):
     while True:
         while True:
             show_menu(menu, state)
