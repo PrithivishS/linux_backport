@@ -13,25 +13,13 @@ import tempfile
 import difflib
 from packaging import version
 import print_log
+import state_access
 
-def confirm(prompt, legal_response_list): #: core_util, @io
-    tmp = input(prompt)
-    if tmp in legal_response_list:
-        return tmp
-    else:
-        return ''
-    
-def get_out_dest(state):#: io
-    if not state: return ""
-    if not 'out_dest' in state.keys():
-        state['out_dest'] = 'both'
-    return state['out_dest']
-    
 def print_log(s, state):#: io
     if not state or 'log_fobj' not in state:
         print("<no logf> " + s)
         return
-    if get_out_dest(state) == 'both':
+    if state_access.get_out_dest(state) == 'both':
         print(s)
     if state['log_fobj']:
         print(s, file=state['log_fobj'])
@@ -58,7 +46,7 @@ def restore_cp(fpath):#: io
             return pickle.load(handle)
     except:
         print("*WARNING* cannot restore pickle file: " + fpath)
-        if not confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
+        if not ui.confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
             sys.exit
         return None
     
@@ -365,7 +353,7 @@ def top_cites_upstream_or_confirmed_dont_care(state):#: @obsolete?
     if patch_cites_upstream(tap_sha): return True
 
     print_log("** top patch does not cite upstream **", state)
-    if confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
+    if ui.confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
         return True
 
     return False
@@ -515,7 +503,7 @@ def _get_needed_symbols(lines, state):#: @unres_syms
 def get_needed_symbols(state):#: @unres_syms
     print("*WARNING* proceeding will replace state for unresolved syms")
     print("and unmatched errors")
-    if not confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
+    if not ui.confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
             return
     spew = build(state)
     _get_needed_symbols(spew, state)
@@ -563,7 +551,7 @@ def git_reset_hard(sha1, state): #: @misplaced, @base-git
     cmd = "git  reset --hard  " + sha1
     print("about to: " + cmd)
     
-    if not confirm("\nEnter 'y' to proceed, else <enter>: ", ['y']):
+    if not ui.confirm("\nEnter 'y' to proceed, else <enter>: ", ['y']):
         return -1
 
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
@@ -592,7 +580,7 @@ def reset_branch_to_last_commit_not_preceding_invalidated(state):#: meta-git
         
     patch = make_patch_dict(state, reset_to_sha)
     print_patch_dict("\n", patch, state)
-    if confirm("about to reset --hard to this commit\nEnter 'y' to proceed, else <enter>: ", ['y']):
+    if ui.confirm("about to reset --hard to this commit\nEnter 'y' to proceed, else <enter>: ", ['y']):
         return
     if git_top_of_applied_stack_sha(state) != state['first_commit']:
         git_reset_hard(reset_to_sha, state)
@@ -633,7 +621,7 @@ def set_unres_provider_by_ix(state):#: unres_syms
     if ix > len(unres_syms) or ix < 0:
         print_log("index %d out of range" %(ix), state)
         
-    if not confirm("are you sure?: ", ['y']):
+    if not ui.confirm("are you sure?: ", ['y']):
         return
     
     sha = input("enter SHA1 id or comma separated list providing symbol <enter> if none: ")
@@ -660,7 +648,7 @@ def delete_unres_sym_by_ix(state):#: unres_syms
     if ix > len(unres_syms) or ix < 0:
         print_log("index %d out of range" %(ix), state)
         
-    if not confirm("are you sure?: ", ['y']):
+    if not ui.confirm("are you sure?: ", ['y']):
         return
     
     unres_syms.pop(ix)
@@ -842,7 +830,7 @@ def add_commits_touching_file_to_all_patches(patch, file, state): #: @workflow
                 prompt += "\t'*': add this and following patches\n"
                 prompt += "\t'!': DONT add this or following patches\n"
                 prompt += "\n"
-                ans = confirm(prompt, ['y', '*', '!' ])
+                ans = ui.confirm(prompt, ['y', '*', '!' ])
                 ix += 1
                 if not ans:
                     continue
@@ -856,7 +844,7 @@ def add_commits_touching_file_to_all_patches(patch, file, state): #: @workflow
     print("ABOUT TO ENTER THESE %d PATCHES IN state['all_patches']" %
           len(patch_list))
 
-    if not confirm("enter 'y' if ok, else <enter>: ", ['y']):
+    if not ui.confirm("enter 'y' if ok, else <enter>: ", ['y']):
     	return
     
     for p in patch_list:
@@ -1035,7 +1023,7 @@ def unapply_branch_tos(state): #: @obsolete
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
         
-    if not confirm("Are you sure? Enter 'y' if ok, else <enter>: ", ['y']):
+    if not ui.confirm("Are you sure? Enter 'y' if ok, else <enter>: ", ['y']):
     	return
 
     sha = git_top_of_applied_stack_sha(state)
@@ -1054,7 +1042,7 @@ def add_sha_list_to_all_patches(state): #: @workflow, @patch_list
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
         return
-    if not confirm("Are you sure you don't need to pop top applied patch? Enter 'y' if ok, else <enter>: ", ['y']):
+    if not ui.confirm("Are you sure you don't need to pop top applied patch? Enter 'y' if ok, else <enter>: ", ['y']):
     	return
 
      # get the name of the sha file
@@ -1091,9 +1079,9 @@ def cherry_pick_abort(state):#: @workflow
     if git_repo_is_clean():
         print_log("repo is clean. can't cherry-pick --abort", state)
         return
-    if not confirm("enter 'y' if ok, else <enter>: ", ['y']):
+    if not ui.confirm("enter 'y' if ok, else <enter>: ", ['y']):
     	return
-    if not confirm("enter 'y' if you're really really sure, else <enter>: ", ['y']):
+    if not ui.confirm("enter 'y' if you're really really sure, else <enter>: ", ['y']):
     	return
     git_cherry_pick_abort()
 
