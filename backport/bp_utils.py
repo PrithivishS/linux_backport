@@ -14,32 +14,8 @@ import difflib
 from packaging import version
 import print_log as pl
 import state_access
+import persist
 
-def save_cp(state):#: io
-    st = state
-    tmp = state['log_fobj']
-    for slot in ['log_fobj', 'args', 'sha_lists_by_tag', 'unresolved_syms',
-                 'unmatched_errors']:
-        state[slot] = None
-
-    f = state['pickle_dir'] + "/" + state['pickle_file'] + "." +\
-        str(state['cp_num'])
-    with open(f, 'wb') as handle:
-        pickle.dump(st, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    state['cp_num']  = int(state['cp_num']) + 1
-    state['log_fobj'] = tmp
-    pl.print_log("@@save_cp: " + f, state)
-
-def restore_cp(fpath):#: io
-    try:
-        with open(fpath, 'rb') as handle:
-            return pickle.load(handle)
-    except:
-        print("*WARNING* cannot restore pickle file: " + fpath)
-        if not ui.confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
-            sys.exit
-        return None
-    
 def patch_status(patch, state): #: patch
     if patch['downstream']: return 'applied'
     if patch['sha1'] == active_cherry_pick_sha(state):
@@ -187,7 +163,7 @@ def load_pickle_file(args, state):#: core, @ui, @io, state
         f = pd + "/" + pf + "." + max_pickle_num
     pl.print_log("loading state: " + f, state)
 
-    state = restore_cp(f)
+    state = persist.restore_cp(f)
     if not state: state = state_init(args)
     state['log_fobj'] = open(args.log_file, 'a')
     state['cp_num'] = next_cp_num(args)
