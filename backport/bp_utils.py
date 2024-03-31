@@ -12,18 +12,8 @@ import shlex
 import tempfile
 import difflib
 from packaging import version
-import print_log
+import print_log as pl
 import state_access
-
-def print_log(s, state):#: io
-    if not state or 'log_fobj' not in state:
-        print("<no logf> " + s)
-        return
-    if state_access.get_out_dest(state) == 'both':
-        print(s)
-    if state['log_fobj']:
-        print(s, file=state['log_fobj'])
-        state['log_fobj'].flush()
 
 def save_cp(state):#: io
     st = state
@@ -38,7 +28,7 @@ def save_cp(state):#: io
         pickle.dump(st, handle, protocol=pickle.HIGHEST_PROTOCOL)
     state['cp_num']  = int(state['cp_num']) + 1
     state['log_fobj'] = tmp
-    print_log("@@save_cp: " + f, state)
+    pl.print_log("@@save_cp: " + f, state)
 
 def restore_cp(fpath):#: io
     try:
@@ -64,7 +54,7 @@ def patch_dict_to_string(msg, patch, state): #: patch
 
 def print_patch_dict(msg, patch, state):  #: patch, @io
     s = patch_dict_to_string(msg, patch, state)
-    print_log(s, state)
+    pl.print_log(s, state)
 
 def make_patch_dict(state, sha1): #: patch
     d = dict()
@@ -93,11 +83,11 @@ def sha_to_dict_string(state, sha):#: patch
 
 def print_patch_list(msg, patch_list, state):#: patch, @io
     i = 0
-    print_log(">>>>>: %s" % (msg), state)
+    pl.print_log(">>>>>: %s" % (msg), state)
     for patch in patch_list:
         print_patch_dict(str(i), patch, state)
         i += 1
-    print_log("<<<<<: %s" % (msg), state)
+    pl.print_log("<<<<<: %s" % (msg), state)
     
 def top_patch_has_upstream_citation(state): #: obsolete?
     tap_sha = git_utils.git_top_of_applied_stack_sha(state)
@@ -145,7 +135,7 @@ def do_menu_choice(menu, state): #: core, @ui
             try:
                 x = int(x)
             except:
-                print_log("oops", state)
+                pl.print_log("oops", state)
                 continue
             if x in range(len(menu)): break
             else: print("bad input")
@@ -157,7 +147,7 @@ def do_menu_choice(menu, state): #: core, @ui
 
         # log unapplied and active(on git log) patches after every menu op
         state['out_dest'] = 'log_only'
-        print_log("menu choice was <%s>" % (x), state)
+        pl.print_log("menu choice was <%s>" % (x), state)
         git_utils.git_short_log('%<(10) %h  %<(12) %an : %s', state)
         state['out_dest'] = 'both'
 
@@ -176,7 +166,7 @@ def copy_key_val_if_present(key, dst_hash, src_hash, state):
     if key in src_hash.keys():
         dst_hash[key] = src_hash[key]
     else:
-        print_log("WARNING: pickle file lacks %s" % (key), state)
+        pl.print_log("WARNING: pickle file lacks %s" % (key), state)
         
 #
 # we look for pickle files in this order:
@@ -195,7 +185,7 @@ def load_pickle_file(args, state):#: core, @ui, @io, state
     else:
         max_pickle_num = str(next_cp_num(state['args']) - 1)
         f = pd + "/" + pf + "." + max_pickle_num
-    print_log("loading state: " + f, state)
+    pl.print_log("loading state: " + f, state)
 
     state = restore_cp(f)
     if not state: state = state_init(args)
@@ -215,7 +205,7 @@ def show_sha_info(sha): #:  meta-git
 def prompted_show_sha_info(state):
     sha = input("enter sha1(return to exit): ")
     if not sha: return None
-    print_log(show_sha_info(sha), state)
+    pl.print_log(show_sha_info(sha), state)
 
                   
 def prompt_to_set_or_alter_state(key, d): #: core, @io, @ui, @state, @persist
@@ -285,7 +275,7 @@ def state_init(args): # anoter obvious objuect #: state, @persist
 
 def backport_patches(state, menu_item_list): #: @core, @MAIN
     current_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print_log("Startup: Current Time = %s" %(current_date_time), state)
+    pl.print_log("Startup: Current Time = %s" %(current_date_time), state)
 
     do_menu_choice(menu_item_list, state)
         
@@ -299,7 +289,7 @@ def get_sha_info(sha, subj):#: @meta-git
     return tmp
     
 def import_sha_list_file(path, state):#: @meta-git
-    print_log("@@import_sha_list_file(%s...)" % (path), state)
+    pl.print_log("@@import_sha_list_file(%s...)" % (path), state)
 
     patch_list = [make_patch_dict(state, l)
                   for l in open(path,"r")]
@@ -322,7 +312,7 @@ def patch_cites_upstream(local_sha): #: @obsolete?
 
 def compare_patch_to_upstream(state):#: @meta-git
     if not git_utils.git_repo_is_clean():
-        print_log("git status not clean. no action taken", state)
+        pl.print_log("git status not clean. no action taken", state)
         return
     # prompt for patch to compare
     s = "enter sha of commit to compare .vs. upstream(<enter> => top patch):"
@@ -352,15 +342,15 @@ def top_cites_upstream_or_confirmed_dont_care(state):#: @obsolete?
 
     if patch_cites_upstream(tap_sha): return True
 
-    print_log("** top patch does not cite upstream **", state)
+    pl.print_log("** top patch does not cite upstream **", state)
     if ui.confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
         return True
 
     return False
 
 def build(state): #: core
-    print_log("@@build", state)
-    line_fn = lambda line, state: print_log(line, state)
+    pl.print_log("@@build", state)
+    line_fn = lambda line, state: pl.print_log(line, state)
     prompt_to_set_or_alter_state('build_cmd', state)
     if not state['build_cmd']:
         return
@@ -370,12 +360,12 @@ def build(state): #: core
     L = state['build_cmd'].split(' ')
     shell_args = ' '.join(L[1:])
     spew = poll_shell_cmd(L[0], shell_args, line_fn, state)
-    print_log(spew, state)
+    pl.print_log(spew, state)
     return spew
 
 def old_build(state): #: obsolete? (or is build() spewing trash?)
-    print_log("@@build", state)
-    line_fn = lambda line, state: print_log(line, state)
+    pl.print_log("@@build", state)
+    line_fn = lambda line, state: pl.print_log(line, state)
     prompt_to_set_or_alter_state('build_cmd', state)
     if not state['build_cmd']:
         return
@@ -535,8 +525,8 @@ def detailed_display_unres_symbol_by_index(state):#: @unres_syms
         return
     
     if ix > len(unres_syms) or ix < 0:
-        print_log("index %d out of range" %(ix), state)
-    print_log(unres_syms[ix], state)
+        pl.print_log("index %d out of range" %(ix), state)
+    pl.print_log(unres_syms[ix], state)
 
 def invalidate_patches_if_new_precedents(state):#: @core, @patch_list
     state['all_patches'].sort(key= lambda x: x['order_in_release'])
@@ -619,7 +609,7 @@ def set_unres_provider_by_ix(state):#: unres_syms
         return
     
     if ix > len(unres_syms) or ix < 0:
-        print_log("index %d out of range" %(ix), state)
+        pl.print_log("index %d out of range" %(ix), state)
         
     if not ui.confirm("are you sure?: ", ['y']):
         return
@@ -646,7 +636,7 @@ def delete_unres_sym_by_ix(state):#: unres_syms
         return
     
     if ix > len(unres_syms) or ix < 0:
-        print_log("index %d out of range" %(ix), state)
+        pl.print_log("index %d out of range" %(ix), state)
         
     if not ui.confirm("are you sure?: ", ['y']):
         return
@@ -745,7 +735,7 @@ def test(state):#: @bsolete, @nuke
 
 def start_backport(state):#: @unclear?, @workflow
     if not git_utils.git_repo_is_clean():
-        print_log("repo is not clean. bailing out", state)
+        pl.print_log("repo is not clean. bailing out", state)
         return
     if state['backport_in_progress']:
         print("OOPS: backport already in progress")
@@ -860,7 +850,7 @@ def add_commits_touching_file_to_all_patches(patch, file, state): #: @workflow
 def parse_cherry_pick_conflict(state): #: @meta_git
     cp_sha = active_cherry_pick_sha(state)
     if not cp_sha:
-        print_log("no active cherry-pick", state)
+        pl.print_log("no active cherry-pick", state)
         return (None, None, None)
          
     cp_patch = state['sha_to_patch'][cp_sha]        
@@ -900,10 +890,10 @@ def show_stuff_for_conflict_resolution(state):#: @workflow
         generate_conflict_resolution_files(cp_sha, file, state)
 
 def cherry_pick_by_sha(state, cp_sha):#: @meta_git
-    print_log("@@cherry_pick_by_sha", state)
+    pl.print_log("@@cherry_pick_by_sha", state)
     pdb.set_trace()
     if not git_repo_is_clean():
-        print_log("git status not clean. no changes made", state)
+        pl.print_log("git status not clean. no changes made", state)
     save_cp(state)
     
 def cherry_pick_complete(state, patch):#: @meta_git
@@ -938,18 +928,18 @@ def try_to_reuse_old_conflict_resolution(patch, state): #: @workflow
         return False # can't use old resolution
         
 def apply_next_patch(state):#: @workflow, @rename:cherry_pick_next_patch
-    print_log("@@apply_next_patch", state)
+    pl.print_log("@@apply_next_patch", state)
     if not top_cites_upstream_or_confirmed_dont_care(state):
-        print_log("no upstream citation or confirmation of indifference",
+        pl.print_log("no upstream citation or confirmation of indifference",
                   state)
         return
     
     if not git_repo_is_clean():
-        print_log("git status not clean. no changes made", state)
+        pl.print_log("git status not clean. no changes made", state)
         
     L = [p for p in state['all_patches'] if not p['downstream']]
     if len(L) == 0:
-        print_log("THERE ARE NO PATCHES TO APPLY", state)
+        pl.print_log("THERE ARE NO PATCHES TO APPLY", state)
         return
     patch = L[0]
 
@@ -965,51 +955,51 @@ def apply_next_patch(state):#: @workflow, @rename:cherry_pick_next_patch
     save_cp(state)
 
 def unapplied_patches(state): #: @patch_list
-    print_log("@@how_unapplied_patches", state)
+    pl.print_log("@@how_unapplied_patches", state)
     L = [p for p in state['all_patches'] if not p['downstream']]
     print_patch_list("", L, state)
     return L
 
 def do_pdb(state): #: @util
-    print_log("@@pdb", state)
+    pl.print_log("@@pdb", state)
     pdb.set_trace()
 
 def checkpoint(state): #: @util
-    print_log("@@checkpoint", state)
+    pl.print_log("@@checkpoint", state)
     save_cp(state)
 
 def pop_branch_tos(state): #: @obsolete?
-    print_log("@@do_pop_branch_tos", state)
+    pl.print_log("@@do_pop_branch_tos", state)
     if not top_cites_upstream_or_confirmed_dont_care(state):
-        print_log("no upstream citation or confirmation of indifference",
+        pl.print_log("no upstream citation or confirmation of indifference",
                   state)
         return
     if not git_repo_is_clean():
-        print_log("git status not clean. no changes made", state)
+        pl.print_log("git status not clean. no changes made", state)
         
     git_utils.git_pop_branch_tos_stack()
     short_git_log(state)
 
 def short_git_log(state): #: @meta_git
-    print_log("@@how_short_git_log", state)
+    pl.print_log("@@how_short_git_log", state)
     git_short_log('%<(10) %h  %<(12) %an : %s', state)
 
 def bash(state): #: @util
-    print_log("@@bash", state)
+    pl.print_log("@@bash", state)
     subprocess.run(['bash'])
 
 def log_note(state): #: @util
-    print_log("@@log_note", state)
+    pl.print_log("@@log_note", state)
     s = input("enter text to be appended to the log: ")
-    print_log(s, state)
+    pl.print_log(s, state)
 
 def patch_info(state): #: @workflow
-    print_log("@@patch_info", state)
+    pl.print_log("@@patch_info", state)
     prompted_show_sha_info(state)
 
 def backup_branch(state): #: @workflow
-    print_log("@@backup_branch", state)
-    line_fn = lambda line, state: print_log(line, state)
+    pl.print_log("@@backup_branch", state)
+    line_fn = lambda line, state: pl.print_log(line, state)
     prompt_to_set_or_alter_state('branch_backup_cmd', state)
     if not state['branch_backup_cmd']:
         return
@@ -1017,11 +1007,11 @@ def backup_branch(state): #: @workflow
     # do it
     cmd = "git " + ' '.join(state['branch_backup_cmd'].split(' ')[1:])
     out = shell_cmd(cmd)
-    print_log(out, state)
+    pl.print_log(out, state)
 
 def unapply_branch_tos(state): #: @obsolete
     if not git_repo_is_clean():
-        print_log("git status not clean. no changes made", state)
+        pl.print_log("git status not clean. no changes made", state)
         
     if not ui.confirm("Are you sure? Enter 'y' if ok, else <enter>: ", ['y']):
     	return
@@ -1038,9 +1028,9 @@ def unapply_branch_tos(state): #: @obsolete
     return
 
 def add_sha_list_to_all_patches(state): #: @workflow, @patch_list
-    print_log("@@add_sha_list_to_all_patches", state)
+    pl.print_log("@@add_sha_list_to_all_patches", state)
     if not git_repo_is_clean():
-        print_log("git status not clean. no changes made", state)
+        pl.print_log("git status not clean. no changes made", state)
         return
     if not ui.confirm("Are you sure you don't need to pop top applied patch? Enter 'y' if ok, else <enter>: ", ['y']):
     	return
@@ -1058,11 +1048,11 @@ def add_sha_list_to_all_patches(state): #: @workflow, @patch_list
 def cherry_pick_continue(state):#: @workflow
     cherry_pick_sha = active_cherry_pick_sha(state)
     if not cherry_pick_sha:
-        print_log("No cherry-pick in progress. can't cherry-pick --continue",
+        pl.print_log("No cherry-pick in progress. can't cherry-pick --continue",
                   state)
         return
     patch = state['sha_to_patch'][cherry_pick_sha]
-    print_log("@@cherry_pick_continue", state)
+    pl.print_log("@@cherry_pick_continue", state)
     git_cherry_pick_continue()
     if git_repo_is_clean():
         downstream_sha = git_top_of_applied_stack_sha(state)
@@ -1075,9 +1065,9 @@ def cherry_pick_continue(state):#: @workflow
             plhe.append(patch)
 
 def cherry_pick_abort(state):#: @workflow
-    print_log("@@cherry_pick_abort", state)
+    pl.print_log("@@cherry_pick_abort", state)
     if git_repo_is_clean():
-        print_log("repo is clean. can't cherry-pick --abort", state)
+        pl.print_log("repo is clean. can't cherry-pick --abort", state)
         return
     if not ui.confirm("enter 'y' if ok, else <enter>: ", ['y']):
     	return
@@ -1091,19 +1081,19 @@ def show_top_unapp(state): #: obsolete?
 def show_patch_by_sha(state): #: @git
     sha = input("enter sha of patch to be shown: ")
     (ret, output) = shell_cmd("git show " + sha)
-    print_log(output, state)
+    pl.print_log(output, state)
 
 def shell_one_liner(state): #: @util
     cmd = input("enter shell one liner<enter to cancel>: ")
     (ret, output) = shell_cmd(cmd)
-    print_log(output, state)
+    pl.print_log(output, state)
 
 def git_status_log(state): #: @obsolete
     s = git_utils.git_status(state)
     
 def do_git_status(state): #: @meta_git
     s = git_status()
-    print_log(s, state)
+    pl.print_log(s, state)
 
 def get_log_result_key_by_index(state): #: workflow
     keys = state['git_log_results'].keys()
@@ -1131,20 +1121,20 @@ def show_one_log_result(state): #: workflow
     key = get_log_result_key_by_index(state)
     if not key: return
     
-    print_log("==== %s ====" % (key), state)
+    pl.print_log("==== %s ====" % (key), state)
     
     sha_out_list = state['git_log_results'][key]
     for sha in sha_out_list.keys():
         _d = make_patch_dict(state,sha)
-        print_log("== %s ==" % (sha_to_dict_string(state, sha)), state)
+        pl.print_log("== %s ==" % (sha_to_dict_string(state, sha)), state)
         out = clip_long_output(sha_out_list[sha], state)
-        print_log(out, state)
+        pl.print_log(out, state)
 
 def delete_one_log_result(state): #: workflow
     key = get_log_result_key_by_index(state)
     if not key: return
     
-    print_log("==== %s ====" % (key), state)
+    pl.print_log("==== %s ====" % (key), state)
     
     del state['git_log_results'][key]
 
