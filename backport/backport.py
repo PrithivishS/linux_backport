@@ -27,5 +27,5 @@ if args.sha_list:
 
 state = load_pickle_file(args, state)
 
-backport_patches(state, bp_menu_item_list)
+backport_patches(state, menu.bp_menu_item_list)
 
