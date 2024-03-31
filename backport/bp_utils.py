@@ -580,7 +580,7 @@ def update_rls_tag_order_in_patch_list(patch_list, state):#: @meta-git
 def show_all_patches(state):#: patch_list
     update_rls_tag_order_in_patch_list(state['all_patches'], state)
     state['all_patches'].sort(key= lambda x: x['order_in_release'])
-    print_patch_list("all patches", state['all_patches'], state)
+    patch.print_list("all patches", state['all_patches'], state)
         
 def del_from_all_patches(sha, state):#: patch_list
     
@@ -672,7 +672,7 @@ def get_sorted_patch_list_from_sha_list(patch, file, state):#: meta_git
     sha_list = uniqify_list(out.split("\n"))[:-1]
     patch_list = [make_patch_dict(state, sha) for sha in sha_list]
     patch_list.sort(key= lambda x: x['order_in_release'])
-    print_patch_list("", patch_list, state)
+    patch.print_list("", patch_list, state)
     return patch_list
 
 def add_commits_touching_file_to_all_patches(patch, file, state): #: @workflow
@@ -705,7 +705,7 @@ def add_commits_touching_file_to_all_patches(patch, file, state): #: @workflow
                     return
             patch_list.append(p)
 
-    print_patch_list("", patch_list, state)
+    patch.print_list("", patch_list, state)
     print("ABOUT TO ENTER THESE %d PATCHES IN state['all_patches']" %
           len(patch_list))
 
@@ -832,7 +832,7 @@ def apply_next_patch(state):#: @workflow, @rename:cherry_pick_next_patch
 def unapplied_patches(state): #: @patch_list
     pl.print_log("@@how_unapplied_patches", state)
     L = [p for p in state['all_patches'] if not p['downstream']]
-    print_patch_list("", L, state)
+    patch.print_list("", L, state)
     return L
 
 def do_pdb(state): #: @util
@@ -951,7 +951,7 @@ def cherry_pick_abort(state):#: @workflow
     git_cherry_pick_abort()
 
 def show_top_unapp(state): #: obsolete?
-    print_patch_list("", unapplied_patches(state)[:1], state)
+    patch.print_list("", unapplied_patches(state)[:1], state)
 
 def show_patch_by_sha(state): #: @git
     sha = input("enter sha of patch to be shown: ")
