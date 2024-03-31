@@ -11,15 +11,13 @@ def get_menu_trailer(state):
     if active_cherry_pick_sha(state):
         trailer += "\n** active cherry-pick ** "
         
-    #if not top_patch_has_upstream_citation(state):
-    #    trailer += "** top applied patch lacks 'commit <sha> upstream' **"
     if trailer:
         trailer += '\n'
         
     return trailer
 
         
-def show_menu_trailer(state):
+def show_menu_trailer(state):n
     print(get_menu_trailer(state))
     
 def show_menu(menu, state):

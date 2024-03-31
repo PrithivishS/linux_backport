@@ -16,15 +16,7 @@ import print_log as pl
 import state_access
 import persist
 import patch
-    
-def top_patch_has_upstream_citation(state): #: obsolete?
-    tap_sha = git_utils.git_top_of_applied_stack_sha(state)
-    if not tap_sha:
-        return
-    if patch_cites_upstream(tap_sha):
-        return True
-    else:
-        return False
+import menu_util
     
 def next_cp_num(args):  #: core, @ui, @io, state
     pfre = args.pickle_dir + "/" + args.pickle_file + ".*"
