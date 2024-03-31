@@ -14,20 +14,20 @@ import difflib
 from packaging import version
 import print_log
 
-def confirm(prompt, legal_response_list):
+def confirm(prompt, legal_response_list): #: core_util, @io
     tmp = input(prompt)
     if tmp in legal_response_list:
         return tmp
     else:
         return ''
     
-def get_out_dest(state):
+def get_out_dest(state):#: io
     if not state: return ""
     if not 'out_dest' in state.keys():
         state['out_dest'] = 'both'
     return state['out_dest']
     
-def print_log(s, state):
+def print_log(s, state):#: io
     if not state or 'log_fobj' not in state:
         print("<no logf> " + s)
         return
@@ -37,7 +37,7 @@ def print_log(s, state):
         print(s, file=state['log_fobj'])
         state['log_fobj'].flush()
 
-def save_cp(state):
+def save_cp(state):#: io
     st = state
     tmp = state['log_fobj']
     for slot in ['log_fobj', 'args', 'sha_lists_by_tag', 'unresolved_syms',
@@ -52,7 +52,7 @@ def save_cp(state):
     state['log_fobj'] = tmp
     print_log("@@save_cp: " + f, state)
 
-def restore_cp(fpath):
+def restore_cp(fpath):#: io
     try:
         with open(fpath, 'rb') as handle:
             return pickle.load(handle)
@@ -62,23 +62,23 @@ def restore_cp(fpath):
             sys.exit
         return None
     
-def patch_status(patch, state):
+def patch_status(patch, state): #: patch
     if patch['downstream']: return 'applied'
     if patch['sha1'] == active_cherry_pick_sha(state):
         return "cherry-pick active"
     return "unapplied"
 
-def patch_dict_to_string(msg, patch, state):
+def patch_dict_to_string(msg, patch, state): #: patch
     s = "%s, %s, %s, %s, %s, %s" % (
         msg, patch['sha1'], patch['subject'], patch['tag'],
               patch['tag_date'], patch_status(patch, state))
     return s
 
-def print_patch_dict(msg, patch, state):  # do we really re-use this?
+def print_patch_dict(msg, patch, state):  #: patch, @io
     s = patch_dict_to_string(msg, patch, state)
     print_log(s, state)
 
-def make_patch_dict(state, sha1):
+def make_patch_dict(state, sha1): #: patch
     d = dict()
     d['sha1'] = sha1.lstrip().rstrip()
     d['sha1'] = d['sha1'][:12]
@@ -98,12 +98,12 @@ def make_patch_dict(state, sha1):
 
     return d
 
-def sha_to_dict_string(state, sha):
+def sha_to_dict_string(state, sha):#: patch
     _d = make_patch_dict(state, sha)
     s = patch_dict_to_string("", _d, state)
     return s
 
-def print_patch_list(msg, patch_list, state):
+def print_patch_list(msg, patch_list, state):#: patch, @io
     i = 0
     print_log(">>>>>: %s" % (msg), state)
     for patch in patch_list:
@@ -111,7 +111,7 @@ def print_patch_list(msg, patch_list, state):
         i += 1
     print_log("<<<<<: %s" % (msg), state)
     
-def top_patch_has_upstream_citation(state):
+def top_patch_has_upstream_citation(state): #: obsolete?
     tap_sha = git_utils.git_top_of_applied_stack_sha(state)
     if not tap_sha:
         return
@@ -120,7 +120,7 @@ def top_patch_has_upstream_citation(state):
     else:
         return False
     
-def get_menu_trailer(state):
+def get_menu_trailer(state): #: core, @ui
     trailer = "\n\n%d commits (%d applied)" % (len(state['all_patches']),
                                            sum(1 for p
                                                in state['all_patches']
@@ -139,16 +139,16 @@ def get_menu_trailer(state):
     return trailer
 
         
-def show_menu_trailer(state):
+def show_menu_trailer(state): #: core, @ui
     print(get_menu_trailer(state))
     
-def show_menu(menu, state):
+def show_menu(menu, state): #: core, @ui
     print("\n\n==================")
     for (ix, d) in zip(range(len(menu) + 1), menu):
         print(str(ix) + ": " + menu[ix]['prompt'])
     show_menu_trailer(state)
 
-def do_menu_choice(menu, state):
+def do_menu_choice(menu, state): #: core, @ui
     while True:
         while True:
             show_menu(menu, state)
@@ -173,7 +173,7 @@ def do_menu_choice(menu, state):
         git_utils.git_short_log('%<(10) %h  %<(12) %an : %s', state)
         state['out_dest'] = 'both'
 
-def next_cp_num(args):
+def next_cp_num(args):  #: core, @ui, @io, state
     pfre = args.pickle_dir + "/" + args.pickle_file + ".*"
     L = glob.glob(pfre)
     L.sort()
@@ -198,7 +198,7 @@ def copy_key_val_if_present(key, dst_hash, src_hash, state):
 #    - otherwise fail since the initial picke file should be created by
 #      sha2pckl
 #
-def load_pickle_file(args, state):
+def load_pickle_file(args, state):#: core, @ui, @io, state
     pd = state['args'].pickle_dir
     pf = state['args'].pickle_file
     
@@ -216,7 +216,7 @@ def load_pickle_file(args, state):
     state['sha_to_patch'] = {p['sha1'] : p for p in state['all_patches']}
     return state
 
-def show_sha_info(sha):
+def show_sha_info(sha): #:  meta-git
     if not sha: return ""
     subj = git_utils.git_get_subject(sha)
     tag = git_utils.git_first_containing_tag(sha)
@@ -230,7 +230,7 @@ def prompted_show_sha_info(state):
     print_log(show_sha_info(sha), state)
 
                   
-def prompt_to_set_or_alter_state(key, d):
+def prompt_to_set_or_alter_state(key, d): #: core, @io, @ui, @state, @persist
     # if no saved value for key
     #	prompt for it
     #	save to d
@@ -250,11 +250,11 @@ def prompt_to_set_or_alter_state(key, d):
             d[key] = tmp
             
 # should subsume some of the duplicate code in git_utils.py over time
-def shell_cmd(cmd):
+def shell_cmd(cmd): #: shell, @process
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
     return (result.returncode, result.stdout.decode('latin-1'))
 
-def poll_shell_cmd(cmd, shell_args, line_fn, state):
+def poll_shell_cmd(cmd, shell_args, line_fn, state):#: shell, @process
     cmd = shutil.which(cmd)
     shell_args = shlex.split(shell_args)
     cmd = [ cmd] + shell_args
@@ -279,7 +279,7 @@ def poll_shell_cmd(cmd, shell_args, line_fn, state):
           
     return spew
               
-def state_init(args): # anoter obvious objuect
+def state_init(args): # anoter obvious objuect #: state, @persist
     state = dict()
     state['cherry_pick_files'] = "/tmp/cp__files"
     state['all_patches'] = list()
@@ -295,13 +295,13 @@ def state_init(args): # anoter obvious objuect
     state['downstream_sha_to_patch'] = dict()
     return state
 
-def backport_patches(state, menu_item_list):
+def backport_patches(state, menu_item_list): #: @core, @MAIN
     current_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print_log("Startup: Current Time = %s" %(current_date_time), state)
 
     do_menu_choice(menu_item_list, state)
         
-def get_sha_info(sha, subj):
+def get_sha_info(sha, subj):#: @meta-git
     if not subj:
         subj = git_utils.git_get_subject(sha)
 
@@ -310,14 +310,14 @@ def get_sha_info(sha, subj):
     tmp = "%s, %s, %s, %s" % (sha, subj, tag, tag_date)
     return tmp
     
-def import_sha_list_file(path, state):
+def import_sha_list_file(path, state):#: @meta-git
     print_log("@@import_sha_list_file(%s...)" % (path), state)
 
     patch_list = [make_patch_dict(state, l)
                   for l in open(path,"r")]
     return patch_list
 
-def patch_cites_upstream(local_sha):
+def patch_cites_upstream(local_sha): #: @obsolete?
     (ret, log_lines) = shell_cmd("git log -1 %s" % (local_sha))
     pat = "(commit )([0-9a-f]+)( upstream)"
     matches = []
@@ -332,7 +332,7 @@ def patch_cites_upstream(local_sha):
     else:
         return False
 
-def compare_patch_to_upstream(state):
+def compare_patch_to_upstream(state):#: @meta-git
     if not git_utils.git_repo_is_clean():
         print_log("git status not clean. no action taken", state)
         return
@@ -359,7 +359,7 @@ def compare_patch_to_upstream(state):
     state['log_fobj'].writelines(difflib.unified_diff(upstream_line_list,
                                                       local_line_list))
     
-def top_cites_upstream_or_confirmed_dont_care(state):
+def top_cites_upstream_or_confirmed_dont_care(state):#: @obsolete?
     tap_sha = git_utils.git_top_of_applied_stack_sha(state)
 
     if patch_cites_upstream(tap_sha): return True
@@ -370,7 +370,7 @@ def top_cites_upstream_or_confirmed_dont_care(state):
 
     return False
 
-def build(state):
+def build(state): #: core
     print_log("@@build", state)
     line_fn = lambda line, state: print_log(line, state)
     prompt_to_set_or_alter_state('build_cmd', state)
@@ -385,7 +385,7 @@ def build(state):
     print_log(spew, state)
     return spew
 
-def old_build(state):
+def old_build(state): #: obsolete? (or is build() spewing trash?)
     print_log("@@build", state)
     line_fn = lambda line, state: print_log(line, state)
     prompt_to_set_or_alter_state('build_cmd', state)
@@ -395,7 +395,7 @@ def old_build(state):
     (ret, spew) = shell_cmd(state['build_cmd'])
     return spew
 
-pats = {
+pats = { #: @unres_syms
     'undecl-fn' :  {
         'pat': "(.*error: implicit declaration of function ‘)([a-zA-Z_][a-zA-Z0-9_]*)(’.*)",
             'groups' : [2]
@@ -453,7 +453,7 @@ pats = {
         },
 }
 
-def extract_symbols(lines, pat_name, pat):
+def extract_symbols(lines, pat_name, pat):#: @unres_syms
     syms = list()
     matched = list()
     
@@ -476,14 +476,14 @@ def extract_symbols(lines, pat_name, pat):
 
     return (syms, matched)
 
-def report_unmatched_errors(errors):
+def report_unmatched_errors(errors):#: @unres_syms
     if len(errors) == 0: return
 
     print("\n*** UNMATCHED ERRORS ***\n")
     
     for error in errors: print(error)
 
-def uniqify_dict_list(L, key):
+def uniqify_dict_list(L, key):#: @unres_syms
     seen = {}
     unq = []
     
@@ -495,7 +495,7 @@ def uniqify_dict_list(L, key):
     return unq
 
 
-def _get_needed_symbols(lines, state):
+def _get_needed_symbols(lines, state):#: @unres_syms
     syms = list()
     errors = [line for line in lines if re.search('.*error: .*', line)]
     
@@ -512,7 +512,7 @@ def _get_needed_symbols(lines, state):
     save_cp(state)
     return (syms, errors)
 
-def get_needed_symbols(state):
+def get_needed_symbols(state):#: @unres_syms
     print("*WARNING* proceeding will replace state for unresolved syms")
     print("and unmatched errors")
     if not confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
@@ -520,7 +520,7 @@ def get_needed_symbols(state):
     spew = build(state)
     _get_needed_symbols(spew, state)
 
-def _short_display_unres_symbols(state, skip_provided):
+def _short_display_unres_symbols(state, skip_provided):#: @unres_syms
     unres_syms = state['unresolved_syms']
     for (i, sym) in zip(range(0, len(unres_syms) , 1), unres_syms):
         if skip_provided and 'provided-by' in sym:
@@ -529,13 +529,13 @@ def _short_display_unres_symbols(state, skip_provided):
         print("%d: %s, %s, %s" % (i, sym['tag'], sym['type'],
                                   str(sym['provided-by'])))
 
-def short_display_unres_symbols_all(state):
+def short_display_unres_symbols_all(state):#: @unres_syms
     _short_display_unres_symbols(state, False)
 
-def short_display_unres_symbols_unprovided(state):
+def short_display_unres_symbols_unprovided(state):#: @unres_syms
     _short_display_unres_symbols(state, True)
 
-def detailed_display_unres_symbol_by_index(state):
+def detailed_display_unres_symbol_by_index(state):#: @unres_syms
     unres_syms = state['unresolved_syms']
     short_display_unres_symbols_unprovided(state)
     
@@ -550,7 +550,7 @@ def detailed_display_unres_symbol_by_index(state):
         print_log("index %d out of range" %(ix), state)
     print_log(unres_syms[ix], state)
 
-def invalidate_patches_if_new_precedents(state):
+def invalidate_patches_if_new_precedents(state):#: @core, @patch_list
     state['all_patches'].sort(key= lambda x: x['order_in_release'])
     invalidate = False
     for patch in state['all_patches']:
@@ -559,7 +559,7 @@ def invalidate_patches_if_new_precedents(state):
             patch['prev_downstream'] = patch['downstream']
             patch['downstream'] = None
         
-def git_reset_hard(sha1, state):
+def git_reset_hard(sha1, state): #: @misplaced, @base-git
     cmd = "git  reset --hard  " + sha1
     print("about to: " + cmd)
     
@@ -570,7 +570,7 @@ def git_reset_hard(sha1, state):
 
     return result.returncode
     
-def reset_branch_to_last_commit_not_preceding_invalidated(state):
+def reset_branch_to_last_commit_not_preceding_invalidated(state):#: meta-git
     # look for the last "applied" patchdownstream set) not followed by a commit
     # with downstream == None
     #
@@ -597,18 +597,18 @@ def reset_branch_to_last_commit_not_preceding_invalidated(state):
     if git_top_of_applied_stack_sha(state) != state['first_commit']:
         git_reset_hard(reset_to_sha, state)
     
-def add_to_all_patches(patch,state):
+def add_to_all_patches(patch,state): #: @patch-list
     state['all_patches'].append(patch)
     state['sha_to_patch'] = {p['sha1'] : p for p in state['all_patches']}
 
-def after_add_to_all_patches(state):
+def after_add_to_all_patches(state):#: @patch-list
     pdb.set_trace()
     invalidate_patches_if_new_precedents(state)
     reset_branch_to_last_commit_not_preceding_invalidated(state)
     reset_branch_to_last_commit_not_preceding_invalidated(state)         
     save_cp(state)
 
-def add_to_all_patches_by_sha(state):
+def add_to_all_patches_by_sha(state):#: @patch-list
      sha = input("enter SHA1 id or comma separated list providing symbol <enter> if none: ")
      if not sha: return
     
@@ -619,7 +619,7 @@ def add_to_all_patches_by_sha(state):
      after_add_to_all_patches(state)
      
    
-def set_unres_provider_by_ix(state):
+def set_unres_provider_by_ix(state):#: unres_syms
     unres_syms = state['unresolved_syms']
     short_display_unres_symbols_unprovided(state)
     
@@ -646,7 +646,7 @@ def set_unres_provider_by_ix(state):
     after_add_to_all_patches(state)
 
 # this and prev function have bothersome amounts of duplicate code
-def delete_unres_sym_by_ix(state):
+def delete_unres_sym_by_ix(state):#: unres_syms
     unres_syms = state['unresolved_syms']
     short_display_unres_symbols_all(state)
     
@@ -665,7 +665,7 @@ def delete_unres_sym_by_ix(state):
     
     unres_syms.pop(ix)
 
-def unresolved_syms_to_patch_dict_list(state):
+def unresolved_syms_to_patch_dict_list(state):#: unres_syms
     sha_list = []
 
     for s in state['unresolved_syms']:
@@ -675,7 +675,7 @@ def unresolved_syms_to_patch_dict_list(state):
     patch_list = [make_patch_dict(state, sha) for sha in sha_list]
     return patch_list
 
-def uniqify_list(L):
+def uniqify_list(L): #: @core, @generic
     ret = list()
     tmp = dict()
     for elt in L:
@@ -684,7 +684,7 @@ def uniqify_list(L):
         ret.append(elt)
     return ret
     
-def uniqify_dict_list(dict_list, key_list):
+def uniqify_dict_list(dict_list, key_list): #: @core, @generic
     ret = list()
     tmp = dict()
     for _dict in dict_list:
@@ -696,7 +696,7 @@ def uniqify_dict_list(dict_list, key_list):
         ret.append(_dict)
     return ret
 
-def commit_order_in_tag_sha_list(state, tag, sha):
+def commit_order_in_tag_sha_list(state, tag, sha):#: @meta-git
     if not tag: return -1
     slbt = state['sha_lists_by_tag']
     if not slbt:
@@ -717,19 +717,19 @@ def commit_order_in_tag_sha_list(state, tag, sha):
         return -1
     return ix
 
-def update_rls_tag_order_in_patch_list(patch_list, state):
+def update_rls_tag_order_in_patch_list(patch_list, state):#: @meta-git
     P = state['all_patches']
     max_tag = sorted([x for x in  {patch['tag'] for patch in P}])[-1]
     for _p in patch_list:
         _p['order_in_release'] = \
             int(commit_order_in_tag_sha_list(state, max_tag,
                                              _p['sha1']))
-def show_all_patches(state):
+def show_all_patches(state):#: patch_list
     update_rls_tag_order_in_patch_list(state['all_patches'], state)
     state['all_patches'].sort(key= lambda x: x['order_in_release'])
     print_patch_list("all patches", state['all_patches'], state)
         
-def del_from_all_patches(sha, state):
+def del_from_all_patches(sha, state):#: patch_list
     
     sha = sha[:12] #FIXME we need to do this in one place and one place only
     try:
@@ -740,7 +740,7 @@ def del_from_all_patches(sha, state):
     state['all_patches'].remove(patch)
     del state['sha_to_patch'][sha]
     
-def experimental_feature_enabled(state, name):
+def experimental_feature_enabled(state, name):#: @bsolete, @nuke
     msg = "no soup for you: %s" % (name)
     try:
         if state['experimental'][name]:
@@ -751,11 +751,11 @@ def experimental_feature_enabled(state, name):
         print(msg)
         return False
 
-def test(state):
+def test(state):#: @bsolete, @nuke
     pdb.set_trace()
     pass
 
-def start_backport(state):
+def start_backport(state):#: @unclear?, @workflow
     if not git_utils.git_repo_is_clean():
         print_log("repo is not clean. bailing out", state)
         return
@@ -767,7 +767,7 @@ def start_backport(state):
     git_utils.next_branch(state)
     git_reset_hard(state['first_commit'], state)
 
-def restart_backport(state):
+def restart_backport(state):#: @unclear?, @workflow
     if active_cherry_pick_sha(state):
         git_cherry_pick_abort()
 
@@ -776,7 +776,7 @@ def restart_backport(state):
     git_reset_hard(state['first_commit'], state)
     start_backport(state)
 
-def active_cherry_pick_sha(state):
+def active_cherry_pick_sha(state):#: @meta_git
     # parse git status and find sha we're cherry_picking
     (ret, classic_status) = shell_cmd("git status")
     (ret, porcelain_status) = shell_cmd("git status --porcelain")
@@ -789,7 +789,7 @@ def active_cherry_pick_sha(state):
     except:
         return None
     
-def generate_blame_files(sha, file, state):
+def generate_blame_files(sha, file, state):#: @meta_git, @workflow?
     dir = state['cherry_pick_files'] + '/' + sha
     fbase = os.path.split(file)[1]
     for _sha in ['HEAD', sha]:
@@ -799,7 +799,7 @@ def generate_blame_files(sha, file, state):
             print(cmd)
             shell_cmd(cmd)
 
-def show_patch(cherry_pick_sha, file, state):
+def show_patch(cherry_pick_sha, file, state):#: @patch
     cmd = "git show %s:%s > %s/%s/%s" % (cherry_pick_sha, file,
                                          state['cherry_pick_files'],
                                          cherry_pick_sha,
@@ -807,11 +807,11 @@ def show_patch(cherry_pick_sha, file, state):
                                          os.path.split(file)[1])
     shell_cmd(cmd)
     
-def generate_conflict_resolution_files(cherry_pick_sha, file, state):
+def generate_conflict_resolution_files(cherry_pick_sha, file, state):#: @workflow
     show_patch(cherry_pick_sha, file, state)
     generate_blame_files(cherry_pick_sha, file, state)
 
-def get_sorted_patch_list_from_sha_list(patch, file, state):
+def get_sorted_patch_list_from_sha_list(patch, file, state):#: meta_git
     min = state['git_log_min_tag']
     max = patch['sha1']
     cmd = f"git log --pretty=tformat:'%h' {min}..{max} {file}"
@@ -822,7 +822,7 @@ def get_sorted_patch_list_from_sha_list(patch, file, state):
     print_patch_list("", patch_list, state)
     return patch_list
 
-def add_commits_touching_file_to_all_patches(patch, file, state):
+def add_commits_touching_file_to_all_patches(patch, file, state): #: @workflow
     patch_list = get_sorted_patch_list_from_sha_list(patch, file, state)
     prompt_every_time = True
     ix = 0
@@ -869,7 +869,7 @@ def add_commits_touching_file_to_all_patches(patch, file, state):
 
     return out
 
-def parse_cherry_pick_conflict(state):
+def parse_cherry_pick_conflict(state): #: @meta_git
     cp_sha = active_cherry_pick_sha(state)
     if not cp_sha:
         print_log("no active cherry-pick", state)
@@ -888,7 +888,7 @@ def parse_cherry_pick_conflict(state):
 
     return (cp_patch, both_mod_files, mod_files)
 
-def show_stuff_for_conflict_resolution(state):
+def show_stuff_for_conflict_resolution(state):#: @workflow
     (cp_patch,
      both_mod_files,
      mod_files) = parse_cherry_pick_conflict(state)
@@ -911,20 +911,20 @@ def show_stuff_for_conflict_resolution(state):
     for file in both_mod_files:
         generate_conflict_resolution_files(cp_sha, file, state)
 
-def cherry_pick_by_sha(state, cp_sha):
+def cherry_pick_by_sha(state, cp_sha):#: @meta_git
     print_log("@@cherry_pick_by_sha", state)
     pdb.set_trace()
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
     save_cp(state)
     
-def cherry_pick_complete(state, patch):
+def cherry_pick_complete(state, patch):#: @meta_git
     patch['prev_downstream'] = patch['downstream']
     patch['downstream'] = git_top_of_applied_stack_sha(state)
     state['downstream_sha_to_patch'][patch['downstream']] = patch
     build(state)
     
-def try_to_reuse_old_conflict_resolution(patch, state):
+def try_to_reuse_old_conflict_resolution(patch, state): #: @workflow
     if not active_cherry_pick_sha(state):
         # we can't use a prev resolution if there is no conflict
         # and we can't have a conflict if not in cherry-pick
@@ -949,7 +949,7 @@ def try_to_reuse_old_conflict_resolution(patch, state):
     else:
         return False # can't use old resolution
         
-def apply_next_patch(state):
+def apply_next_patch(state):#: @workflow, @rename:cherry_pick_next_patch
     print_log("@@apply_next_patch", state)
     if not top_cites_upstream_or_confirmed_dont_care(state):
         print_log("no upstream citation or confirmation of indifference",
@@ -976,21 +976,21 @@ def apply_next_patch(state):
             cherry_pick_complete(state, patch)
     save_cp(state)
 
-def unapplied_patches(state):
+def unapplied_patches(state): #: @patch_list
     print_log("@@how_unapplied_patches", state)
     L = [p for p in state['all_patches'] if not p['downstream']]
     print_patch_list("", L, state)
     return L
 
-def do_pdb(state):
+def do_pdb(state): #: @util
     print_log("@@pdb", state)
     pdb.set_trace()
 
-def checkpoint(state):
+def checkpoint(state): #: @util
     print_log("@@checkpoint", state)
     save_cp(state)
 
-def pop_branch_tos(state):    
+def pop_branch_tos(state): #: @obsolete?
     print_log("@@do_pop_branch_tos", state)
     if not top_cites_upstream_or_confirmed_dont_care(state):
         print_log("no upstream citation or confirmation of indifference",
@@ -1002,24 +1002,24 @@ def pop_branch_tos(state):
     git_utils.git_pop_branch_tos_stack()
     short_git_log(state)
 
-def short_git_log(state):
+def short_git_log(state): #: @meta_git
     print_log("@@how_short_git_log", state)
     git_short_log('%<(10) %h  %<(12) %an : %s', state)
 
-def bash(state):
+def bash(state): #: @util
     print_log("@@bash", state)
     subprocess.run(['bash'])
 
-def log_note(state):
+def log_note(state): #: @util
     print_log("@@log_note", state)
     s = input("enter text to be appended to the log: ")
     print_log(s, state)
 
-def patch_info(state):
+def patch_info(state): #: @workflow
     print_log("@@patch_info", state)
     prompted_show_sha_info(state)
 
-def backup_branch(state):
+def backup_branch(state): #: @workflow
     print_log("@@backup_branch", state)
     line_fn = lambda line, state: print_log(line, state)
     prompt_to_set_or_alter_state('branch_backup_cmd', state)
@@ -1031,7 +1031,7 @@ def backup_branch(state):
     out = shell_cmd(cmd)
     print_log(out, state)
 
-def unapply_branch_tos(state):
+def unapply_branch_tos(state): #: @obsolete
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
         
@@ -1049,7 +1049,7 @@ def unapply_branch_tos(state):
 
     return
 
-def add_sha_list_to_all_patches(state):
+def add_sha_list_to_all_patches(state): #: @workflow, @patch_list
     print_log("@@add_sha_list_to_all_patches", state)
     if not git_repo_is_clean():
         print_log("git status not clean. no changes made", state)
@@ -1067,7 +1067,7 @@ def add_sha_list_to_all_patches(state):
         add_to_all_patches(patch, state)
     after_add_to_all_patches(state)
 
-def cherry_pick_continue(state):
+def cherry_pick_continue(state):#: @workflow
     cherry_pick_sha = active_cherry_pick_sha(state)
     if not cherry_pick_sha:
         print_log("No cherry-pick in progress. can't cherry-pick --continue",
@@ -1086,7 +1086,7 @@ def cherry_pick_continue(state):
         for patch in state['all_patches']:
             plhe.append(patch)
 
-def cherry_pick_abort(state):
+def cherry_pick_abort(state):#: @workflow
     print_log("@@cherry_pick_abort", state)
     if git_repo_is_clean():
         print_log("repo is clean. can't cherry-pick --abort", state)
@@ -1097,27 +1097,27 @@ def cherry_pick_abort(state):
     	return
     git_cherry_pick_abort()
 
-def show_top_unapp(state):
+def show_top_unapp(state): #: obsolete?
     print_patch_list("", unapplied_patches(state)[:1], state)
 
-def show_patch_by_sha(state):
+def show_patch_by_sha(state): #: @git
     sha = input("enter sha of patch to be shown: ")
     (ret, output) = shell_cmd("git show " + sha)
     print_log(output, state)
 
-def shell_one_liner(state):
+def shell_one_liner(state): #: @util
     cmd = input("enter shell one liner<enter to cancel>: ")
     (ret, output) = shell_cmd(cmd)
     print_log(output, state)
 
-def git_status_log(state):
+def git_status_log(state): #: @obsolete
     s = git_utils.git_status(state)
     
-def do_git_status(state):
+def do_git_status(state): #: @meta_git
     s = git_status()
     print_log(s, state)
 
-def get_log_result_key_by_index(state):
+def get_log_result_key_by_index(state): #: workflow
     keys = state['git_log_results'].keys()
     keys_l = list(keys)
     
@@ -1139,7 +1139,7 @@ def get_log_result_key_by_index(state):
     key = keys_l[ix]
     return key
     
-def show_one_log_result(state):
+def show_one_log_result(state): #: workflow
     key = get_log_result_key_by_index(state)
     if not key: return
     
@@ -1152,7 +1152,7 @@ def show_one_log_result(state):
         out = clip_long_output(sha_out_list[sha], state)
         print_log(out, state)
 
-def delete_one_log_result(state):
+def delete_one_log_result(state): #: workflow
     key = get_log_result_key_by_index(state)
     if not key: return
     
@@ -1161,14 +1161,14 @@ def delete_one_log_result(state):
     del state['git_log_results'][key]
 
     
-def hackery(state):
+def hackery(state):#: obsolete
     for patch in state['all_patches']:
         patch['conflicts'] = None
         patch['prev_conflicts'] = None
         patch['downstream'] = None
         patch['prev_downstream'] = None
         
-def both_mod_commits(state):
+def both_mod_commits(state):#: @workflow
     (cp_patch,
      both_mod_files,
      mod_files) = parse_cherry_pick_conflict(state)
