@@ -4,7 +4,7 @@ import argparse
 from bp_utils import *
 import menu
 import persist
-import state
+import state_access as sa
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--pickle-num', help='checkpoint to load')
@@ -22,7 +22,7 @@ parser.add_argument('--no-auto-save', default = 'n',
                     help='for examining pickles')
 # Parse the command line arguments
 args = parser.parse_args()
-state = state.state_init(args)
+state = sa.state_init(args)
 
 if args.sha_list:
     import_sha_list_file(state['args'].sha_list, 'set', state)
