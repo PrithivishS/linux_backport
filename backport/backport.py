@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
 import argparse
-from bp_utils import *
 import menu
 import persist
 import state_access as sa
+import bp_utils as bu
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--pickle-num', help='checkpoint to load')
@@ -29,5 +29,5 @@ if args.sha_list:
 
 state = persist.load_pickle_file(args, state)
 
-backport_patches(state, menu.bp_menu_item_list)
+bu.backport_patches(state, menu.bp_menu_item_list)
 
