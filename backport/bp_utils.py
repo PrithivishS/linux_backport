@@ -16,21 +16,9 @@ import state_access
 import persist
 import patch
 import menu_util as mu
+import meta_git as mg
+import shell_util as su
     
-def show_sha_info(sha): #:  meta-git
-    if not sha: return ""
-    subj = git_utils.git_get_subject(sha)
-    tag = git_utils.git_first_containing_tag(sha)
-    tag_date = git_utils.git_get_commit_date(tag)
-    s  = "%s, %s, %s, %s" % (sha, subj, tag, tag_date)
-    return s
-                  
-def prompted_show_sha_info(state):
-    sha = input("enter sha1(return to exit): ")
-    if not sha: return None
-    pl.print_log(show_sha_info(sha), state)
-
-                  
 def prompt_to_set_or_alter_state(key, d): #: core, @io, @ui, @state, @persist
     # if no saved value for key
     #	prompt for it
@@ -49,37 +37,8 @@ def prompt_to_set_or_alter_state(key, d): #: core, @io, @ui, @state, @persist
                     % (key))
         if tmp:
             d[key] = tmp
-            
-# should subsume some of the duplicate code in git_utils.py over time
-def shell_cmd(cmd): #: shell, @process
-    result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
-    return (result.returncode, result.stdout.decode('latin-1'))
+#@@@
 
-def poll_shell_cmd(cmd, shell_args, line_fn, state):#: shell, @process
-    cmd = shutil.which(cmd)
-    shell_args = shlex.split(shell_args)
-    cmd = [ cmd] + shell_args
-    shell_args = ' '.join(shell_args)
-    
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
-    # Create empty buffers and a polling object
-    poll = select.poll()
-    poll.register(process.stdout, select.POLLIN)
-    poll.register(process.stderr, select.POLLIN)
-
-    # Continuously poll the stdout and stderr streams to capture output as it
-    # appears
-    spew = []
-    while process.poll() is None:
-        rlist, _, _ = select.select([process.stdout, process.stderr], [], [])
-        for stream in rlist:
-            line = stream.readline().decode().rstrip("\n")
-            spew.append(line)
-            line_fn(line, state)
-          
-    return spew
-              
 def state_init(args): # anoter obvious objuect #: state, @persist
     state = dict()
     state['cherry_pick_files'] = "/tmp/cp__files"
@@ -119,7 +78,7 @@ def import_sha_list_file(path, state):#: @meta-git
     return patch_list
 
 def patch_cites_upstream(local_sha): #: @obsolete?
-    (ret, log_lines) = shell_cmd("git log -1 %s" % (local_sha))
+    (ret, log_lines) = su.shell_cmd("git log -1 %s" % (local_sha))
     pat = "(commit )([0-9a-f]+)( upstream)"
     matches = []
     log_lines = [l.strip() for l in log_lines.split('\n')]
@@ -151,8 +110,8 @@ def compare_patch_to_upstream(state):#: @meta-git
     
     
     # show_diff
-    (ret, local_patch) = shell_cmd("git show " + local_sha)
-    (ret, upstream_patch) = shell_cmd("git show " + upstream_sha)
+    (ret, local_patch) = su.shell_cmd("git show " + local_sha)
+    (ret, upstream_patch) = su.shell_cmd("git show " + upstream_sha)
     local_line_list = [x + '\n' for x in local_patch.split('\n')]
     upstream_line_list = [x + '\n' for x in upstream_patch.split('\n')]
     sys.stdout.writelines(difflib.unified_diff(upstream_line_list,
@@ -193,7 +152,7 @@ def old_build(state): #: obsolete? (or is build() spewing trash?)
     if not state['build_cmd']:
         return
 
-    (ret, spew) = shell_cmd(state['build_cmd'])
+    (ret, spew) = su.shell_cmd(state['build_cmd'])
     return spew
 
 pats = { #: @unres_syms
@@ -579,8 +538,8 @@ def restart_backport(state):#: @unclear?, @workflow
 
 def active_cherry_pick_sha(state):#: @meta_git
     # parse git status and find sha we're cherry_picking
-    (ret, classic_status) = shell_cmd("git status")
-    (ret, porcelain_status) = shell_cmd("git status --porcelain")
+    (ret, classic_status) = su.shell_cmd("git status")
+    (ret, porcelain_status) = su.shell_cmd("git status --porcelain")
 
     classic_pat = "(.*cherry-picking commit )([a-fA-F0-9]+)(.*)"
     match = re.search(classic_pat, classic_status)
@@ -598,7 +557,7 @@ def generate_blame_files(sha, file, state):#: @meta_git, @workflow?
             SHA = _sha + sfx
             cmd = f"git blame {SHA} -- {file} > {dir}/{SHA}.{fbase}"
             print(cmd)
-            shell_cmd(cmd)
+            su.shell_cmd(cmd)
 
 def show_patch(cherry_pick_sha, file, state):#: @patch
     cmd = "git show %s:%s > %s/%s/%s" % (cherry_pick_sha, file,
@@ -606,7 +565,7 @@ def show_patch(cherry_pick_sha, file, state):#: @patch
                                          cherry_pick_sha,
 
                                          os.path.split(file)[1])
-    shell_cmd(cmd)
+    su.shell_cmd(cmd)
     
 def generate_conflict_resolution_files(cherry_pick_sha, file, state):#: @workflow
     show_patch(cherry_pick_sha, file, state)
@@ -616,7 +575,7 @@ def get_sorted_patch_list_from_sha_list(patch, file, state):#: meta_git
     min = state['git_log_min_tag']
     max = patch['sha1']
     cmd = f"git log --pretty=tformat:'%h' {min}..{max} {file}"
-    (ret, out) = shell_cmd(cmd)
+    (ret, out) = su.shell_cmd(cmd)
     sha_list = uniqify_list(out.split("\n"))[:-1]
     patch_list = [make_patch_dict(state, sha) for sha in sha_list]
     patch_list.sort(key= lambda x: x['order_in_release'])
@@ -679,7 +638,7 @@ def parse_cherry_pick_conflict(state): #: @meta_git
     cp_patch = state['sha_to_patch'][cp_sha]        
 
     # parse git status --porcelain
-    (ret, porcelain_status) = shell_cmd("git status --porcelain")
+    (ret, porcelain_status) = su.shell_cmd("git status --porcelain")
     mod_files = []
     both_mod_files = []
     for line in porcelain_status.split("\n")[: -1]:
@@ -700,13 +659,13 @@ def show_stuff_for_conflict_resolution(state):#: @workflow
     cp_sha = cp_patch['sha1']
     
     # clean tmp dir
-    shell_cmd("mkdir -p " + state['cherry_pick_files'] + "/" + cp_sha)
+    su.shell_cmd("mkdir -p " + state['cherry_pick_files'] + "/" + cp_sha)
     
     # emit patch to temp dir
     cmd = "git show %s > %s/%s/patch" % (cp_sha,
                                          state['cherry_pick_files'],
                                          cp_sha)
-    shell_cmd(cmd)
+    su.shell_cmd(cmd)
     
     # emit both_mod files to "both_mod.".filename
     for file in both_mod_files:
@@ -818,7 +777,7 @@ def log_note(state): #: @util
 
 def patch_info(state): #: @workflow
     pl.print_log("@@patch_info", state)
-    prompted_show_sha_info(state)
+    mg.prompted_show_sha_info(state)
 
 def backup_branch(state): #: @workflow
     pl.print_log("@@backup_branch", state)
@@ -829,7 +788,7 @@ def backup_branch(state): #: @workflow
 
     # do it
     cmd = "git " + ' '.join(state['branch_backup_cmd'].split(' ')[1:])
-    out = shell_cmd(cmd)
+    out = su.shell_cmd(cmd)
     pl.print_log(out, state)
 
 def unapply_branch_tos(state): #: @obsolete
@@ -903,12 +862,12 @@ def show_top_unapp(state): #: obsolete?
 
 def show_patch_by_sha(state): #: @git
     sha = input("enter sha of patch to be shown: ")
-    (ret, output) = shell_cmd("git show " + sha)
+    (ret, output) = su.shell_cmd("git show " + sha)
     pl.print_log(output, state)
 
 def shell_one_liner(state): #: @util
     cmd = input("enter shell one liner<enter to cancel>: ")
-    (ret, output) = shell_cmd(cmd)
+    (ret, output) = su.shell_cmd(cmd)
     pl.print_log(output, state)
 
 def git_status_log(state): #: @obsolete

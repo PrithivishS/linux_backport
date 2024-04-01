@@ -3,6 +3,7 @@ import re
 import os
 import threading
 from print_log import *
+import shell_util as su
 import pdb
 
 EG_pretty_fmt=" --pretty=tformat:'%<(10) %h  %<(12) %an : %s: %cd' "
@@ -14,7 +15,7 @@ def shell_cmd(cmd):
 
 
 def git_repo_is_clean():
-    (ret, tmp) = shell_cmd("git status --porcelain")
+    (ret, tmp) = su.shell_cmd("git status --porcelain")
     if tmp:
         return False
     else:
@@ -232,7 +233,7 @@ def search_commit_for_pattern(search_type, pattern, tag1, tag2, line_fn, state,
     key = search_type + "," + pattern + "," + tag1 +"," + tag2
     cmd = "git show %s | grep %s" % (sha, pattern)
     #_pdb = pdb.Pdb();_pdb.set_trace()
-    (ret, out) = shell_cmd(cmd)
+    (ret, out) = su.shell_cmd(cmd)
 
     if 'git_log_results' not in state:
         state['git_log_results'] = dict()
@@ -251,7 +252,7 @@ def git_log_search(search_type, pattern, tag1, tag2, line_fn, state):
     cmd =  "git log -%s%s" % (search_type, pattern)
     cmd += " --pretty=tformat:\'%<(10) %h\'"
     cmd += " %s..%s" % (tag1, tag2)
-    (ret, out) = shell_cmd(cmd)
+    (ret, out) = su.shell_cmd(cmd)
     #_pdb = pdb.Pdb();_pdb.set_trace()
     out = [x.lstrip() for x in out.rstrip("\n").split("\n")]
 
@@ -263,7 +264,7 @@ def git_log_search(search_type, pattern, tag1, tag2, line_fn, state):
     return ret
     
 def git_top_of_applied_stack_sha(state):
-    (ret,tap_sha) = shell_cmd("git rev-parse --short HEAD")
+    (ret,tap_sha) = su.shell_cmd("git rev-parse --short HEAD")
     if not tap_sha:
         print_log("** something is very wrong. can't find sha of top commit**",
                   state)
@@ -271,15 +272,15 @@ def git_top_of_applied_stack_sha(state):
 
 def git_pop_branch_tos():
     # pop applied patch
-    shell_cmd('git reset --hard HEAD^')
+    su.shell_cmd('git reset --hard HEAD^')
     
 def get_short_sha_list_by_key(key):
     cmd = f"git log --pretty=tformat:'%h' {key}"
-    (ret, out) = shell_cmd(cmd)
+    (ret, out) = su.shell_cmd(cmd)
     out = out.split("\n")
     return out
 
 def git_get_conflicts():
     cmd = "git diff --diff-filter=U"
-    (ret, out) = shell_cmd(cmd)
+    (ret, out) = su.shell_cmd(cmd)
     return out

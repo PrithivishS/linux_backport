@@ -11,6 +11,7 @@ import argparse
 import sys
 from git_utils import *
 from bp_utils import *
+from meta_git import *
 
 EG_ver="v6.6"
 EG_pretty_fmt=" --pretty=tformat:'%<(10) %h  %<(12) %an : %s: %cd' "

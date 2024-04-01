@@ -1,4 +1,5 @@
 import print_log as pl
+import meta_git as mg
 
 def status(patch, state):
     if patch['downstream']: return 'applied'

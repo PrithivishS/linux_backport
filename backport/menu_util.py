@@ -1,5 +1,6 @@
 import git_utils as git
 import bp_utils as bpu
+import print_log as pl
 
 def get_menu_trailer(state):
     trailer = "\n\n%d commits (%d applied)" % (len(state['all_patches']),
