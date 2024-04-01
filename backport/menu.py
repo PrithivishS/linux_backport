@@ -1,5 +1,6 @@
 import  bp_utils as bpu
 import git_utils as git
+import meta_git as mg
 
 bp_menu_item_list = [
     #
@@ -12,7 +13,7 @@ bp_menu_item_list = [
     {'prompt' : 'cherry pick next patch', 'action':  bpu.apply_next_patch},
     {'prompt' : 'patch_info(sha)', 'action' : bpu.patch_info},
     {'prompt' : 'find commits referring to pattern',
-     'action' : git.git_logG_simple},
+     'action' : mg.git_logG_simple},
     {'prompt' : 'find commits touching "both modified" files',
      'action' : bpu.both_mod_commits},
     {'prompt' : 'add patch by sha',
@@ -49,7 +50,7 @@ bp_menu_item_list = [
         {'prompt' : 'short display unresolved syms (all)',
          'action': bpu.short_display_unres_symbols_all},
         {'prompt' : 'find commits referring unresolved symbols',
-         'action' : git.git_logG_syms},
+         'action' : mg.git_logG_syms},
         {'prompt' : 'set provider(resolve) by index',
          'action' : bpu.set_unres_provider_by_ix},
         {'prompt' : 'delete unresolved sym by index',

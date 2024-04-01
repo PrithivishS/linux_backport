@@ -39,28 +39,12 @@ def prompt_to_set_or_alter_dict_val(key, d): #: core, @io, @ui, @state, @persist
             d[key] = tmp
 #@@@
 
-def backport_patches(state, menu_item_list): #: @core, @MAIN
+def backport_patches(state, menu_item_list): #: @core, @MAIN, @workflow
     current_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     pl.print_log("Startup: Current Time = %s" %(current_date_time), state)
 
     mu.do_menu_choice(menu_item_list, state)
         
-def get_sha_info(sha, subj):#: @meta-git
-    if not subj:
-        subj = git_utils.git_get_subject(sha)
-
-    tag = git_utils.git_first_containing_tag(sha)
-    tag_date = git_utils.git_get_commit_date(tag)
-    tmp = "%s, %s, %s, %s" % (sha, subj, tag, tag_date)
-    return tmp
-    
-def import_sha_list_file(path, state):#: @meta-git
-    pl.print_log("@@import_sha_list_file(%s...)" % (path), state)
-
-    patch_list = [make_patch_dict(state, l)
-                  for l in open(path,"r")]
-    return patch_list
-
 def patch_cites_upstream(local_sha): #: @obsolete?
     (ret, log_lines) = su.shell_cmd("git log -1 %s" % (local_sha))
     pat = "(commit )([0-9a-f]+)( upstream)"
