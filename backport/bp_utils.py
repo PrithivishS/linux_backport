@@ -45,17 +45,6 @@ def backport_patches(state, menu_item_list): #: @core, @MAIN, @workflow
 
     mu.do_menu_choice(menu_item_list, state)
         
-def uniqify_dict_list(L, key):#: @unres_syms
-    seen = {}
-    unq = []
-    
-    for d in L:
-        tag = d[key]
-        if tag not in seen:
-            seen[key] = d
-            unq.append(d)
-    return unq
-
 def git_reset_hard(sha1, state): #: @misplaced, @base-git
     cmd = "git  reset --hard  " + sha1
     print("about to: " + cmd)
