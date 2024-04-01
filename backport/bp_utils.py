@@ -44,18 +44,7 @@ def backport_patches(state, menu_item_list): #: @core, @MAIN, @workflow
     pl.print_log("Startup: Current Time = %s" %(current_date_time), state)
 
     mu.do_menu_choice(menu_item_list, state)
-        
-def git_reset_hard(sha1, state): #: @misplaced, @base-git
-    cmd = "git  reset --hard  " + sha1
-    print("about to: " + cmd)
-    
-    if not ui.confirm("\nEnter 'y' to proceed, else <enter>: ", ['y']):
-        return -1
-
-    result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
-
-    return result.returncode    
-   
+           
 def uniqify_list(L): #: @core, @generic
     ret = list()
     tmp = dict()

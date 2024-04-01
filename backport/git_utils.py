@@ -228,3 +228,14 @@ def git_get_conflicts():
     cmd = "git diff --diff-filter=U"
     (ret, out) = su.shell_cmd(cmd)
     return out
+
+def git_reset_hard(sha1, state): #: @misplaced, @base-git
+    cmd = "git  reset --hard  " + sha1
+    print("about to: " + cmd)
+    
+    if not ui.confirm("\nEnter 'y' to proceed, else <enter>: ", ['y']):
+        return -1
+
+    result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
+
+    return result.returncode    
