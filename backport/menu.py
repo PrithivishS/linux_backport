@@ -2,6 +2,8 @@ import  bp_utils as bpu
 import git_utils as git
 import meta_git as mg
 import patch as patch
+import unres_syms as us
+import shell_util as su
 
 bp_menu_item_list = [
     #
@@ -22,7 +24,7 @@ bp_menu_item_list = [
     {'prompt' : 'show one git log result', 'action': bpu.show_one_log_result},
     {'prompt' : 'delete one git log result',
      'action': bpu.delete_one_log_result},
-    {'prompt' : 'build', 'action' : bpu.build},
+    {'prompt' : 'build', 'action' : su.build},
     {'prompt' : 'cherry-pick --continue',
      'action': bpu.cherry_pick_continue},#@
     {'prompt' : 'cherry-pick -abort', 'action': bpu.cherry_pick_abort},
@@ -47,19 +49,19 @@ bp_menu_item_list = [
      },
      {'prompt' : 'experimental actions', 'sub-menu' : [
         {'prompt' : 'short display unresolved syms (unprovided)',
-         'action': bpu.short_display_unres_symbols_unprovided},
+         'action': us.short_display_unres_symbols_unprovided},
         {'prompt' : 'short display unresolved syms (all)',
-         'action': bpu.short_display_unres_symbols_all},
+         'action': us.short_display_unres_symbols_all},
         {'prompt' : 'find commits referring unresolved symbols',
          'action' : mg.git_logG_syms},
         {'prompt' : 'set provider(resolve) by index',
-         'action' : bpu.set_unres_provider_by_ix},
+         'action' : us.set_unres_provider_by_ix},
         {'prompt' : 'delete unresolved sym by index',
-         'action' : bpu.delete_unres_sym_by_ix},
+         'action' : us.delete_unres_sym_by_ix},
         {'prompt' : 'unresolved syms to patch dict list',
-         'action': bpu.unresolved_syms_to_patch_dict_list},
+         'action': us.unresolved_syms_to_patch_dict_list},
         {'prompt' : 'detailed display unresolved sym by index',
-         'action': bpu.detailed_display_unres_symbol_by_index},
-        {'prompt' : 'build and parse', 'action': bpu.get_needed_symbols},
+         'action': us.detailed_display_unres_symbol_by_index},
+        {'prompt' : 'build and parse', 'action': us.get_needed_symbols},
      ]},
 ]
