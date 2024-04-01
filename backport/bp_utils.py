@@ -19,7 +19,7 @@ import menu_util as mu
 import meta_git as mg
 import shell_util as su
     
-def prompt_to_set_or_alter_state(key, d): #: core, @io, @ui, @state, @persist
+def prompt_to_set_or_alter_dict_val(key, d): #: core, @io, @ui, @state, @persist
     # if no saved value for key
     #	prompt for it
     #	save to d
@@ -117,7 +117,7 @@ def top_cites_upstream_or_confirmed_dont_care(state):#: @obsolete?
 def build(state): #: core
     pl.print_log("@@build", state)
     line_fn = lambda line, state: pl.print_log(line, state)
-    prompt_to_set_or_alter_state('build_cmd', state)
+    prompt_to_set_or_alter_dict_val('build_cmd', state)
     if not state['build_cmd']:
         return
 
@@ -132,7 +132,7 @@ def build(state): #: core
 def old_build(state): #: obsolete? (or is build() spewing trash?)
     pl.print_log("@@build", state)
     line_fn = lambda line, state: pl.print_log(line, state)
-    prompt_to_set_or_alter_state('build_cmd', state)
+    prompt_to_set_or_alter_dict_val('build_cmd', state)
     if not state['build_cmd']:
         return
 
@@ -766,7 +766,7 @@ def patch_info(state): #: @workflow
 def backup_branch(state): #: @workflow
     pl.print_log("@@backup_branch", state)
     line_fn = lambda line, state: pl.print_log(line, state)
-    prompt_to_set_or_alter_state('branch_backup_cmd', state)
+    prompt_to_set_or_alter_dict_val('branch_backup_cmd', state)
     if not state['branch_backup_cmd']:
         return
 
