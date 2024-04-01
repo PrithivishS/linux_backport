@@ -1,5 +1,7 @@
 import ui
 import pickle
+import glob
+import print_log as pl
 
 def save_cp(state):
     st = state
@@ -26,3 +28,38 @@ def restore_cp(fpath):
             sys.exit
         return None
     
+def next_cp_num(args):  #: core, @ui, @io, state
+    pfre = args.pickle_dir + "/" + args.pickle_file + ".*"
+    L = glob.glob(pfre)
+    L.sort()
+    if len(L) < 1:
+        return 1
+    ret = max([int(l.split('.')[-1]) for l in L]) + 1
+    return ret
+
+#
+# we look for pickle files in this order:
+#
+#    - if args.pickle_num is given, only that pickle file
+#    - if files match "pickle.*", the largest one
+#    - otherwise fail since the initial picke file should be created by
+#      sha2pckl
+#
+def load_pickle_file(args, state):#: core, @ui, @io, state
+    pd = state['args'].pickle_dir
+    pf = state['args'].pickle_file
+    
+    if state['args'].pickle_num:
+        f = pd + "/" + pf + "." + state['args'].pickle_num
+    else:
+        max_pickle_num = str(next_cp_num(state['args']) - 1)
+        f = pd + "/" + pf + "." + max_pickle_num
+    pl.print_log("loading state: " + f, state)
+
+    state = restore_cp(f)
+    if not state: state = state_init(args)
+    state['log_fobj'] = open(args.log_file, 'a')
+    state['cp_num'] = next_cp_num(args)
+    state['sha_to_patch'] = {p['sha1'] : p for p in state['all_patches']}
+    return state
+
