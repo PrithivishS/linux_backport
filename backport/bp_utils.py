@@ -17,14 +17,6 @@ import persist
 import patch
 import menu_util as mu
     
-def copy_key_val_if_present(key, dst_hash, src_hash, state): #: obsolete?
-    if src_hash is None: return
-    
-    if key in src_hash.keys():
-        dst_hash[key] = src_hash[key]
-    else:
-        pl.print_log("WARNING: pickle file lacks %s" % (key), state)
-        
 def show_sha_info(sha): #:  meta-git
     if not sha: return ""
     subj = git_utils.git_get_subject(sha)
