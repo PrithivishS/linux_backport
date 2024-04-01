@@ -1,4 +1,3 @@
-import print_log
 import state_access
 
 def print_log(s, state):
