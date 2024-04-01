@@ -42,7 +42,7 @@ def sha_to_patch_string(state, sha):
     s = to_string("", _d, state)
     return s
 
-def print_list(msg, patch_list, state):#: patch, @io
+def print_list(msg, patch_list, state):
     i = 0
     pl.print_log(">>>>>: %s" % (msg), state)
     for patch in patch_list:
