@@ -51,3 +51,26 @@ def print_list(msg, patch_list, state):#: patch, @io
     pl.print_log("<<<<<: %s" % (msg), state)
 
 
+def compare_patch_to_downstream(state):
+    print("compare_patch_to_downstream(): NEEDS RETEST **********")
+    if not git_utils.git_repo_is_clean():
+        pl.print_log("git status not clean. no action taken", state)
+        return
+    # prompt for patch to compare
+    s = "enter sha of commit to compare .vs. downstream(<enter> => cancel):"
+    upstream_sha = input(s)
+    if not local_sha:
+        return
+    
+    downstream_sha = state['sha_to_patch'][upstream_sha]['downstream']
+
+    # show_diff
+    (ret, local_patch) = su.shell_cmd("git show " + downstream_sha)
+    (ret, upstream_patch) = su.shell_cmd("git show " + upstream_sha)
+    local_line_list = [x + '\n' for x in local_patch.split('\n')]
+    upstream_line_list = [x + '\n' for x in upstream_patch.split('\n')]
+    sys.stdout.writelines(difflib.unified_diff(upstream_line_list,
+                                               local_line_list))
+    state['log_fobj'].writelines(difflib.unified_diff(upstream_line_list,
+                                                      local_line_list))
+

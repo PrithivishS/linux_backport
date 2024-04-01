@@ -45,59 +45,6 @@ def backport_patches(state, menu_item_list): #: @core, @MAIN, @workflow
 
     mu.do_menu_choice(menu_item_list, state)
         
-def patch_cites_upstream(local_sha): #: @obsolete?
-    (ret, log_lines) = su.shell_cmd("git log -1 %s" % (local_sha))
-    pat = "(commit )([0-9a-f]+)( upstream)"
-    matches = []
-    log_lines = [l.strip() for l in log_lines.split('\n')]
-    for l in log_lines:
-        match = re.search(pat, l)
-        if match:
-            matches.append(match.group(2))
-
-    if len(matches) == 1:
-        return matches[0] # upstream sha
-    else:
-        return False
-
-def compare_patch_to_upstream(state):#: @meta-git
-    if not git_utils.git_repo_is_clean():
-        pl.print_log("git status not clean. no action taken", state)
-        return
-    # prompt for patch to compare
-    s = "enter sha of commit to compare .vs. upstream(<enter> => top patch):"
-    local_sha = input(s)
-    if not local_sha:
-        local_sha = git_utils.git_top_of_applied_stack_sha(state)
-
-    # check if patch notes upstream
-    upstream_sha = patch_cites_upstream(local_sha)
-    if not upstream_sha:
-        print("no upstream citation found, returning")
-        return
-    
-    
-    # show_diff
-    (ret, local_patch) = su.shell_cmd("git show " + local_sha)
-    (ret, upstream_patch) = su.shell_cmd("git show " + upstream_sha)
-    local_line_list = [x + '\n' for x in local_patch.split('\n')]
-    upstream_line_list = [x + '\n' for x in upstream_patch.split('\n')]
-    sys.stdout.writelines(difflib.unified_diff(upstream_line_list,
-                                               local_line_list))
-    state['log_fobj'].writelines(difflib.unified_diff(upstream_line_list,
-                                                      local_line_list))
-    
-def top_cites_upstream_or_confirmed_dont_care(state):#: @obsolete?
-    tap_sha = git_utils.git_top_of_applied_stack_sha(state)
-
-    if patch_cites_upstream(tap_sha): return True
-
-    pl.print_log("** top patch does not cite upstream **", state)
-    if ui.confirm("Enter 'y' to proceed, else <enter>: ", ['y']):
-        return True
-
-    return False
-
 def build(state): #: core
     pl.print_log("@@build", state)
     line_fn = lambda line, state: pl.print_log(line, state)
@@ -679,11 +626,6 @@ def try_to_reuse_old_conflict_resolution(patch, state): #: @workflow
         
 def apply_next_patch(state):#: @workflow, @rename:cherry_pick_next_patch
     pl.print_log("@@apply_next_patch", state)
-    if not top_cites_upstream_or_confirmed_dont_care(state):
-        pl.print_log("no upstream citation or confirmation of indifference",
-                  state)
-        return
-    
     if not git_repo_is_clean():
         pl.print_log("git status not clean. no changes made", state)
         
@@ -720,10 +662,6 @@ def checkpoint(state): #: @util
 
 def pop_branch_tos(state): #: @obsolete?
     pl.print_log("@@do_pop_branch_tos", state)
-    if not top_cites_upstream_or_confirmed_dont_care(state):
-        pl.print_log("no upstream citation or confirmation of indifference",
-                  state)
-        return
     if not git_repo_is_clean():
         pl.print_log("git status not clean. no changes made", state)
         

@@ -1,6 +1,7 @@
 import  bp_utils as bpu
 import git_utils as git
 import meta_git as mg
+import patch as patch
 
 bp_menu_item_list = [
     #
@@ -26,7 +27,7 @@ bp_menu_item_list = [
      'action': bpu.cherry_pick_continue},#@
     {'prompt' : 'cherry-pick -abort', 'action': bpu.cherry_pick_abort},
     {'prompt' : 'compare patch to upstream',
-     'action' : bpu.compare_patch_to_upstream},
+     'action' : patch.compare_patch_to_downstream},
     {'prompt' : 'show one git log result', 'action': bpu.show_one_log_result},
     {'prompt' : 'show git log completions', 'action': git.show_log_completions},
     {'prompt' : 'add sha list to all patches',
