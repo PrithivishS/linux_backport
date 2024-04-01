@@ -15,9 +15,9 @@ import print_log as pl
 import state_access
 import persist
 import patch
-import menu_util
+import menu_util as mu
     
-def copy_key_val_if_present(key, dst_hash, src_hash, state):
+def copy_key_val_if_present(key, dst_hash, src_hash, state): #: obsolete?
     if src_hash is None: return
     
     if key in src_hash.keys():
@@ -108,7 +108,7 @@ def backport_patches(state, menu_item_list): #: @core, @MAIN
     current_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     pl.print_log("Startup: Current Time = %s" %(current_date_time), state)
 
-    do_menu_choice(menu_item_list, state)
+    mu.do_menu_choice(menu_item_list, state)
         
 def get_sha_info(sha, subj):#: @meta-git
     if not subj:

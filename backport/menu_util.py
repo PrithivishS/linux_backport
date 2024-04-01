@@ -1,14 +1,15 @@
 import git_utils as git
+import bp_utils as bpu
 
 def get_menu_trailer(state):
     trailer = "\n\n%d commits (%d applied)" % (len(state['all_patches']),
                                            sum(1 for p
                                                in state['all_patches']
                                                if p['downstream']))
-    if not git_utils.git_repo_is_clean():
+    if not git.git_repo_is_clean():
         trailer += "\n** working tree UNCLEAN **"
 
-    if active_cherry_pick_sha(state):
+    if bpu.active_cherry_pick_sha(state):
         trailer += "\n** active cherry-pick ** "
         
     if trailer:
@@ -17,7 +18,7 @@ def get_menu_trailer(state):
     return trailer
 
         
-def show_menu_trailer(state):n
+def show_menu_trailer(state):
     print(get_menu_trailer(state))
     
 def show_menu(menu, state):
@@ -48,6 +49,6 @@ def do_menu_choice(menu, state):
         # log unapplied and active(on git log) patches after every menu op
         state['out_dest'] = 'log_only'
         pl.print_log("menu choice was <%s>" % (x), state)
-        git_utils.git_short_log('%<(10) %h  %<(12) %an : %s', state)
+        git.git_short_log('%<(10) %h  %<(12) %an : %s', state)
         state['out_dest'] = 'both'
 
