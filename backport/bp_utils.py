@@ -45,31 +45,6 @@ def backport_patches(state, menu_item_list): #: @core, @MAIN, @workflow
 
     mu.do_menu_choice(menu_item_list, state)
         
-def build(state): #: core
-    pl.print_log("@@build", state)
-    line_fn = lambda line, state: pl.print_log(line, state)
-    prompt_to_set_or_alter_dict_val('build_cmd', state)
-    if not state['build_cmd']:
-        return
-
-    # do it, ignore ret text(for now @ least)
-    # assume build_cmd is of the form: <cmd> <arg string>
-    L = state['build_cmd'].split(' ')
-    shell_args = ' '.join(L[1:])
-    spew = poll_shell_cmd(L[0], shell_args, line_fn, state)
-    pl.print_log(spew, state)
-    return spew
-
-def old_build(state): #: obsolete? (or is build() spewing trash?)
-    pl.print_log("@@build", state)
-    line_fn = lambda line, state: pl.print_log(line, state)
-    prompt_to_set_or_alter_dict_val('build_cmd', state)
-    if not state['build_cmd']:
-        return
-
-    (ret, spew) = su.shell_cmd(state['build_cmd'])
-    return spew
-
 pats = { #: @unres_syms
     'undecl-fn' :  {
         'pat': "(.*error: implicit declaration of function ‘)([a-zA-Z_][a-zA-Z0-9_]*)(’.*)",
