@@ -9,6 +9,7 @@ import shell_util as su
 import all_patches as ap
 import workflow as wf
 
+
 bp_menu_item_list = [
     #
     # main menu
@@ -17,12 +18,13 @@ bp_menu_item_list = [
     {'prompt' : 'short_git_log', 'action': bu.short_git_log},
     {'prompt' : 'show unapplied patches','action': ap.unapplied_patches},
     {'prompt': 'show all patches', 'action' : ap.show_all_patches},
-    {'prompt' : 'cherry pick next patch', 'action':  bu.apply_next_patch},
+    {'prompt' : 'cherry pick next patch',
+     'action':  wf.cherry_pick_next_patch},
     {'prompt' : 'patch_info(sha)', 'action' : bu.patch_info},
     {'prompt' : 'find commits referring to pattern',
      'action' : mg.git_logG_simple},
     {'prompt' : 'find commits touching "both modified" files',
-     'action' : bu.both_mod_commits},
+     'action' : wf.both_mod_commits},
     {'prompt' : 'add patch by sha',
      'action' : ap.add_to_all_patches_by_sha},
     {'prompt' : 'show one git log result', 'action': bu.show_one_log_result},
@@ -30,8 +32,8 @@ bp_menu_item_list = [
      'action': bu.delete_one_log_result},
     {'prompt' : 'build', 'action' : su.build},
     {'prompt' : 'cherry-pick --continue',
-     'action': bu.cherry_pick_continue},#@
-    {'prompt' : 'cherry-pick -abort', 'action': bu.cherry_pick_abort},
+     'action': wf.cherry_pick_continue},
+    {'prompt' : 'cherry-pick -abort', 'action': wf.cherry_pick_abort},
     {'prompt' : 'compare patch to upstream',
      'action' : patch.compare_patch_to_downstream},
     {'prompt' : 'show one git log result', 'action': bu.show_one_log_result},

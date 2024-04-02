@@ -18,6 +18,7 @@ import patch
 import menu_util as mu
 import meta_git as mg
 import shell_util as su
+import cherry_pick as cp
     
 def prompt_to_set_or_alter_dict_val(key, d): #: core, @io, @ui, @state, @persist
     # if no saved value for key
@@ -66,108 +67,6 @@ def uniqify_dict_list(dict_list, key_list): #: @core, @generic
         ret.append(_dict)
     return ret
 
-#@@@
-def parse_cherry_pick_conflict(state): #: @meta_git
-    cp_sha = mg.active_cherry_pick_sha(state)
-    if not cp_sha:
-        pl.print_log("no active cherry-pick", state)
-        return (None, None, None)
-         
-    cp_patch = state['sha_to_patch'][cp_sha]        
-
-    # parse git status --porcelain
-    (ret, porcelain_status) = su.shell_cmd("git status --porcelain")
-    mod_files = []
-    both_mod_files = []
-    for line in porcelain_status.split("\n")[: -1]:
-        (code, file) = [x for x in line.split(' ') if not x == '']
-        if code == 'M': mod_files.append(file)
-        if code == 'UU': both_mod_files.append(file)
-
-    return (cp_patch, both_mod_files, mod_files)
-
-def show_stuff_for_conflict_resolution(state):#: @workflow
-    (cp_patch,
-     both_mod_files,
-     mod_files) = parse_cherry_pick_conflict(state)
-
-    if not cp_patch:
-        return
-    
-    cp_sha = cp_patch['sha1']
-    
-    # clean tmp dir
-    su.shell_cmd("mkdir -p " + state['cherry_pick_files'] + "/" + cp_sha)
-    
-    # emit patch to temp dir
-    cmd = "git show %s > %s/%s/patch" % (cp_sha,
-                                         state['cherry_pick_files'],
-                                         cp_sha)
-    su.shell_cmd(cmd)
-    
-    # emit both_mod files to "both_mod.".filename
-    for file in both_mod_files:
-        generate_conflict_resolution_files(cp_sha, file, state)
-
-def cherry_pick_by_sha(state, cp_sha):#: @meta_git
-    pl.print_log("@@cherry_pick_by_sha", state)
-    pdb.set_trace()
-    if not git_repo_is_clean():
-        pl.print_log("git status not clean. no changes made", state)
-    save_cp(state)
-    
-def cherry_pick_complete(state, patch):#: @meta_git
-    patch['prev_downstream'] = patch['downstream']
-    patch['downstream'] = git_top_of_applied_stack_sha(state)
-    state['downstream_sha_to_patch'][patch['downstream']] = patch
-    build(state)
-    
-def try_to_reuse_old_conflict_resolution(patch, state): #: @workflow
-    if not mg.active_cherry_pick_sha(state):
-        # we can't use a prev resolution if there is no conflict
-        # and we can't have a conflict if not in cherry-pick
-        return False
-    
-    patch['prev_conflicts'] = patch['conflicts']
-    patch['conflicts'] = git_get_conflicts()
-
-    if (patch['prev_downstream'] and
-        patch['conflicts'] == patch['prev_conflicts']):
-        pdb.set_trace() #FIXME
-        # abort current cherry pick
-        git_cherry_pick_abort()
-        # cherry-pick prev downstream
-        cherry_pick_by_sha(patch['prev_downstream'])
-                           
-        if git_repo_is_clean():
-            return True
-        else:
-            return False
-
-    else:
-        return False # can't use old resolution
-        
-def apply_next_patch(state):#: @workflow, @rename:cherry_pick_next_patch
-    pl.print_log("@@apply_next_patch", state)
-    if not git_repo_is_clean():
-        pl.print_log("git status not clean. no changes made", state)
-        
-    L = [p for p in state['all_patches'] if not p['downstream']]
-    if len(L) == 0:
-        pl.print_log("THERE ARE NO PATCHES TO APPLY", state)
-        return
-    patch = L[0]
-
-    patch.print_dict("@@ cherry picking :", patch, state)
-    git_cherry_pick(patch['sha1'])
-    
-    if git_repo_is_clean():
-        cherry_pick_complete(state, patch)
-    else:
-        show_stuff_for_conflict_resolution(state)
-        if try_to_reuse_old_conflict_resolution(patch, state):
-            cherry_pick_complete(state, patch)
-    save_cp(state)
 
 def do_pdb(state): #: @util
     pl.print_log("@@pdb", state)
@@ -250,37 +149,7 @@ def add_sha_list_to_all_patches(state): #: @workflow, @patch_list
         add_to_all_patches(patch, state)
     after_add_to_all_patches(state)
 
-def cherry_pick_continue(state):#: @workflow
-    cherry_pick_sha = mg.active_cherry_pick_sha(state)
-    if not cherry_pick_sha:
-        pl.print_log("No cherry-pick in progress. can't cherry-pick --continue",
-                  state)
-        return
-    patch = state['sha_to_patch'][cherry_pick_sha]
-    pl.print_log("@@cherry_pick_continue", state)
-    git_cherry_pick_continue()
-    if git_repo_is_clean():
-        downstream_sha = git_top_of_applied_stack_sha(state)
-        patch['downstream'] = downstream_sha
-        state['downstream_sha_to_patch'][downstream_sha] = patch
-        plh = state['patch_list_history']
-        plh.append(list())
-        plhe = plh[-1]
-        for patch in state['all_patches']:
-            plhe.append(patch)
-
-def cherry_pick_abort(state):#: @workflow
-    pl.print_log("@@cherry_pick_abort", state)
-    if git_repo_is_clean():
-        pl.print_log("repo is clean. can't cherry-pick --abort", state)
-        return
-    if not ui.confirm("enter 'y' if ok, else <enter>: ", ['y']):
-    	return
-    if not ui.confirm("enter 'y' if you're really really sure, else <enter>: ", ['y']):
-    	return
-    git_cherry_pick_abort()
-
-def show_top_unapp(state): #: obsolete?
+def show_top_unapp(state): #: obsolete? #@@@@
     patch.print_list("", unapplied_patches(state)[:1], state)
 
 def show_patch_by_sha(state): #: @git
@@ -351,13 +220,3 @@ def hackery(state):#: obsolete
         patch['downstream'] = None
         patch['prev_downstream'] = None
         
-def both_mod_commits(state):#: @workflow
-    (cp_patch,
-     both_mod_files,
-     mod_files) = parse_cherry_pick_conflict(state)
-
-    if not cp_patch:
-        return
-
-    for file in both_mod_files:
-        add_commits_touching_file_to_all_patches(cp_patch, file, state)
