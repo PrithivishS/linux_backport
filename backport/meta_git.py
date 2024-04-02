@@ -1,4 +1,6 @@
 import git_utils
+import shell_util as su
+import re
 
 def show_sha_info(sha):
     if not sha: return ""

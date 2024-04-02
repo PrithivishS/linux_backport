@@ -37,7 +37,6 @@ def prompt_to_set_or_alter_dict_val(key, d): #: core, @io, @ui, @state, @persist
                     % (key))
         if tmp:
             d[key] = tmp
-#@@@
 
 def backport_patches(state, menu_item_list): #: @core, @MAIN, @workflow
     current_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -67,6 +66,7 @@ def uniqify_dict_list(dict_list, key_list): #: @core, @generic
         ret.append(_dict)
     return ret
 
+#@@@
 def commit_order_in_tag_sha_list(state, tag, sha):#: @meta-git
     if not tag: return -1
     slbt = state['sha_lists_by_tag']
@@ -88,40 +88,6 @@ def commit_order_in_tag_sha_list(state, tag, sha):#: @meta-git
         return -1
     return ix
 
-def start_backport(state):#: @unclear?, @workflow
-    if not git_utils.git_repo_is_clean():
-        pl.print_log("repo is not clean. bailing out", state)
-        return
-    if state['backport_in_progress']:
-        print("OOPS: backport already in progress")
-        return
-
-    state['backport_in_progress'] = True
-    git_utils.next_branch(state)
-    git_reset_hard(state['first_commit'], state)
-
-def restart_backport(state):#: @unclear?, @workflow
-    if active_cherry_pick_sha(state):
-        git_cherry_pick_abort()
-
-    state['backport_in_progress'] = False
-    git_utils.next_branch(state)
-    git_reset_hard(state['first_commit'], state)
-    start_backport(state)
-
-def active_cherry_pick_sha(state):#: @meta_git
-    # parse git status and find sha we're cherry_picking
-    (ret, classic_status) = su.shell_cmd("git status")
-    (ret, porcelain_status) = su.shell_cmd("git status --porcelain")
-
-    classic_pat = "(.*cherry-picking commit )([a-fA-F0-9]+)(.*)"
-    match = re.search(classic_pat, classic_status)
-    try:
-        cherry_pick_sha = match.group(2)
-        return cherry_pick_sha
-    except:
-        return None
-    
 def generate_blame_files(sha, file, state):#: @meta_git, @workflow?
     dir = state['cherry_pick_files'] + '/' + sha
     fbase = os.path.split(file)[1]

@@ -7,6 +7,7 @@ import patch as patch
 import unres_syms as us
 import shell_util as su
 import all_patches as ap
+import workflow as wf
 
 bp_menu_item_list = [
     #
@@ -46,8 +47,8 @@ bp_menu_item_list = [
         {'prompt' : 'enter pdb', 'action' : bu.do_pdb},
         {'prompt' : 'launch bash', 'action' : bu.bash},
         {'prompt': 'show_patch_by_sha', 'action' : bu.show_patch_by_sha},
-        {'prompt' : 'start_backport', 'action': bu.start_backport},
-        {'prompt' : 'REstart_backport', 'action': bu.restart_backport},
+        {'prompt' : 'start_backport', 'action': wf.start_backport},
+        {'prompt' : 'REstart_backport', 'action': wf.restart_backport},
         ]
      },
      {'prompt' : 'experimental actions', 'sub-menu' : [
