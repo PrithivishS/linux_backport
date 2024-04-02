@@ -88,21 +88,6 @@ def commit_order_in_tag_sha_list(state, tag, sha):#: @meta-git
         return -1
     return ix
 
-def experimental_feature_enabled(state, name):#: @bsolete, @nuke
-    msg = "no soup for you: %s" % (name)
-    try:
-        if state['experimental'][name]:
-            return True
-        print(msg)
-        return False
-    except:
-        print(msg)
-        return False
-
-def test(state):#: @bsolete, @nuke
-    pdb.set_trace()
-    pass
-
 def start_backport(state):#: @unclear?, @workflow
     if not git_utils.git_repo_is_clean():
         pl.print_log("repo is not clean. bailing out", state)
