@@ -211,12 +211,3 @@ def delete_one_log_result(state): #: workflow
     pl.print_log("==== %s ====" % (key), state)
     
     del state['git_log_results'][key]
-
-    
-def hackery(state):#: obsolete
-    for patch in state['all_patches']:
-        patch['conflicts'] = None
-        patch['prev_conflicts'] = None
-        patch['downstream'] = None
-        patch['prev_downstream'] = None
-        
