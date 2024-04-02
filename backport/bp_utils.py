@@ -149,9 +149,6 @@ def add_sha_list_to_all_patches(state): #: @workflow, @patch_list
         add_to_all_patches(patch, state)
     after_add_to_all_patches(state)
 
-def show_top_unapp(state): #: obsolete? #@@@@
-    patch.print_list("", unapplied_patches(state)[:1], state)
-
 def show_patch_by_sha(state): #: @git
     sha = input("enter sha of patch to be shown: ")
     (ret, output) = su.shell_cmd("git show " + sha)
