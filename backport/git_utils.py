@@ -239,3 +239,16 @@ def git_reset_hard(sha1, state): #: @misplaced, @base-git
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
 
     return result.returncode    
+
+def show_patch_by_sha(state): #: @git
+    sha = input("enter sha of patch to be shown: ")
+    (ret, output) = su.shell_cmd("git show " + sha)
+    pl.print_log(output, state)
+
+def git_status_log(state): #: @obsolete
+    s = git_utils.git_status(state)
+    
+def do_git_status(state): #: @meta_git
+    s = git_status()
+    pl.print_log(s, state)
+

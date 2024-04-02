@@ -3,7 +3,7 @@
 import pdb
 import pickle
 from git_utils import *
-import git_utils
+import git_utils as git
 from datetime import datetime
 import select
 import shutil
@@ -149,22 +149,10 @@ def add_sha_list_to_all_patches(state): #: @workflow, @patch_list
         add_to_all_patches(patch, state)
     after_add_to_all_patches(state)
 
-def show_patch_by_sha(state): #: @git
-    sha = input("enter sha of patch to be shown: ")
-    (ret, output) = su.shell_cmd("git show " + sha)
-    pl.print_log(output, state)
-
-def shell_one_liner(state): #: @util
+def shell_one_liner(state): 
     cmd = input("enter shell one liner<enter to cancel>: ")
     (ret, output) = su.shell_cmd(cmd)
     pl.print_log(output, state)
-
-def git_status_log(state): #: @obsolete
-    s = git_utils.git_status(state)
-    
-def do_git_status(state): #: @meta_git
-    s = git_status()
-    pl.print_log(s, state)
 
 def get_log_result_key_by_index(state): #: workflow
     keys = state['git_log_results'].keys()

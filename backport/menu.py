@@ -48,7 +48,7 @@ bp_menu_item_list = [
         {'prompt' : 'shell one_liner', 'action': bu.shell_one_liner},
         {'prompt' : 'enter pdb', 'action' : bu.do_pdb},
         {'prompt' : 'launch bash', 'action' : bu.bash},
-        {'prompt': 'show_patch_by_sha', 'action' : bu.show_patch_by_sha},
+        {'prompt': 'show_patch_by_sha', 'action' : git.show_patch_by_sha},
         {'prompt' : 'start_backport', 'action': wf.start_backport},
         {'prompt' : 'REstart_backport', 'action': wf.restart_backport},
         ]
