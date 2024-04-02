@@ -76,14 +76,6 @@ def checkpoint(state): #: @util
     pl.print_log("@@checkpoint", state)
     save_cp(state)
 
-def pop_branch_tos(state): #: @obsolete?
-    pl.print_log("@@do_pop_branch_tos", state)
-    if not git_repo_is_clean():
-        pl.print_log("git status not clean. no changes made", state)
-        
-    git_utils.git_pop_branch_tos_stack()
-    short_git_log(state)
-
 def short_git_log(state): #: @meta_git
     pl.print_log("@@how_short_git_log", state)
     git_short_log('%<(10) %h  %<(12) %an : %s', state)
@@ -112,24 +104,6 @@ def backup_branch(state): #: @workflow
     cmd = "git " + ' '.join(state['branch_backup_cmd'].split(' ')[1:])
     out = su.shell_cmd(cmd)
     pl.print_log(out, state)
-
-def unapply_branch_tos(state): #: @obsolete
-    if not git_repo_is_clean():
-        pl.print_log("git status not clean. no changes made", state)
-        
-    if not ui.confirm("Are you sure? Enter 'y' if ok, else <enter>: ", ['y']):
-    	return
-
-    sha = git_top_of_applied_stack_sha(state)
-    patch = state['downstream_sha_to_patch']
-    downstream_sha = patch['downstream']
-    patch['downstream'] = None
-    del state['downstream_sha_to_patch'][downstream_sha]
-
-    git_utils.git_pop_branch_tos()
-    del state['downstream_sha_to_patch'][downstream_sha]
-
-    return
 
 def add_sha_list_to_all_patches(state): #: @workflow, @patch_list
     pl.print_log("@@add_sha_list_to_all_patches", state)

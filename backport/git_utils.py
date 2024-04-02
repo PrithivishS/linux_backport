@@ -214,10 +214,6 @@ def git_top_of_applied_stack_sha(state):
                   state)
     return tap_sha.rstrip('\n')
 
-def git_pop_branch_tos():
-    # pop applied patch
-    su.shell_cmd('git reset --hard HEAD^')
-    
 def get_short_sha_list_by_key(key):
     cmd = f"git log --pretty=tformat:'%h' {key}"
     (ret, out) = su.shell_cmd(cmd)
