@@ -2,7 +2,6 @@
 #
 
 import patch
-
 def invalidate_patches_if_new_precedents(state):#: @core, @patch_list
     state['all_patches'].sort(key= lambda x: x['order_in_release'])
     invalidate = False

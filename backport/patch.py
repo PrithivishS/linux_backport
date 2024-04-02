@@ -93,3 +93,36 @@ def commit_order_in_tag_sha_list(state, tag, sha):
         print(f"CAN'T FIND RELEASE CONTAINING {sha}")
         return -1
     return ix
+def generate_blame_files(sha, file, state):#: @meta_git, @workflow?
+    dir = state['cherry_pick_files'] + '/' + sha
+    fbase = os.path.split(file)[1]
+    for _sha in ['HEAD', sha]:
+        for sfx in  ['^', '']:
+            SHA = _sha + sfx
+            cmd = f"git blame {SHA} -- {file} > {dir}/{SHA}.{fbase}"
+            print(cmd)
+            su.shell_cmd(cmd)
+
+def show_patch(cherry_pick_sha, file, state):#: @patch
+    cmd = "git show %s:%s > %s/%s/%s" % (cherry_pick_sha, file,
+                                         state['cherry_pick_files'],
+                                         cherry_pick_sha,
+
+                                         os.path.split(file)[1])
+    su.shell_cmd(cmd)
+    
+def generate_conflict_resolution_files(cherry_pick_sha, file, state):#: @workflow
+    show_patch(cherry_pick_sha, file, state)
+    generate_blame_files(cherry_pick_sha, file, state)
+
+def get_sorted_patch_list_from_sha_list(patch, file, state):#: meta_git
+    min = state['git_log_min_tag']
+    max = patch['sha1']
+    cmd = f"git log --pretty=tformat:'%h' {min}..{max} {file}"
+    (ret, out) = su.shell_cmd(cmd)
+    sha_list = uniqify_list(out.split("\n"))[:-1]
+    patch_list = [make_patch_dict(state, sha) for sha in sha_list]
+    patch_list.sort(key= lambda x: x['order_in_release'])
+    patch.print_list("", patch_list, state)
+    return patch_list
+
