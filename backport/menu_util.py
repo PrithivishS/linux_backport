@@ -10,7 +10,7 @@ def get_menu_trailer(state):
     if not git.git_repo_is_clean():
         trailer += "\n** working tree UNCLEAN **"
 
-    if bpu.active_cherry_pick_sha(state):
+    if mg.active_cherry_pick_sha(state):
         trailer += "\n** active cherry-pick ** "
         
     if trailer:

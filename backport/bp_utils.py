@@ -156,7 +156,7 @@ def get_sorted_patch_list_from_sha_list(patch, file, state):#: meta_git
     return patch_list
 
 def parse_cherry_pick_conflict(state): #: @meta_git
-    cp_sha = active_cherry_pick_sha(state)
+    cp_sha = mg.active_cherry_pick_sha(state)
     if not cp_sha:
         pl.print_log("no active cherry-pick", state)
         return (None, None, None)
@@ -211,7 +211,7 @@ def cherry_pick_complete(state, patch):#: @meta_git
     build(state)
     
 def try_to_reuse_old_conflict_resolution(patch, state): #: @workflow
-    if not active_cherry_pick_sha(state):
+    if not mg.active_cherry_pick_sha(state):
         # we can't use a prev resolution if there is no conflict
         # and we can't have a conflict if not in cherry-pick
         return False
@@ -339,7 +339,7 @@ def add_sha_list_to_all_patches(state): #: @workflow, @patch_list
     after_add_to_all_patches(state)
 
 def cherry_pick_continue(state):#: @workflow
-    cherry_pick_sha = active_cherry_pick_sha(state)
+    cherry_pick_sha = mg.active_cherry_pick_sha(state)
     if not cherry_pick_sha:
         pl.print_log("No cherry-pick in progress. can't cherry-pick --continue",
                   state)

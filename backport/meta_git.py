@@ -87,3 +87,16 @@ def git_logG_syms(state):
 #                thrd.join()
         print_log("git_logG_syms/exit", state)
 
+def active_cherry_pick_sha(state):#: @meta_git
+    # parse git status and find sha we're cherry_picking
+    (ret, classic_status) = su.shell_cmd("git status")
+    (ret, porcelain_status) = su.shell_cmd("git status --porcelain")
+
+    classic_pat = "(.*cherry-picking commit )([a-fA-F0-9]+)(.*)"
+    match = re.search(classic_pat, classic_status)
+    try:
+        cherry_pick_sha = match.group(2)
+        return cherry_pick_sha
+    except:
+        return None
+    
