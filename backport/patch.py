@@ -73,3 +73,23 @@ def compare_patch_to_downstream(state):
     state['log_fobj'].writelines(difflib.unified_diff(upstream_line_list,
                                                       local_line_list))
 
+def commit_order_in_tag_sha_list(state, tag, sha):
+    if not tag: return -1
+    slbt = state['sha_lists_by_tag']
+    if not slbt:
+        print(f"sha_lists_by_tag not in state: {tag}")
+        state['sha_lists_by_tag'] = dict()
+        slbt = state['sha_lists_by_tag']
+
+    if tag not in slbt:
+        L = git_utils.get_short_sha_list_by_key(tag)
+        slbt[tag] = L
+    else:
+        L = slbt[tag]
+
+    try:
+        ix = len(L) - L.index(sha)
+    except:
+        print(f"CAN'T FIND RELEASE CONTAINING {sha}")
+        return -1
+    return ix

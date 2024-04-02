@@ -67,27 +67,6 @@ def uniqify_dict_list(dict_list, key_list): #: @core, @generic
     return ret
 
 #@@@
-def commit_order_in_tag_sha_list(state, tag, sha):#: @meta-git
-    if not tag: return -1
-    slbt = state['sha_lists_by_tag']
-    if not slbt:
-        print(f"sha_lists_by_tag not in state: {tag}")
-        state['sha_lists_by_tag'] = dict()
-        slbt = state['sha_lists_by_tag']
-
-    if tag not in slbt:
-        L = git_utils.get_short_sha_list_by_key(tag)
-        slbt[tag] = L
-    else:
-        L = slbt[tag]
-
-    try:
-        ix = len(L) - L.index(sha)
-    except:
-        print(f"CAN'T FIND RELEASE CONTAINING {sha}")
-        return -1
-    return ix
-
 def generate_blame_files(sha, file, state):#: @meta_git, @workflow?
     dir = state['cherry_pick_files'] + '/' + sha
     fbase = os.path.split(file)[1]

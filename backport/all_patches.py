@@ -1,6 +1,8 @@
 # operations that modify or iterate over the whole list of patches
 #
 
+import patch
+
 def invalidate_patches_if_new_precedents(state):#: @core, @patch_list
     state['all_patches'].sort(key= lambda x: x['order_in_release'])
     invalidate = False
@@ -63,8 +65,8 @@ def update_rls_tag_order_in_patch_list(patch_list, state):#: @meta-git
     max_tag = sorted([x for x in  {patch['tag'] for patch in P}])[-1]
     for _p in patch_list:
         _p['order_in_release'] = \
-            int(commit_order_in_tag_sha_list(state, max_tag,
-                                             _p['sha1']))
+            int(patch.commit_order_in_tag_sha_list(state, max_tag,
+                                                   _p['sha1']))
 def show_all_patches(state):#: patch_list
     update_rls_tag_order_in_patch_list(state['all_patches'], state)
     state['all_patches'].sort(key= lambda x: x['order_in_release'])
