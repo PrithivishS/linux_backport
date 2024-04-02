@@ -151,12 +151,6 @@ def clip_long_output(s, state):
             s = s[0: clip_len - 1]
     return s
 
-def show_log_completions(state):
-    try:
-        print(state['git_log_completed'])
-    except:
-        return
-
 def git_log_tag(state, min_max):
     if min_max == "min":
         key = 'git_log_min_tag'
