@@ -208,8 +208,11 @@ def git_top_of_applied_stack_sha(state):
                   state)
     return tap_sha.rstrip('\n')
 
-def get_short_sha_list_by_key(key):
-    cmd = f"git log --pretty=tformat:'%h' {key}"
+def get_short_sha_list_by_key(key, git_path = None):
+    if git_path:
+        cmd = f"git -C {git_path} log --pretty=tformat:'%h' {key}"
+    else:
+        cmd = f"git log --pretty=tformat:'%h' {key}"
     (ret, out) = su.shell_cmd(cmd)
     out = out.split("\n")
     return out
