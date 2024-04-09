@@ -106,20 +106,6 @@ def git_cherry_pick_by_sha(sha):
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
     return result.returncode
     
-def find_sha1_by_subject(subject, max_ver):
-    fmt = " --pretty=tformat:'%<(10) %h  %<(12) %an : %s: %cd' "
-    cmd = "git  log " + max_ver + fmt
-    ret = subprocess.check_output(cmd, shell=True)
-    text = ret.decode('latin-1')
-    text = text.split("\n")
-    doozer = [x for x in text if re.search(subject, x, re.IGNORECASE)]
-    if len(doozer) > 1:
-        sys.exit("more than one match for: %s" % (subject))
-    if len(doozer) == 0:
-        sys.exit("No matching commit for: " + subject)
-    duh = doozer[0].strip()
-    return duh.split(" ")[0]
-
 def add_or_inc_ver_num(path):
     L = path.split(".")
     if  L[-1:][0].isnumeric():
@@ -261,6 +247,8 @@ def log_sync(git_path = None, commitish = None, fmt = "'%h'",):
     # returns list of git log output lines
     if git_path:
          cmd = f"git -C {git_path} log"
+    else:
+        cmd = "git log"
     if fmt:
         cmd += f" --pretty=tformat:{fmt}"
     if commitish:
