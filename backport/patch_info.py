@@ -34,10 +34,12 @@ def main(args):
     if args.subject and args.sha:
         sys.exit("provide only one of --sha, --subject")
     if args.subject:
-        sha1 = find_sha1_by_subject(subject, EG_ver)
+        sha1_list = find_sha1_list_by_subject(subject, None, EG_ver)
+        for sha in sha1_list:
+            show_sha_info(sha, args.subject)
     else:
         sha1 = args.sha
-    show_sha_info(sha1, args.subject)
+        show_sha_info(sha1, args.subject)
 
     
 parser = argparse.ArgumentParser()

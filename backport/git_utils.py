@@ -257,3 +257,15 @@ def log_sync(git_path = None, commitish = None, fmt = "'%h'",):
     (ret, out) = su.shell_cmd(cmd)
     out = out.split("\n")
     return out[:-1]
+
+saved_sha_sub_lists = dict()
+
+def find_sha1_list_by_subject(subject, git_path = None, branch = None):
+    key =  str(git_path) + str(branch)
+    if not key in saved_sha_sub_lists:
+       saved_sha_sub_lists[key]  = log_sync(git_path, branch, "'%h %s'")
+    
+    doozer = [x for x in saved_sha_sub_lists[key]
+              if re.search(subject, x, re.IGNORECASE)]
+    ret = [x.split(' ')[0] for x in doozer]
+    return ret;
