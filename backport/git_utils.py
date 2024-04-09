@@ -13,7 +13,6 @@ def shell_cmd(cmd):
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
     return (result.returncode, result.stdout.decode('latin-1'))
 
-
 def git_repo_is_clean():
     (ret, tmp) = su.shell_cmd("git status --porcelain")
     if tmp:
@@ -208,15 +207,6 @@ def git_top_of_applied_stack_sha(state):
                   state)
     return tap_sha.rstrip('\n')
 
-def get_short_sha_list_by_key(key, git_path = None):
-    if git_path:
-        cmd = f"git -C {git_path} log --pretty=tformat:'%h' {key}"
-    else:
-        cmd = f"git log --pretty=tformat:'%h' {key}"
-    (ret, out) = su.shell_cmd(cmd)
-    out = out.split("\n")
-    return out
-
 def git_get_conflicts():
     cmd = "git diff --diff-filter=U"
     (ret, out) = su.shell_cmd(cmd)
@@ -245,3 +235,29 @@ def do_git_status(state): #: @meta_git
     s = git_status()
     pl.print_log(s, state)
 
+def get_short_sha_list_by_key(key, git_path = None):
+    if git_path:
+        cmd = f"git -C {git_path} log --pretty=tformat:'%h' {key}"
+    else:
+        cmd = f"git log --pretty=tformat:'%h' {key}"
+    (ret, out) = su.shell_cmd(cmd)
+    out = out.split("\n")
+    return out
+
+def log_sync(git_path = None, commitish = None, fmt = "'%h'",):
+    # synchronous git log
+    # example
+    # ocos_analysis.py --vendor_tree_path=~/wrk/amd/OpenCloudOS-Kernel \
+    # --vendor_branch=5.4.119-20.0009.30.spr.0001
+    #FIXME: existing git log cmds should be rewritten in terms of this
+    # returns list of git log output lines
+    if git_path:
+         cmd = f"git -C {git_path} log"
+    if fmt:
+        cmd += f" --pretty=tformat:{fmt}"
+    if commitish:
+         cmd += f" {commitish}"
+
+    (ret, out) = su.shell_cmd(cmd)
+    out = out.split("\n")
+    return out[:-1]

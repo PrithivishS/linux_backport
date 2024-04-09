@@ -1,13 +1,10 @@
 #!/usr/bin/python3
 
 import argparse
-import pickle
 import pdb
 
 #our modules
-import ocos_upstream_tags as oc_tags
 import git_utils as git
-import persist
 
 def get_upstream_sha_lists_by_tag(args, tags):
     # this code asssumes one tag per line with a comma at eol
@@ -25,19 +22,11 @@ def get_upstream_sha_lists_by_tag(args, tags):
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--upstream_tree_path', help='path to upstream_git_tree')
-parser.add_argument('--pickle-path', default='/home/evantass/tmp/sha_list_db.pickle',
-                    help='where to store checkpoints')
+parser.add_argument('--vendor_tree_path', help='path to vendor_git_tree')
+parser.add_argument('--vendor_branch', help='vendor branch')
 
 # Parse the command line arguments
 args = parser.parse_args()
 
 pdb.set_trace()
-tags = oc_tags.upstream_tags
-upstream_sha_lists_by_tag = get_upstream_sha_lists_by_tag(args, tags)
-
-with open(args.pickle_path, 'wb') as handle:
-        pdb.set_trace()
-        pickle.dump(upstream_sha_lists_by_tag, handle,
-                    protocol=pickle.HIGHEST_PROTOCOL)
-        pdb.set_trace()
-        pass
+vendor_sha_list = git.log_sync(args.vendor_tree_path, args.vendor_branch)
