@@ -8,6 +8,10 @@ import pdb
 
 EG_pretty_fmt=" --pretty=tformat:'%<(10) %h  %<(12) %an : %s: %cd' "
 
+#FIXME: vet rid of "git_" in function names since these are mostly used via
+#  "import git_utils as git;git.<whatever>
+#
+
 # should subsume some of the duplicate code in git_utils.py over time
 def shell_cmd(cmd):
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
