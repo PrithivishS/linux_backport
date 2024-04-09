@@ -51,8 +51,12 @@ def git_get_commit_date(commitish):
     s = result.stdout.decode().strip()
     return s
 
-def find_tag_by_sha1(sha1):
-    cmd = "git tag --contains " + sha1
+def find_tag_by_sha1(sha1, git_path = None):
+    if git_path:
+        cmd = f"git -C {git_path} tag"
+    else:
+        cmd = "git tag"
+    cmd += " --contains " + sha1
     ret = subprocess.check_output(cmd, shell=True)
     text = ret.decode('latin-1')
     text = text.split("\n")
