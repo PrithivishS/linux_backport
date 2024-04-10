@@ -262,8 +262,7 @@ saved_subj_sha_dicts = dict()
 
 def subj_to_sha_list_hash(git_path = None, branch = None):
     d = dict()
-    sha_subj_list  = log_sync(git_path, branch, "'%h %s'")[0:10]
-    print("Achtung clipping!!!!!")
+    sha_subj_list  = log_sync(git_path, branch, "'%h %s'")
 
     for l in sha_subj_list:
         sha = l.split(' ')[0]
