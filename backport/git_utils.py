@@ -258,14 +258,34 @@ def log_sync(git_path = None, commitish = None, fmt = "'%h'",):
     out = out.split("\n")
     return out[:-1]
 
-saved_sha_sub_lists = dict()
+saved_subj_sha_dicts = dict()
 
+def subj_to_sha_list_hash(git_path = None, branch = None):
+    d = dict()
+    sha_subj_list  = log_sync(git_path, branch, "'%h %s'")[0:10]
+    print("Achtung clipping!!!!!")
+
+    for l in sha_subj_list:
+        sha = l.split(' ')[0]
+        subj = ' '.join(l.split(' ')[1:])
+        if subj in d:
+            d[subj].append(sha)
+        else:
+            d[subj] = [sha]
+    return d
+        
 def find_sha1_list_by_subject(subject, git_path = None, branch = None):
-    key =  str(git_path) + str(branch)
-    if not key in saved_sha_sub_lists:
-       saved_sha_sub_lists[key]  = log_sync(git_path, branch, "'%h %s'")
+    d = subj_to_sha_hash(git_path, branch)
+    key =  str(git_path) + ',' + str(branch)
+    if not key in saved_subj_sha_dicts:
+        print("->save_sha_sub_lists[%s]" % (key))
+        saved_subj_sha_dicts[key]  = subj_to_sha_hash(git_path, branch)
+
+    try:
+        ret = saved_subj_sha_dicts[key][subject]
+        print(".", end='')
+    except:
+        ret = []
+        print("+", end="")
     
-    doozer = [x for x in saved_sha_sub_lists[key]
-              if re.search(subject, x, re.IGNORECASE)]
-    ret = [x.split(' ')[0] for x in doozer]
     return ret;
