@@ -2,6 +2,7 @@ import git_utils as git
 import meta_git as mg
 import bp_utils as bpu
 import print_log as pl
+import persist
 
 def get_menu_trailer(state):
     trailer = "\n\n%d commits (%d applied)" % (len(state['all_patches']),
@@ -34,7 +35,7 @@ def do_menu_choice(menu, state):
         while True:
             show_menu(menu, state)
             x = input("enter choice(<enter> to exit menu): ")
-            if not x: save_cp(state);return
+            if not x: persist.save_cp(state);return
             try:
                 x = int(x)
             except:

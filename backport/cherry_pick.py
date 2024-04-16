@@ -3,6 +3,9 @@
 import git_utils as gu
 import print_log as pl
 import meta_git as mg
+import shell_util as su
+import patch
+import persist
 
 def parse_cherry_pick_conflict(state):
     cp_sha = mg.active_cherry_pick_sha(state)
@@ -44,14 +47,14 @@ def show_stuff_for_conflict_resolution(state):
     
     # emit both_mod files to "both_mod.".filename
     for file in both_mod_files:
-        generate_conflict_resolution_files(cp_sha, file, state)
+        patch.generate_conflict_resolution_files(cp_sha, file, state)
 
 def cherry_pick_by_sha(state, cp_sha):
     pl.print_log("@@cherry_pick_by_sha", state)
     pdb.set_trace()
     if not git_repo_is_clean():
         pl.print_log("git status not clean. no changes made", state)
-    save_cp(state)
+    persist.save_cp(state)
     
 def cherry_pick_complete(state, patch):
     patch['prev_downstream'] = patch['downstream']
@@ -66,7 +69,7 @@ def try_to_reuse_old_conflict_resolution(patch, state):
         return False
     
     patch['prev_conflicts'] = patch['conflicts']
-    patch['conflicts'] = git_get_conflicts()
+    patch['conflicts'] = gu.git_get_conflicts()
 
     if (patch['prev_downstream'] and
         patch['conflicts'] == patch['prev_conflicts']):

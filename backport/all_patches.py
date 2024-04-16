@@ -2,6 +2,11 @@
 #
 
 import patch
+import print_log as pl
+import pdb
+import ui
+import git_utils as git
+import persist
 
 def invalidate_patches_if_new_precedents(state):#: @core, @patch_list
     state['all_patches'].sort(key= lambda x: x['order_in_release'])
@@ -32,23 +37,21 @@ def reset_branch_to_last_commit_not_preceding_invalidated(state):#: meta-git
         ix = state['all_patches'].index(first_unapplied_patch)
         reset_to_sha = state['all_patches'][ix - 1]['sha1']
         
-    patch = make_patch_dict(state, reset_to_sha)
-    patch.print_dict("\n", patch, state)
+    _patch = patch.make_patch_dict(state, reset_to_sha)
+    patch.print_dict("\n", _patch, state)
     if ui.confirm("about to reset --hard to this commit\nEnter 'y' to proceed, else <enter>: ", ['y']):
         return
-    if git_top_of_applied_stack_sha(state) != state['first_commit']:
-        git_reset_hard(reset_to_sha, state)
+    if git.git_top_of_applied_stack_sha(state) != state['first_commit']:
+        git.git_reset_hard(reset_to_sha, state)
     
 def add_to_all_patches(patch,state): #: @patch-list
     state['all_patches'].append(patch)
     state['sha_to_patch'] = {p['sha1'] : p for p in state['all_patches']}
 
 def after_add_to_all_patches(state):#: @patch-list
-    pdb.set_trace()
     invalidate_patches_if_new_precedents(state)
     reset_branch_to_last_commit_not_preceding_invalidated(state)
-    reset_branch_to_last_commit_not_preceding_invalidated(state)         
-    save_cp(state)
+    persist.save_cp(state)
 
 def add_to_all_patches_by_sha(state):#: @patch-list
      sha = input("enter SHA1 id or comma separated list providing symbol <enter> if none: ")

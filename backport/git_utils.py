@@ -1,10 +1,9 @@
 import subprocess
 import re
 import os
-import threading
-from print_log import *
 import shell_util as su
 import pdb
+import print_log as pl
 
 EG_pretty_fmt=" --pretty=tformat:'%<(10) %h  %<(12) %an : %s: %cd' "
 
@@ -158,41 +157,6 @@ def git_log_tag(state, min_max):
         return val
     else:
         return state[key]
-    
-def search_commit_for_pattern(search_type, pattern, tag1, tag2, line_fn, state,
-                              sha):
-    key = search_type + "," + pattern + "," + tag1 +"," + tag2
-    cmd = "git show %s | grep %s" % (sha, pattern)
-    #_pdb = pdb.Pdb();_pdb.set_trace()
-    (ret, out) = su.shell_cmd(cmd)
-
-    if 'git_log_results' not in state:
-        state['git_log_results'] = dict()
-
-    if key not in state['git_log_results']:
-        state['git_log_results'][key] = dict()
-
-    if sha in state['git_log_results'][key]:
-        print("uh-oh")
-    else:
-        state['git_log_results'][key][sha] = out
-
-# git log is capable of much more than this function shows
-#
-def git_log_search(search_type, pattern, tag1, tag2, line_fn, state): 
-    cmd =  "git log -%s%s" % (search_type, pattern)
-    cmd += " --pretty=tformat:\'%<(10) %h\'"
-    cmd += " %s..%s" % (tag1, tag2)
-    (ret, out) = su.shell_cmd(cmd)
-    #_pdb = pdb.Pdb();_pdb.set_trace()
-    out = [x.lstrip() for x in out.rstrip("\n").split("\n")]
-
-    for sha in out:
-        search_commit_for_pattern(search_type, pattern, tag1, tag2, line_fn,
-                                  state, sha)
-    key = search_type + "," + pattern + "," + tag1 +"," + tag2
-    state['git_log_completed'].append(key)
-    return ret
     
 def git_top_of_applied_stack_sha(state):
     (ret,tap_sha) = su.shell_cmd("git rev-parse --short HEAD")

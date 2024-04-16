@@ -2,8 +2,23 @@ import ui
 import pickle
 import glob
 import print_log as pl
+import sys
+import state_access as sa
+import persist
+import os
 
+def create_pickle_dir_if_needed(state):
+    pd = state['pickle_dir']
+    if not os.path.isdir(pd):
+        os.mkdir(pd)
+        if not os.path.isdir(pd):
+            return False # mkdir failed
+    return True
+    
 def save_cp(state):
+    if not create_pickle_dir_if_needed(state):
+        pl.print_log("WARNING CAN'T CREATE PICKLE DIR: " + state['pickle_dir'])
+        return
     st = state
     tmp = state['log_fobj']
     for slot in ['log_fobj', 'args', 'sha_lists_by_tag', 'unresolved_syms',
@@ -57,9 +72,9 @@ def load_pickle_file(args, state):#: core, @ui, @io, state
     pl.print_log("loading state: " + f, state)
 
     state = restore_cp(f)
-    if not state: state = state_init(args)
+    if not state: state = sa.state_init(args)
     state['log_fobj'] = open(args.log_file, 'a')
-    state['cp_num'] = next_cp_num(args)
+    state['cp_num'] = persist.next_cp_num(args)
     state['sha_to_patch'] = {p['sha1'] : p for p in state['all_patches']}
     return state
 

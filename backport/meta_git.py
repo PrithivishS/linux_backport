@@ -1,6 +1,8 @@
 import git_utils
 import shell_util as su
 import re
+import print_log as pl
+import patch
 
 def show_sha_info(sha):
     if not sha: return ""
@@ -26,9 +28,8 @@ def get_sha_info(sha, subj):
     return tmp
     
 def import_sha_list_file(path, state):
-    pl.print_log("@@import_sha_list_file(%s...)" % (path), state)
 
-    patch_list = [make_patch_dict(state, l)
+    patch_list = [patch.make_patch_dict(state, l)
                   for l in open(path,"r")]
     return patch_list
 

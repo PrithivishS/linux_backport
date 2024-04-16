@@ -1,8 +1,13 @@
 import print_log as pl
+import git_utils
+import meta_git as mg
+import pdb
+import os
+import shell_util as su
 
 def status(patch, state):
     if patch['downstream']: return 'applied'
-    if patch['sha1'] == active_cherry_pick_sha(state):
+    if patch['sha1'] == mg.active_cherry_pick_sha(state):
         return "cherry-pick active"
     return "unapplied"
 
@@ -18,7 +23,8 @@ def print_dict(msg, patch, state):
 
 def make_patch_dict(state, sha1):
     d = dict()
-    d['sha1'] = sha1.lstrip().rstrip()
+    sha1 = sha1.lstrip().rstrip()
+    d['sha1'] = sha1
     d['sha1'] = d['sha1'][:12]
     d['done'] = False
     d['pre_reqs'] = list()
@@ -77,7 +83,6 @@ def commit_order_in_tag_sha_list(state, tag, sha):
     if not tag: return -1
     slbt = state['sha_lists_by_tag']
     if not slbt:
-        print(f"sha_lists_by_tag not in state: {tag}")
         state['sha_lists_by_tag'] = dict()
         slbt = state['sha_lists_by_tag']
 

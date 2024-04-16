@@ -19,6 +19,8 @@ import menu_util as mu
 import meta_git as mg
 import shell_util as su
 import cherry_pick as cp
+import ui
+import all_patches as ap
     
 def prompt_to_set_or_alter_dict_val(key, d): #: core, @io, @ui, @state, @persist
     # if no saved value for key
@@ -74,7 +76,7 @@ def do_pdb(state): #: @util
 
 def checkpoint(state): #: @util
     pl.print_log("@@checkpoint", state)
-    save_cp(state)
+    persist.save_cp(state)
 
 def short_git_log(state): #: @meta_git
     pl.print_log("@@how_short_git_log", state)
@@ -110,18 +112,15 @@ def add_sha_list_to_all_patches(state): #: @workflow, @patch_list
     if not git_repo_is_clean():
         pl.print_log("git status not clean. no changes made", state)
         return
-    if not ui.confirm("Are you sure you don't need to pop top applied patch? Enter 'y' if ok, else <enter>: ", ['y']):
-    	return
 
      # get the name of the sha file
     print("enter the path of a file containing one sha per line <enter> if none")
     sha_file = input("sha_file: ")
     if not sha_file: return
 
-    patches = import_sha_list_file(sha_file, state)
-    for patch in import_sha_list_file(sha_file, state):
-        add_to_all_patches(patch, state)
-    after_add_to_all_patches(state)
+    for patch in mg.import_sha_list_file(sha_file, state):
+        ap.add_to_all_patches(patch, state)
+    ap.after_add_to_all_patches(state)
 
 def shell_one_liner(state): 
     cmd = input("enter shell one liner<enter to cancel>: ")

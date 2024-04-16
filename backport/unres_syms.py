@@ -1,6 +1,7 @@
 #unresolved defense
 
 import all_patches as ap
+import persist
 
 pats = { #: @unres_syms
     'undecl-fn' :  {
@@ -104,7 +105,7 @@ def _get_needed_symbols(lines, state):#: @unres_syms
     report_unmatched_errors(errors)
     state['unresolved_syms'] = syms
     state['unmatched_errors'] = errors
-    save_cp(state)
+    persist.save_cp(state)
     return (syms, errors)
 
 def get_needed_symbols(state):#: @unres_syms
