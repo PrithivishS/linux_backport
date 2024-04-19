@@ -38,7 +38,6 @@ bp_menu_item_list = [
     {'prompt' : 'cherry-pick -abort', 'action': wf.cherry_pick_abort},
     {'prompt' : 'compare patch to upstream',
      'action' : patch.compare_patch_to_downstream},
-    {'prompt' : 'show git log completions', 'action': gls.show_log_completions},
     {'prompt' : 'add sha list to all patches',
      'action':  bu.add_sha_list_to_all_patches},
     {'prompt' : 'utility actions', 'sub-menu' : [

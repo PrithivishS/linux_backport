@@ -1,4 +1,6 @@
 import subprocess
+import pdb
+import threading
 
 # should subsume some of the duplicate code in git_utils.py over time
 def shell_cmd(cmd):
@@ -55,3 +57,14 @@ def old_build(state): #: obsolete? (or is build() spewing trash?)
     (ret, spew) = shell_cmd(state['build_cmd'])
     return spew
 
+def do_async_cmd(cmd, key, state):
+    (ret, out) = shell_cmd(cmd)
+    if 'async_result' not in state:
+        state['async_result'] = dict()
+    state['async_result'][key] = out
+
+# https://realpython.com/intro-to-python-threading
+def async_shell_cmd(cmd, key, state):
+    thrd = threading.Thread(target=do_async_cmd, args = (cmd, key, state),
+                            daemon=True)
+    thrd.start()
