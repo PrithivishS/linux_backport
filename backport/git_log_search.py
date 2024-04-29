@@ -7,7 +7,8 @@ import shell_util as su
 import pdb
 import meta_git as mg
 
-def get_log_result_key_by_index(state): #: workflow
+def get_async_result_key_by_index(state): #: workflow
+    if 'async_result' not in state: return None
     keys = state['async_result'].keys()
     keys_l = list(keys)
     
@@ -34,8 +35,9 @@ def search_commit_for_pattern(type, pattern, sha, state):
     (ret, out) = su.shell_cmd(cmd)
     return out
 
-def show_one_log_result(state): #: workflow
-    key = get_log_result_key_by_index(state)
+def show_one_async_result(state): #: workflow
+    if 'async_result' not in state: return
+    key = get_async_result_key_by_index(state)
     (type, pattern, min_tag, max_tage)  = key.split(',')
     if not key: return
     sha_str = state['async_result'][key]
@@ -49,8 +51,8 @@ def show_one_log_result(state): #: workflow
         out = gu.clip_long_output(tmp, state).rstrip()
         pl.print_log(out, state)
 
-def delete_one_log_result(state): #: workflow
-    key = get_log_result_key_by_index(state)
+def delete_one_async_result(state): #: workflow
+    key = get_async_result_key_by_index(state)
     if not key: return
     
     pl.print_log("==== %s ====" % (key), state)
