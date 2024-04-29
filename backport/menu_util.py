@@ -14,8 +14,11 @@ def get_menu_trailer(state):
 
     if mg.active_cherry_pick_sha(state):
         trailer += "\n** active cherry-pick ** "
-        
-    arl = len(state['async_result'].keys())
+
+    try:
+        arl = len(state['async_result'].keys())
+    except:
+        arl = 0
     if arl:
         trailer += "\navailable async results: %d" % (arl)
         
