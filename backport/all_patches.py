@@ -65,6 +65,7 @@ def add_to_all_patches_by_sha(state):#: @patch-list
      
 def update_rls_tag_order_in_patch_list(patch_list, state):#: @meta-git
     P = state['all_patches']
+    if len(P) == 0: return
     max_tag = sorted([x for x in  {patch['tag'] for patch in P}])[-1]
     for _p in patch_list:
         _p['order_in_release'] = \
