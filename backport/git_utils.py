@@ -46,7 +46,7 @@ def git_short_log(fmt, state):
     n = len(lines)
 
     for (ix, line)  in zip(range(1, len(lines), 1), lines):
-        print_log(str(ix) + ": " + line, state)
+        pl.print_log(str(ix) + ": " + line, state)
     
 def git_get_commit_date(commitish):
     cmd = "git log -1 --pretty=format:'%ad' --date=format:'%m/%d/%y' " + commitish
@@ -120,13 +120,13 @@ def get_current_branch(): # works on git < 2.22
 
 def next_branch(state):
     if not git_repo_is_clean():
-        print_log("git status not clean. no action taken", state)
+        pl.print_log("git status not clean. no action taken", state)
         return
     cmd = "git checkout -b " +  add_or_inc_ver_num(get_current_branch())
     result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
     s = result.stdout.decode().strip().rstrip()
     git_status()
-    print_log(s, state)
+    pl.print_log(s, state)
 
 def git_applied_sha_list(state):
     range = "%s^..HEAD" % (state['first_commit'])
@@ -161,7 +161,7 @@ def git_log_tag(state, min_max):
 def git_top_of_applied_stack_sha(state):
     (ret,tap_sha) = su.shell_cmd("git rev-parse --short HEAD")
     if not tap_sha:
-        print_log("** something is very wrong. can't find sha of top commit**",
+        pl.print_log("** something is very wrong. can't find sha of top commit**",
                   state)
     return tap_sha.rstrip('\n')
 
