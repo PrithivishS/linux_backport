@@ -58,8 +58,8 @@ def add_to_all_patches_by_sha(state):#: @patch-list
      if not sha: return
     
      for sha in sha.split(','):
-         patch = make_patch_dict(state, sha)
-         add_to_all_patches(patch, state)
+         _patch = patch.make_patch_dict(state, sha)
+         add_to_all_patches(_patch, state)
          
      after_add_to_all_patches(state)
      
@@ -97,7 +97,7 @@ def add_commits_touching_file_to_all_patches(patch, file, state):
     for patch in patch_list:
         sha = patch['sha1']
         if sha not in state['all_patches']:
-            p = make_patch_dict(state, sha)
+            p = patch.make_patch_dict(state, sha)
             # confirm if they want this commit
             if prompt_every_time:
                 prompt = get_menu_trailer(state)
