@@ -29,7 +29,7 @@ def get_sha_info(sha, subj):
     
 def import_sha_list_file(path, state):
 
-    patch_list = [patch.make_patch_dict(state, l)
+    patch_list = [patch.make_patch_dict(state, l, True)
                   for l in open(path,"r")]
     return patch_list
 

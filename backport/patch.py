@@ -21,7 +21,7 @@ def print_dict(msg, patch, state):
     s = to_string(msg, patch, state)
     pl.print_log(s, state)
 
-def make_patch_dict(state, sha1):
+def make_patch_dict(state, sha1, verbose=False):
     d = dict()
     sha1 = sha1.lstrip().rstrip()
     d['sha1'] = sha1
@@ -39,6 +39,7 @@ def make_patch_dict(state, sha1):
     d['prev_downstream'] = None
     d['conflicts'] = ""
     d['prev_conflicts'] = ""
+    if verbose: print(d['subject'])
 
     return d
 
