@@ -26,11 +26,32 @@ def get_sha_info(sha, subj):
     tag_date = git_utils.git_get_commit_date(tag)
     tmp = "%s, %s, %s, %s" % (sha, subj, tag, tag_date)
     return tmp
-    
+
+# Following the Genoa Patch List format, the file format is expected to be
+#	<sha> <version introduced> 
+def genoa_patch_list_format_to_sha_list(path, state):
+    def is_hex_str(s):
+        try:
+            int(s, 16)
+            return True # there would have been exception if not valid hex string
+        except:
+            return False
+
+    ret = list()
+    for l in open(path, "r"):
+        _l = l
+        _l = l.split(' ')
+        sha = _l[0]
+        if is_hex_str(sha):
+            ret.append(sha)
+        else:
+            pl.print_log("rejecting %s" % (l), state)
+    return ret
+
 def import_sha_list_file(path, state):
 
-    patch_list = [patch.make_patch_dict(state, l, True)
-                  for l in open(path,"r")]
+    patch_list = [patch.make_patch_dict(state, sha, True)
+                  for sha in genoa_patch_list_format_to_sha_list(path, state)]
     return patch_list
 
 def active_cherry_pick_sha(state):#: @meta_git
