@@ -53,38 +53,25 @@ def sanitize_diff_body(db):
         ret.append(line)
     return ret
 
-def detect_non_context_delta(marker, diffdiff):
-    #marker is char '+' or '-'
-    # diffdiff is the diff between the two commit diffs
-    x2 = marker * 2
-    x3 = marker * 3
-
-    for line in diffdiff:
-        if line.startswith(x2) and not line.startswith(x3):
-            print("NON CONTEXT DIFF: (%s)" % (line))
-            pdb.set_trace()
-            return True
-    return False
-
-def detect_all_non_context_deltas(diffdiff):
-        if detect_non_context_delta('-', diffdiff):
-            return True
-        if detect_non_context_delta('-', diffdiff):
-            return True
-        return False
-    
 def diff_list(L1, L2):
-    #pdb.set_trace()
+    buf = "===========\n"
     tmp = list(difflib.unified_diff(L1, L2))
     if not len(tmp):
         print("no diff **")
     else:
-        if not detect_all_non_context_deltas(tmp):
-            print("*** NO NON CONTEXT DIFFS")
-        print("==========")
+        count = 0
         for line in tmp:
-            print(line)
-    
+            sw = line.startswith
+            if sw("--- \n") or sw("+++ \n"):
+                continue
+            if sw("++") or sw("+-") or sw("--") or sw("-+"):
+                buf += line
+                count += 1
+        if count == 0 :
+            print("no non context diff**")
+        else:
+            print(buf)
+
 def get_commit_parts(sha):
     result = subprocess.run(['git', 'show', sha], capture_output=True, text=True)
 
@@ -100,7 +87,7 @@ def check_backported_patch(bpsha):
     if bp_upstrm_sha == 0:
         raise Exception("no upstream patch citation")
     us_hdr, us_body, us_upstrm_sha, us_deviation = get_commit_parts(bp_upstrm_sha)
-    print("backported sha: %s, \n\tupstream sha: %s, \n\tdeviation explanation:%s" % (bpsha, us_upstrm_sha, bp_deviation))
+    print("backported sha: %s, \n\tupstream sha: %s, \n\tdeviation explanation:%s" % (bpsha, bp_upstrm_sha, bp_deviation))
     diff_list(bp_body, us_body)
     print("==========")
 
