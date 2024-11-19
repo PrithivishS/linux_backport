@@ -1,0 +1,24 @@
+# backport_tools
+Various tools used for backporting projects developed by our team
+The main tools are backport.py and patch_info.py.
+
+The new entrant is rvw_diff.py. To use it:
+    - add the path to the script to your PATH
+    - clone https://github.com/AMDEPYC/Linux_Backport.git
+    - check out the appropriate branch
+    - rvw_diff.py
+      - at the prompt, enter the backported sha id from the code rvw request
+      - ^C when you are done
+
+Important things to remember about reviewing backported patches:
+	  + you don't need to worry about the main content of an ALREADY UPSTREAMED patch.
+	  + you do need to worry about non context diffs where some non context part of
+	    upstream patch is modified.
+	    - look at the patch description and see that any deviation from the upstream
+	      patch is
+	      - correct
+	      - adequately explained in the [Backport Changes] se
+
+      
+You have just reading all the documentation available.
+For now try the commands with --help and use the source
