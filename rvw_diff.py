@@ -21,20 +21,17 @@ def parse_header(hdr):
     pattern = rf"\b{re.escape('commit')}\s+(\w+)\s+{re.escape('upstream')}\b"
     backport_changes = False #no explained changes
     upstrm_sha = 0
-    
+
     for line in hdr:
         match = re.search(pattern, line)
         if match:
             upstrm_sha = match.group(1)
 
-        tmp = line.upper()
-        tmp = tmp.lstrip()
-        sw = tmp.startswith
-        if sw("[BACKPORT CHANGES]"):
+        if line.upper().lstrip().startswith("[BACKPORT CHANGES]"):
             backport_changes = True
-            
+
     return (upstrm_sha, backport_changes) # will fault if sha not found
-                      
+
 def parse_diff_body(lines):
     for ix, line in enumerate(lines):
         if line.startswith("diff --git a/"):
