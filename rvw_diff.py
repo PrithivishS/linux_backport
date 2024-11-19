@@ -42,7 +42,7 @@ def parse_diff_body(lines):
 def sanitize_diff_body(db):
     ret = []
     pattern = r'^@@ .+? @@ (.*)$'
-    
+
     for line in db:
         if line.startswith("index "):
             continue
