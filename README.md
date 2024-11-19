@@ -9,6 +9,17 @@ The new entrant is rvw_diff.py. To use it:
     - rvw_diff.py
       - at the prompt, enter the backported sha id from the code rvw request
       - ^C when you are done
+
+Important things to remember about reviewing backported patches:
+	  + you don't need to worry about the main content of an ALREADY UPSTREAMED patch.
+	  + you do need to worry about non context diffs where some non context part of
+	    upstream patch is modified.
+	    - look at the patch description and see that any deviation from the upstream
+	      patch is
+	      - correct
+	      - adequately explained in the [Backport Changes] section of the commit
+	        message.
+
       
 You have just reading all the documentation available.
 For now try the commands with --help and use the source
