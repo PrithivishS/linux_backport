@@ -94,4 +94,9 @@ def check_backported_patch(bpsha):
 # main
 while True:
     bpsha = input("enter the SHA for the backported patch<or ctrl-c>: ")
-    check_backported_patch(bpsha)
+    try:
+        check_backported_patch(bpsha)
+    except Exception as e:
+        print("something went wrong, maybe missing commit")
+        print("may also be short sha is not long enough")
+
