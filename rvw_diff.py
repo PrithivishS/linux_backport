@@ -70,7 +70,6 @@ def diff_list(L1, L2):
         if count == 0 :
             print("no non context diff**")
         else:
-            pdb.set_trace()
             print(buf)
 
 def get_commit_parts(sha):
