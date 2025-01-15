@@ -6,6 +6,7 @@ import os
 import subprocess
 import re
 import difflib
+import argparse
 
 def tempfile_notes():    
     (bp_fd, bp_path) = tempfile.mkstemp() # "bp" -> backported
@@ -91,7 +92,22 @@ def check_backported_patch(bpsha):
     diff_list(bp_body, us_body)
     print("==========")
 
+def add_commit_comment(args, token, comment):
+    pass
+
 # main
+parser = argparse.ArgumentParser(description="diff review tool")
+parser.add_argument("-ghu", "--github_user", type=str, help="your github user id")
+parser.add_argument("-ght", "--github_token", type=str, help="your github access token")
+
+args = parser.parse_args()
+
+if not args.github_user or not args.github_token:    
+    print("automatic access to github not possible. Run rvw_diff.py --help and look for -ghu, -ght")
+
+token_display = "present" if args.github_token != "" else "absent"
+print(f"user: {args.github_user}, token: {token_display}")
+
 while True:
     bpsha = input("enter the SHA for the backported patch<or ctrl-c>: ")
     try:
