@@ -7,6 +7,8 @@ import subprocess
 import re
 import difflib
 import argparse
+from github import Github
+from github import Auth
 
 def tempfile_notes():    
     (bp_fd, bp_path) = tempfile.mkstemp() # "bp" -> backported
@@ -54,11 +56,13 @@ def sanitize_diff_body(db):
         ret.append(line)
     return ret
 
+# return True if auto approve is permitted
 def diff_list(L1, L2):
     buf = "===========\n"
     tmp = list(difflib.unified_diff(L1, L2))
     if not len(tmp):
         print("no diff **")
+        return True
     else:
         count = 0
         for line in tmp:
@@ -70,8 +74,10 @@ def diff_list(L1, L2):
                 count += 1
         if count == 0 :
             print("no non context diff**")
+            return True
         else:
             print(buf)
+            return False
 
 def get_commit_parts(sha):
     result = subprocess.run(['git', 'show', sha], capture_output=True, text=True)
@@ -83,22 +89,31 @@ def get_commit_parts(sha):
     upstrm_sha, deviation_explntn = parse_header(hdr)
     return hdr, diff_body, upstrm_sha, deviation_explntn
 
-def check_backported_patch(bpsha):
+def add_comment(args, repo_url, sha, comment):
+    auth = Auth.Token(args.github_token)
+    g = Github(auth=auth)
+    r = g.get_repo(repo_url)
+    c = r.get_commit(sha)
+    c.create_comment(comment)
+    return (g)
+
+def check_backported_patch(args, bpsha):
     bp_hdr, bp_body, bp_upstrm_sha, bp_deviation = get_commit_parts(bpsha)
     if bp_upstrm_sha == 0:
         raise Exception("no upstream patch citation")
     us_hdr, us_body, us_upstrm_sha, us_deviation = get_commit_parts(bp_upstrm_sha)
     print("backported sha: %s, \n\tupstream sha: %s, \n\tdeviation explanation:%s" % (bpsha, bp_upstrm_sha, bp_deviation))
-    diff_list(bp_body, us_body)
+    if diff_list(bp_body, us_body) and args.auto_approve:
+        print("\tAdding automatic approved comment to commit")
+        g = add_comment(args, "AMDEPYC/Linux_Backport", bpsha, "approved")
+        g.close() #close github context
     print("==========")
-
-def add_commit_comment(args, token, comment):
-    pass
 
 # main
 parser = argparse.ArgumentParser(description="diff review tool")
 parser.add_argument("-ghu", "--github_user", type=str, help="your github user id")
 parser.add_argument("-ght", "--github_token", type=str, help="your github access token")
+parser.add_argument("-aa", "--auto_approve",  action='store_true', help="your github access token")
 
 args = parser.parse_args()
 
@@ -111,8 +126,8 @@ print(f"user: {args.github_user}, token: {token_display}")
 while True:
     bpsha = input("enter the SHA for the backported patch<or ctrl-c>: ")
     try:
-        check_backported_patch(bpsha)
+        check_backported_patch(args, bpsha)
     except Exception as e:
-        print("something went wrong, maybe missing commit")
-        print("may also be short sha is not long enough")
+        print("Something went wrong. May be missing commit")
+        print("May also be short sha is not long enough")
 
