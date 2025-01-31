@@ -1,0 +1,81 @@
+#!/usr/bin/python3
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+import requests
+import re
+from github import Github, Auth
+
+github_token = os.getenv("GITHUB_TOKEN")
+
+if github_token is None:
+	raise ValueError("GITHUB_TOKEN env variable not set")
+
+def find_old_sha_by_sub(commit_dict, subject):
+	for old_sha, data in commit_dict.items():
+		if data["subject"] == subject:
+			return old_sha
+	return None
+
+def store_comments(new_sha, subject, repo_url):
+
+	auth = Auth.Token(github_token)
+	g = Github(auth=auth)
+	r = g.get_repo(repo_url)
+
+	try:
+		with open('/tmp/comments.json', 'r') as file:
+			comments_data = json.load(file)
+	except FileNotFoundError:
+		comments_data = {}
+
+	old_sha = find_old_sha_by_sub(comments_data, subject)
+
+	if old_sha:
+		comments_data[old_sha]['new_sha'] = new_sha
+	
+	# It's about time to beef up new sha's with old comments
+	c = r.get_commit(new_sha)
+	c.create_comment(comments_data[old_sha]['comment'])
+
+	# Save the updated comments to the file
+	with open('/tmp/comments.json', 'w') as file:
+		json.dump(comments_data, file)
+	
+	return comments_data
+
+def import_new_arg():
+	with open("/tmp/num_rebase_cmts.txt", "r") as file:
+		new_arg = file.read()
+	return new_arg
+
+# Check git reflog to extract if operation is rebase or not.
+# Continue further handling if intended operation is rebase.
+
+reflog_output = subprocess.check_output(['git', 'reflog']).decode('utf-8')
+first_line = reflog_output.splitlines()[0]
+pattern = r"\brebase\b"
+
+# Trigger this hook only on rebase
+if re.search(pattern, reflog_output):
+	git_push = "git push --force origin"
+	subprocess.run(git_push, shell=True, capture_output=True, text=True)	
+
+	num_rebase_commits = import_new_arg()
+
+	git_command = f'git log --pretty=format:"%H %s" {num_rebase_commits}'
+
+	# Run the git log command and capture the output
+	git_output = subprocess.run(git_command, shell=True, capture_output=True, text=True)
+
+	# Check if the git command was successfull
+	if git_output.returncode == 0:
+		# Process the output
+		lines = git_output.stdout.splitlines()
+		for line in lines:
+			new_sha, subject = line.split(" ", 1)
+			store_comments(new_sha, subject, 'pvpk1994/Backport_tools')
+
