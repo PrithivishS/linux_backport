@@ -1,0 +1,67 @@
+#!/usr/bin/python3
+
+import subprocess
+import sys
+import os
+import requests
+import json
+from github import Github, Auth
+
+# Get the github token from env variable
+github_token = os.getenv("GITHUB_TOKEN")
+
+if github_token is None:
+	raise ValueError("GITHUB_TOKEN env variable not set")
+
+comments_data = {}
+
+def store_comments(old_sha, subject, repo_url):
+	# Authentication and repo access
+	auth = Auth.Token(github_token)
+	g = Github(auth=auth)
+	r = g.get_repo(repo_url)
+	c = r.get_commit(old_sha)
+	cmts = list(c.get_comments())
+
+	cmt_data = []	
+	for cmt in cmts:
+		body = cmt.body
+		cmt_data.append(body)
+
+	# Store the comments
+	comments_data[old_sha] = {
+		"subject": subject,
+		"comment": cmt_data[0] if cmt_data else ""
+	}
+
+	# Save the updated comments to the file
+	if comments_data is not None:
+		with open('/tmp/comments.json', 'w') as file:
+			json.dump(comments_data, file)
+
+def main(args):
+	# Save the arg value
+	arg = " ".join(args)
+	new_arg = f"{arg}.."
+
+	# store new_arg to temp file
+	with open("/tmp/num_rebase_cmts.txt", "w") as file:
+		file.write(new_arg)
+	
+	# Define the git log command
+	git_command = f'git log --pretty=format:"%H %s" {new_arg}'
+
+	# Run the git log command and capture the output
+	git_output = subprocess.run(git_command, shell=True, capture_output=True, text=True)
+
+	# Check if the git command was successful
+	if git_output.returncode == 0:
+		# Process the output using awk equivalent in Python
+		lines = git_output.stdout.splitlines()
+		for line in lines:
+			old_sha, subject = line.split(" ", 1)
+			store_comments(old_sha, subject, 'pvpk1994/Backport_tools')
+      
+if __name__ == "__main__":
+	main(sys.argv[1:])
+
