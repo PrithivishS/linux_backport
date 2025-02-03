@@ -5,7 +5,27 @@ import sys
 import os
 import requests
 import json
+import re
 from github import Github, Auth
+
+# Repo-url parsing (Only for github parsing)
+# arg-1: input_str (git remote -v)
+def get_repo_url(input_str):
+	pattern = r'github\.com:(.+?)\.git'
+
+	url_match = re.search(pattern, input_str)
+	if url_match:
+		repo_url = url_match.group(1)
+		return repo_url
+	else:
+		print("No url for repository found!!")
+	
+
+# Create a tmp file to mark start of rebase operation
+REBASE_TEMP_FILE=".git/rebase-in-progress"
+
+with open(REBASE_TEMP_FILE, 'a'):
+	os.utime(REBASE_TEMP_FILE, None)
 
 # Get the github token from env variable
 github_token = os.getenv("GITHUB_TOKEN")
@@ -53,6 +73,8 @@ def main(args):
 
 	# Run the git log command and capture the output
 	git_output = subprocess.run(git_command, shell=True, capture_output=True, text=True)
+	git_remote_output = subprocess.run(['git', 'remote', '-v'], stdout=subprocess.PIPE, text=True)
+	output_lines = git_remote_output.stdout.splitlines()
 
 	# Check if the git command was successful
 	if git_output.returncode == 0:
@@ -60,7 +82,7 @@ def main(args):
 		lines = git_output.stdout.splitlines()
 		for line in lines:
 			old_sha, subject = line.split(" ", 1)
-			store_comments(old_sha, subject, 'pvpk1994/Backport_tools')
+			store_comments(old_sha, subject, get_repo_url(output_lines[0]))
       
 if __name__ == "__main__":
 	main(sys.argv[1:])
