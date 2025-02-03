@@ -76,7 +76,7 @@ output_lines = git_remote_output.stdout.splitlines()
 
 
 # Trigger this hook only on rebase
-if re.search(pattern, reflog_output):
+if re.search(pattern, first_line):
 
 	num_rebase_commits = import_new_arg()
 
