@@ -10,9 +10,22 @@ import re
 from github import Github, Auth
 
 github_token = os.getenv("GITHUB_TOKEN")
+comments_data = {}
 
 if github_token is None:
 	raise ValueError("GITHUB_TOKEN env variable not set")
+
+# Repo-url parsing (only for github parsing)
+# arg-1: input_str (git remote -v)
+def get_repo_url(input_str):
+	pattern = r'github\.com:(.+?)\.git'
+
+	url_match = re.search(pattern, input_str)
+	if url_match:
+		repo_url = url_match.group(1)
+		return repo_url
+	else:
+		print("No url for repository found!!")
 
 def find_old_sha_by_sub(commit_dict, subject):
 	for old_sha, data in commit_dict.items():
@@ -22,6 +35,7 @@ def find_old_sha_by_sub(commit_dict, subject):
 
 def store_comments(new_sha, subject, repo_url):
 
+	global comments_data
 	auth = Auth.Token(github_token)
 	g = Github(auth=auth)
 	r = g.get_repo(repo_url)
@@ -29,18 +43,14 @@ def store_comments(new_sha, subject, repo_url):
 	try:
 		with open('/tmp/comments.json', 'r') as file:
 			comments_data = json.load(file)
-	except FileNotFoundError:
-		comments_data = {}
+	except:
+		print("/tmp/comments.json NOT found")
 
 	old_sha = find_old_sha_by_sub(comments_data, subject)
 
 	if old_sha:
 		comments_data[old_sha]['new_sha'] = new_sha
 	
-	# It's about time to beef up new sha's with old comments
-	c = r.get_commit(new_sha)
-	c.create_comment(comments_data[old_sha]['comment'])
-
 	# Save the updated comments to the file
 	with open('/tmp/comments.json', 'w') as file:
 		json.dump(comments_data, file)
@@ -59,10 +69,14 @@ reflog_output = subprocess.check_output(['git', 'reflog']).decode('utf-8')
 first_line = reflog_output.splitlines()[0]
 pattern = r"\brebase\b"
 
+REBASE_TEMP_FILE = ".git/rebase-in-progress"
+
+git_remote_output = subprocess.run(['git', 'remote', '-v'], stdout=subprocess.PIPE, text=True)
+output_lines = git_remote_output.stdout.splitlines()
+
+
 # Trigger this hook only on rebase
 if re.search(pattern, reflog_output):
-	git_push = "git push --force origin"
-	subprocess.run(git_push, shell=True, capture_output=True, text=True)	
 
 	num_rebase_commits = import_new_arg()
 
@@ -77,5 +91,54 @@ if re.search(pattern, reflog_output):
 		lines = git_output.stdout.splitlines()
 		for line in lines:
 			new_sha, subject = line.split(" ", 1)
-			store_comments(new_sha, subject, 'pvpk1994/Backport_tools')
+			store_comments(new_sha, subject, get_repo_url(output_lines[0]))
+
+		
+# Once done with storing all new SHAs in comments.json, its time to force push
+if len(sys.argv) > 1 and sys.argv[1] == "rebase":
+	# checks if rebase is in its final stage.
+	if os.path.isfile(REBASE_TEMP_FILE):
+		print("Rebase done. Let's push changes...")
+		git_push = "git push --force origin"
+		subprocess.run(git_push, shell=True, capture_output=True, text=True)
+		
+		# It is now time to populate new SHAs with old SHA's github comments
+		auth = Auth.Token(github_token)
+		g = Github(auth=auth)
+		# TODO: make repo_url a user-fed parameter 
+		r = g.get_repo(get_repo_url(output_lines[0]))
+
+		# print("COMMENTS DATA: ", comments_data)
+
+		for old_sha in comments_data:
+
+			if not comments_data[old_sha]["comment"]:
+				raise ValueError("Comment body is missing for: ",
+						comments_data[old_sha]["new_sha"])
+
+			# Make this search a little more efficient:
+			# These are the commits that were part of rebase,
+			# but have not undergone rebase...
+			if old_sha == comments_data[old_sha]["new_sha"]:
+				continue
+
+			c = r.get_commit(comments_data[old_sha]["new_sha"])
+			c.create_comment(comments_data[old_sha]["comment"])
+
+		# Perform cleanups (Del: /tmp/comments.json, /tmp/num_rebase_cmts,
+		#			 .git/rebase-in-progress)
+		comments = '/tmp/comments.json'
+		rebase_cmts = '/tmp/num_rebase_cmts.txt'
+		in_progress = '.git/rebase-in-progress'
+
+		if os.path.exists(comments):
+			os.remove(comments)
+
+		if os.path.exists(rebase_cmts):
+			os.remove(rebase_cmts)
+
+		if os.path.exists(in_progress):
+			os.remove(in_progress)
+
+		sys.exit(0)
 
