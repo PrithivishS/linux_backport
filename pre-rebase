@@ -11,7 +11,7 @@ from github import Github, Auth
 # Repo-url parsing (Only for github parsing)
 # arg-1: input_str (git remote -v)
 def get_repo_url(input_str):
-	pattern = r'github\.com:(.+?)\.git'
+	pattern = r'github\.com[/:]([\w-]+/[\w-]+)\.git'
 
 	url_match = re.search(pattern, input_str)
 	if url_match:
