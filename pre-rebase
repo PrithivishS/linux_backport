@@ -8,6 +8,8 @@ import json
 import re
 from github import Github, Auth
 
+REBASE_CONFIG = ".git/rebase_hook_config.json"
+
 # Repo-url parsing (Only for github parsing)
 # arg-1: input_str (git remote -v)
 def get_repo_url(input_str):
@@ -19,13 +21,10 @@ def get_repo_url(input_str):
 		return repo_url
 	else:
 		print("No url for repository found!!")
-	
+
 
 # Create a tmp file to mark start of rebase operation
 REBASE_TEMP_FILE=".git/rebase-in-progress"
-
-with open(REBASE_TEMP_FILE, 'a'):
-	os.utime(REBASE_TEMP_FILE, None)
 
 # Get the github token from env variable
 github_token = os.getenv("GITHUB_TOKEN")
@@ -43,14 +42,13 @@ def store_comments(old_sha, subject, repo_url):
 	c = r.get_commit(old_sha)
 	cmts = list(c.get_comments())
 
-	cmt_data = []	
+	cmt_data = []
 	for cmt in cmts:
 		body = cmt.body
 		cmt_data.append(body)
 
 	# Store the comments
 	comments_data[old_sha] = {
-		"subject": subject,
 		"comment": cmt_data[0] if cmt_data else ""
 	}
 
@@ -60,14 +58,27 @@ def store_comments(old_sha, subject, repo_url):
 			json.dump(comments_data, file)
 
 def main(args):
+
+	# Check for rebase check config right away
+	with open(REBASE_CONFIG, 'r') as f:
+		rebase_config = json.load(f)
+
+	if not rebase_config.get("hooks_enabled", True):
+		print("Custom pre-rebase hook is DISABLED as requested.")
+		return
+
+	with open(REBASE_TEMP_FILE,'a'):
+		os.utime(REBASE_TEMP_FILE, None)
+
 	# Save the arg value
 	arg = " ".join(args)
 	new_arg = f"{arg}.."
+	print("Num rebase: ", new_arg)
 
 	# store new_arg to temp file
-	with open("/tmp/num_rebase_cmts.txt", "w") as file:
-		file.write(new_arg)
-	
+#	with open("/tmp/num_rebase_cmts.txt", "w") as file:
+#		file.write(new_arg)
+
 	# Define the git log command
 	git_command = f'git log --pretty=format:"%H %s" {new_arg}'
 
@@ -83,7 +94,10 @@ def main(args):
 		for line in lines:
 			old_sha, subject = line.split(" ", 1)
 			store_comments(old_sha, subject, get_repo_url(output_lines[0]))
-      
+
 if __name__ == "__main__":
+	with open(REBASE_TEMP_FILE, 'a'):
+		os.utime(REBASE_TEMP_FILE, None)
+
 	main(sys.argv[1:])
 
