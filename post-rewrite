@@ -12,6 +12,13 @@ commits_data = {}
 REBASE_TEMP_FILE=".git/rebase-in-progress"
 REBASE_CONFIG_FILE = ".git/rebase_hook_config.json"
 
+# Get the current checked out branch
+def get_current_branch():
+	cmd = "git branch --show-current"
+	rst = subprocess.run(['git', 'branch', '--show-current'], stdout=subprocess.PIPE, text=True)
+	current_branch = rst.stdout.strip()
+	return current_branch
+
 # Repo-url parsing (only for github parsing)
 # arg-1: input_str (git remote -v)
 def get_repo_url(input_str):
@@ -64,7 +71,8 @@ def main():
 		# Perform only if rebase is in its final stage
 		if os.path.isfile(REBASE_TEMP_FILE):
 			print("Rebase done. Let's push changes...")
-			git_push = "git push --force origin"
+			cb = get_current_branch()
+			git_push = f"git push --force origin {cb}"
 			out=subprocess.run(git_push, shell=True, capture_output=True, text=True)
 			if out.returncode != 0:
 				print("git push --force FAILED.")
