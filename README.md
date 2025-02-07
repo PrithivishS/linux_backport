@@ -63,9 +63,6 @@ For this project, post-rewrite hook is designed to only work for 'rebase'.
    upstream branch and thereafter all the github comments are populated from old SHAs to new
    SHAs.
 
-NOTE: Some commits in the rebase may not have comments before the rebase. The post-rewrite hook
-honors this absence and leaves the corresponding new SHAs without any comments.
-
 # How to enable
 
 These hooks are disabled by default. 
@@ -80,5 +77,13 @@ Once after rebase finishes, all the review comments associated with old SHAs are
 to new SHAs. This will help reviewers to quickly look at their earlier review comments and ensure
 those comments are addressed in the current revision.
 
+# NOTES
+1. Some commits in the rebase may not have comments before the rebase. The post-rewrite hook
+honors this absence and leaves the corresponding new SHAs without any comments.
+
+2. It is very important to note that although github comments can be added to merge commits, interactive
+rebase would never have any actions corresponding to the merge commits. In fact, these merge commits do not
+even appear in the editor list. So please do NOT add github comments to any merge commits.
+ 
 For any questions/observations, please reach out to Pavan Kumar Paluri <pavankumar.paluri@amd.com>
  
