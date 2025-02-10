@@ -13,8 +13,16 @@ def main():
     
     sha_list = ut.get_sha_list(first_sha)
     ut.emit("sha list: %s" % (str(sha_list)))
-    assert False, "FIXME: check if env_disable for GITHUB_HOOKS set"
-    return False # FIXME: shdb true when done
+    
+    if ut.state_file_exists():
+        ut.emit("STATE FILE EXISTS: may indicating a previous rebase aborted")
+        return False
+    else:
+        state = dict()
+        state['sha_list'] = sha_list
+        ut.save_state(state)
+        return True
+    return False 
         
 if main():
     ut.exit(0)

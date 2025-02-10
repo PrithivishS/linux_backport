@@ -4,6 +4,7 @@ import os
 import subprocess
 import sys
 import pdb
+import pickle
 
 # DONT USE PRINT UNLESS UNAVOIDABLE
 
@@ -45,3 +46,23 @@ def get_sha_list(first_sha):
     result = subprocess.run("git rev-list %s^..HEAD" % (first_sha),
                             shell=True, stdout=subprocess.PIPE)
     return result.stdout.decode('latin-1').split('\n')
+
+def get_pickle_file_name():
+    return "pickle"
+
+def load_state():
+    try:
+        with open(get_pickle_file_name(), 'rb') as handle:
+            return pickle.load(handle)
+    except:
+        emit("*WARNING* cannot restore pickle file: " + fpath)
+
+def state_file_exists():
+    if os.path.exists(get_pickle_file_name()):
+        return True
+    else:
+        return False
+
+def save_state(state_dict):
+    with open(get_pickle_file_name(), 'wb') as handle:
+        pickle.dump(state_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
