@@ -1,4 +1,47 @@
 ; -*- mode: outline -*-
+* documentation
+  https://git-scm.com/docs/githooks
+* basic idea]
+** main d/s
+*** looks like
+**** abstract
+    stuff_rec = {'modified' : <bool>, 'comment-list' : [comments]}
+    stuff[sha'] = {'modified' : <bool>, 'comment-list' : [comments]}
+**** created on checkout, deleted after push
+**** post-checkout hook
+     - smash the pickle
+     - init new pickle
+     - for each sha on branch
+       	   create stuff_rec
+	   	  set sha
+		  modified = False
+		  comment_list = get_comment_list(upstream_sha)
+**** rebase hook - not sure it's needed
+     it seems rebase just causes ref changes and is not that interesting
+**** reference transaction hook(can it detect deletion)
+     if old_sha in stuff_hash
+     	old_stuff = stufff_array[old_sha]
+	delete old_sha key in stuff_hash
+	old['modified'] = True
+	stuff_hash[new_sha] = old_stuff
+**** last hook that runs after push
+     for each stuff_key in stuff_rec.keys()
+     	 stuff_rec = stuff_hash[stuff_key]
+     	 us_commit_obj = get_PyGitHubObj(stuff_rec['sha'])
+	 if not us_commit:
+	    nastygram("something wrong")
+	    stuff_hash.delete(stuff_key)
+	    continue
+	 else:
+	    for each comment in stuff_rec['comment-list']
+	    #may have to reverse comment list so most recent is added last
+	    us_commit_obj.add_comment
+	    stuff_hash.delete(stuff_key)
+	 
+**** xx hook    
+* notation
+  '@@' is a message from a stubby shell hook
+  '##' is from python
 * _done_
 * rebase scenarios
 ** ==== done - all are rebase scenarios ====
@@ -679,7 +722,7 @@ To https://github.com/evtHsa/trash.git
 @@pre-rebase hook: HEAD~4
 @@pre-rebase hook: HEAD~5
 @@pre-rebase hook: HEAD~6
-* needed funcitions
+* needed functions
 ** done
 ** py
 ** _done_
@@ -711,3 +754,105 @@ To https://github.com/evtHsa/trash.git
 ** rebase w/o '-i'
 ** --onto
 ** cleanup stuff if rebase aborted, how do we know
+* reference-transaction analysis(rewording commit e)
+** start state
+ git log --pretty=oneline
+6a004689b788892b1b4aac7629022f51e4532629 (HEAD -> main, origin/main, origin/HEAD) file f
+6a5503b6dad41ee58ad03ddc2254ca3c6ae3714a file e
+19212a450ef2114a58ed53abe37aeeb66364e86c file d
+ad8edfd50c6e76112b131447ae60662356eb2fdc file c
+1d9a53d4d524a19bc1e5230f0162d1cfe987ff4b file b
+efcc71c2cac95897879d6a0cb074e55021939594 file a
+** rebase hooks log
+*** log start
+evantass@purico-43b9-os:/tmp/trash.git$ git rebase -i HEAD~4
+**** @@post-index-change hook: 0 0
+**** ## .git/hooks/pre-rebase: ##: hook: ['HEAD~4']
+## .git/hooks/pre-rebase: sha list: ['6a004689b788892b1b4aac7629022f51e4532629', '6a5503b6dad41ee58ad03ddc2254ca3c6ae3714a', '19212a450ef2114a58ed53abe37aeeb66364e86c', 'ad8edfd50c6e76112b131447ae60662356eb2fdc', '1d9a53d4d524a19bc1e5230f0162d1cfe987ff4b', '']
+hint: Waiting for your editor to close the file...
+**** ## .git/hooks/reference-transaction: ##: hook: ['prepared']
+	0000000000000000000000000000000000000000 6a004689b788892b1b4aac7629022f51e4532629 ORIG_HEAD
+
+**** ## .git/hooks/reference-transaction: ##: hook: ['committed']
+	0000000000000000000000000000000000000000 6a004689b788892b1b4aac7629022f51e4532629 ORIG_HEAD
+
+**** ## .git/hooks/reference-transaction: ##: hook: ['aborted']
+	0000000000000000000000000000000000000000 0000000000000000000000000000000000000000 REBASE_HEAD
+
+**** ## .git/hooks/reference-transaction: ##: hook: ['prepared']
+	0000000000000000000000000000000000000000 0000000000000000000000000000000000000000 REBASE_HEAD
+
+**** ## .git/hooks/reference-transaction: ##: hook: ['committed']
+	0000000000000000000000000000000000000000 0000000000000000000000000000000000000000 REBASE_HEAD
+
+@@post-index-change hook: 1 0
+**** ## .git/hooks/reference-transaction: ##: hook: ['prepared']
+	19212a450ef2114a58ed53abe37aeeb66364e86c 6a5503b6dad41ee58ad03ddc2254ca3c6ae3714a HEAD
+
+**** ## .git/hooks/reference-transaction: ##: hook: ['committed']
+	19212a450ef2114a58ed53abe37aeeb66364e86c 6a5503b6dad41ee58ad03ddc2254ca3c6ae3714a HEAD
+
+**** @@pre-commit hook: 
+hint: Waiting for your editor to close the file...
+**** @@commit-msg hook: .git/COMMIT_EDITMSG
+**** ready to smash old commit 'e'
+**** ## .git/hooks/reference-transaction: ##: hook: ['prepared']
+	6a5503b6dad41ee58ad03ddc2254ca3c6ae3714a 350738b5041f50c67a36c885282e31a7ffee945f HEAD
+**** old commit 'e' smashed (you must still worry about aborted
+**** ## .git/hooks/reference-transaction: ##: hook: ['committed']
+	6a5503b6dad41ee58ad03ddc2254ca3c6ae3714a 350738b5041f50c67a36c885282e31a7ffee945f HEAD
+
+**** @@post-commit-hook:  
+**** @@post-rewrite hook: amend
+[detached HEAD 350738b] file e
+ Date: Mon Feb 10 07:15:04 2025 -0800
+ 1 file changed, 5 insertions(+)
+ create mode 100644 e
+**** ## .git/hooks/reference-transaction: ##: hook: ['aborted']
+	0000000000000000000000000000000000000000 0000000000000000000000000000000000000000 REBASE_HEAD
+
+**** ## .git/hooks/reference-transaction: ##: hook: ['prepared']
+	0000000000000000000000000000000000000000 0000000000000000000000000000000000000000 REBASE_HEAD
+
+**** ## .git/hooks/reference-transaction: ##: hook: ['committed']
+	0000000000000000000000000000000000000000 0000000000000000000000000000000000000000 REBASE_HEAD
+
+**** @@post-index-change hook: 1 0
+**** ## .git/hooks/reference-transaction: ##: hook: ['prepared']
+	0000000000000000000000000000000000000000 6a004689b788892b1b4aac7629022f51e4532629 CHERRY_PICK_HEAD
+
+**** ## .git/hooks/reference-transaction: ##: hook: ['committed']
+	0000000000000000000000000000000000000000 6a004689b788892b1b4aac7629022f51e4532629 CHERRY_PICK_HEAD
+
+**** ## .git/hooks/reference-transaction: ##: hook: ['prepared']
+	350738b5041f50c67a36c885282e31a7ffee945f 01ccc8063cb8d9a5a6405c9df3bddff7fa4ca0ab HEAD
+
+**** ## .git/hooks/reference-transaction: ##: hook: ['committed']
+	350738b5041f50c67a36c885282e31a7ffee945f 01ccc8063cb8d9a5a6405c9df3bddff7fa4ca0ab HEAD
+
+**** @@post-commit-hook:  
+## .git/hooks/reference-transaction: ##: hook: ['aborted']
+	0000000000000000000000000000000000000000 0000000000000000000000000000000000000000 CHERRY_PICK_HEAD
+
+## .git/hooks/reference-transaction: ##: hook: ['prepared']
+	0000000000000000000000000000000000000000 0000000000000000000000000000000000000000 CHERRY_PICK_HEAD
+
+## .git/hooks/reference-transaction: ##: hook: ['committed']
+	0000000000000000000000000000000000000000 0000000000000000000000000000000000000000 CHERRY_PICK_HEAD
+
+## .git/hooks/reference-transaction: ##: hook: ['prepared']
+	6a004689b788892b1b4aac7629022f51e4532629 01ccc8063cb8d9a5a6405c9df3bddff7fa4ca0ab refs/heads/main
+**** smashing commit 'f'
+**** ## .git/hooks/reference-transaction: ##: hook: ['committed']
+	6a004689b788892b1b4aac7629022f51e4532629 01ccc8063cb8d9a5a6405c9df3bddff7fa4ca0ab refs/heads/main
+
+**** @@post-rewrite hook: rebase
+Successfully rebased and updated refs/heads/main.
+** post-rebase state
+git log --pretty=oneline
+01ccc8063cb8d9a5a6405c9df3bddff7fa4ca0ab (HEAD -> main) file f
+350738b5041f50c67a36c885282e31a7ffee945f file e
+19212a450ef2114a58ed53abe37aeeb66364e86c file d
+ad8edfd50c6e76112b131447ae60662356eb2fdc file c
+1d9a53d4d524a19bc1e5230f0162d1cfe987ff4b file b
+efcc71c2cac95897879d6a0cb074e55021939594 file a
