@@ -1,2 +1,25 @@
-#!/bin/sh
-echo "@@reference-transaction hook: $*"
+#!/usr/bin/python3.10
+
+import util as ut
+import sys
+
+def main():
+    ut.show_args()
+    if ut.argc() != 2: return False
+    if not ut.check_github_comment_preserving_hooks_enabled(): return False
+
+    lines = sys.stdin.readlines()
+
+    for line in lines:
+        print("\t%s" % (line))
+
+    match ut.argv(1):
+        case 'prepared':
+            return True
+        case 'committed':
+            return
+        case 'aborted':
+            return
+    return False
+
+ut.invoke_hook_main(main)
