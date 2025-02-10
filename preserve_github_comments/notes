@@ -1,4 +1,8 @@
 ; -*- mode: outline -*-
+* tbd
+** _ done_
+** use hook_main in pre_rebase, but rip out fnality
+** implement post-checkout(beware billions of commits)
 * documentation
   https://git-scm.com/docs/githooks
 * basic idea]
