@@ -1,0 +1,22 @@
+#!/usr/bin/python3
+
+
+# backport stuff
+import util as ut
+
+def main():
+    ut.show_args()
+    if ut.argc() < 2: return False
+    if not ut.check_github_comment_preserving_hooks_enabled(): return False
+    
+    first_sha = (ut.argv(1))
+    
+    sha_list = ut.get_sha_list(first_sha)
+    ut.emit("sha list: %s" % (str(sha_list)))
+    assert False, "FIXME: check if env_disable for GITHUB_HOOKS set"
+    return False # FIXME: shdb true when done
+        
+if main():
+    ut.exit(0)
+else:
+    ut.exit(1)

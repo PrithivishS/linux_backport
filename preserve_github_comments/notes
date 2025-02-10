@@ -1,0 +1,713 @@
+; -*- mode: outline -*-
+* _done_
+* rebase scenarios
+** ==== done - all are rebase scenarios ====
+*** git rebase -i <invalid#>: never even get to hooks
+*** nuke rebase file so nothing should happen
+**** log
+@@pre-rebase hook: HEAD~6
+Successfully rebased and updated refs/heads/test.
+**** notes
+   - we probably have to nuke any state setup on entry to this hook
+   - we may need to convert HEAD~6 to a SHA id
+**** hooks used   
+@@pre-rebase hook
+*** dont modify rebase file so also nothing should happen
+** reword, change subj line
+*** log
+git rebase -i HEAD~6
+@@pre-rebase hook: HEAD~6
+@@pre-commit hook: 
+hint: Waiting for your editor to close the file...
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@post-commit hook: 
+@@post-rewrite hook: amend
+[detached HEAD 143dcf6] moe: subj chg
+ Date: Sat Feb 8 15:45:22 2025 -0600
+ 1 file changed, 1 insertion(+)
+ create mode 100644 moe
+@@post-rewrite hook: rebase
+Successfully rebased and updated refs/heads/test.
+ (test): trash $
+ *** notes
+ *** hooks used
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@post-rewrite hook: amend
+@@post-rewrite hook: rebase
+@@pre-commit hook: 
+@@post-commit hook: 
+@@pre-rebase hook: HEAD~6
+** reword, change non subj line
+*** log
+ (test): trash $ git rebase -i HEAD~6
+@@pre-rebase hook: HEAD~6
+@@pre-commit hook: 
+hint: Waiting for your editor to close the file...
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@post-commit hook: 
+@@post-rewrite hook: amend
+[detached HEAD 143dcf6] moe: subj chg
+ Date: Sat Feb 8 15:45:22 2025 -0600
+ 1 file changed, 1 insertion(+)
+ create mode 100644 moe
+@@post-rewrite hook: rebase
+Successfully rebased and updated refs/heads/test.
+ (test): trash $ !!
+git rebase -i HEAD~6
+@@pre-rebase hook: HEAD~6
+@@pre-commit hook: 
+hint: Waiting for your editor to close the file...
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@post-commit hook: 
+@@post-rewrite hook: amend
+[detached HEAD e258db2] curly x
+ Date: Sat Feb 8 15:44:44 2025 -0600
+ 1 file changed, 1 insertion(+)
+ create mode 100644 curly
+@@post-rewrite hook: rebase
+Successfully rebased and updated refs/heads/test.
+*** notes
+    - commit-msg hook means we have to check subject chg (if we lookup by subj)
+*** hooks used   
+** edit 2, reset HEAD^, make 2 commits out of one
+*** log
+git rebase -i HEAD~6
+@@pre-rebase hook: HEAD~6
+Stopped at 575c7f6...  yet_more_trash
+You can amend the commit now, with
+
+  git commit --amend 
+
+Once you are satisfied with your changes, run
+
+  git rebase --continue
+ ((no branch, rebasing test)): trash $ git reset HEAD^
+ ((no branch, rebasing test)): trash $ git status
+interactive rebase in progress; onto f962789
+Last commands done (5 commands done):
+   pick 6a17ad6 boffo
+   edit 575c7f6 yet_more_trash
+  (see more in file .git/rebase-merge/done)
+Next command to do (1 remaining command):
+   pick 41b2e99 yet_more_trash2
+  (use "git rebase --edit-todo" to view and edit)
+You are currently editing a commit while rebasing branch 'test' on 'f962789'.
+  (use "git commit --amend" to amend the current commit)
+  (use "git rebase --continue" once you are satisfied with your changes)
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	yet_more_trash
+
+nothing added to commit but untracked files present (use "git add" to track)
+ ((no branch, rebasing test)): trash $ git add -i
+
+ *** Commands ***
+  1: [s]tatus	  2: [u]pdate	  3: [r]evert	  4: [a]dd untracked
+  5: [p]atch	  6: [d]iff	  7: [q]uit	  8: [h]elp
+What now> 5
+No changes.
+ *** Commands ***
+  1: [s]tatus	  2: [u]pdate	  3: [r]evert	  4: [a]dd untracked
+  5: [p]atch	  6: [d]iff	  7: [q]uit	  8: [h]elp
+What now> 4
+  1: [y]et_more_trash
+Add untracked>> 
+No untracked files.
+
+ *** Commands ***
+  1: [s]tatus	  2: [u]pdate	  3: [r]evert	  4: [a]dd untracked
+  5: [p]atch	  6: [d]iff	  7: [q]uit	  8: [h]elp
+What now> 5
+No changes.
+ *** Commands ***
+  1: [s]tatus	  2: [u]pdate	  3: [r]evert	  4: [a]dd untracked
+  5: [p]atch	  6: [d]iff	  7: [q]uit	  8: [h]elp
+What now> q
+Bye.
+ ((no branch, rebasing test)): trash $ git status
+interactive rebase in progress; onto f962789
+Last commands done (5 commands done):
+   pick 6a17ad6 boffo
+   edit 575c7f6 yet_more_trash
+  (see more in file .git/rebase-merge/done)
+Next command to do (1 remaining command):
+   pick 41b2e99 yet_more_trash2
+  (use "git rebase --edit-todo" to view and edit)
+You are currently editing a commit while rebasing branch 'test' on 'f962789'.
+  (use "git commit --amend" to amend the current commit)
+  (use "git rebase --continue" once you are satisfied with your changes)
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	yet_more_trash
+
+nothing added to commit but untracked files present (use "git add" to track)
+ ((no branch, rebasing test)): trash $ git add -n yet_more_trash 
+add 'yet_more_trash'
+ ((no branch, rebasing test)): trash $ git status
+interactive rebase in progress; onto f962789
+Last commands done (5 commands done):
+   pick 6a17ad6 boffo
+   edit 575c7f6 yet_more_trash
+  (see more in file .git/rebase-merge/done)
+Next command to do (1 remaining command):
+   pick 41b2e99 yet_more_trash2
+  (use "git rebase --edit-todo" to view and edit)
+You are currently editing a commit while rebasing branch 'test' on 'f962789'.
+  (use "git commit --amend" to amend the current commit)
+  (use "git rebase --continue" once you are satisfied with your changes)
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	yet_more_trash
+
+nothing added to commit but untracked files present (use "git add" to track)
+ ((no branch, rebasing test)): trash $ git add -N yet_more_trash
+ ((no branch, rebasing test)): trash $ git status
+interactive rebase in progress; onto f962789
+Last commands done (5 commands done):
+   pick 6a17ad6 boffo
+   edit 575c7f6 yet_more_trash
+  (see more in file .git/rebase-merge/done)
+Next command to do (1 remaining command):
+   pick 41b2e99 yet_more_trash2
+  (use "git rebase --edit-todo" to view and edit)
+You are currently splitting a commit while rebasing branch 'test' on 'f962789'.
+  (Once your working directory is clean, run "git rebase --continue")
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	new file:   yet_more_trash
+
+no changes added to commit (use "git add" and/or "git commit -a")
+ ((no branch, rebasing test)): trash $ git add -i
+           staged     unstaged path
+  1:        +0/-0        +7/-0 yet_more_trash
+
+ *** Commands ***
+  1: [s]tatus	  2: [u]pdate	  3: [r]evert	  4: [a]dd untracked
+  5: [p]atch	  6: [d]iff	  7: [q]uit	  8: [h]elp
+What now> 5
+           staged     unstaged path
+  1:        +0/-0        +7/-0 [y]et_more_trash
+Patch update>> 1
+           staged     unstaged path
+ * 1:        +0/-0        +7/-0 [y]et_more_trash
+Patch update>> 
+diff --git a/yet_more_trash b/yet_more_trash
+index e69de29..a8962b6 100644
+--- a/yet_more_trash
++++ b/yet_more_trash
+@@ -0,0 +1,7 @@
++boffo
++curly
++larry
++moe
++more_trash
++README.md
++yet_more_trash
+Stage this hunk [y,n,q,a,d,e,?]? e
+
+ *** Commands ***
+  1: [s]tatus	  2: [u]pdate	  3: [r]evert	  4: [a]dd untracked
+  5: [p]atch	  6: [d]iff	  7: [q]uit	  8: [h]elp
+What now> q
+Bye.
+ ((no branch, rebasing test)): trash $ git diff --cached
+diff --git a/yet_more_trash b/yet_more_trash
+new file mode 100644
+index 0000000..d7038a4
+--- /dev/null
++++ b/yet_more_trash
+@@ -0,0 +1,4 @@
++boffo
++larry
++more_trash
++yet_more_trash
+ ((no branch, rebasing test)): trash $ git diff
+diff --git a/yet_more_trash b/yet_more_trash
+index d7038a4..a8962b6 100644
+--- a/yet_more_trash
++++ b/yet_more_trash
+@@ -1,4 +1,7 @@
+ boffo
++curly
+ larry
++moe
+ more_trash
++README.md
+ yet_more_trash
+ ((no branch, rebasing test)): trash $ git commit --amend
+@@pre-commit hook: 
+hint: Waiting for your editor to close the file...
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@post-commit hook: 
+@@post-rewrite hook: amend
+[detached HEAD 791c07f] boffo
+ Date: Sat Feb 8 18:52:13 2025 -0600
+ 2 files changed, 10 insertions(+)
+ create mode 100644 boffo
+ create mode 100644 yet_more_trash
+ ((no branch, rebasing test)): trash $ git status
+interactive rebase in progress; onto f962789
+Last commands done (5 commands done):
+   pick 6a17ad6 boffo
+   edit 575c7f6 yet_more_trash
+  (see more in file .git/rebase-merge/done)
+Next command to do (1 remaining command):
+   pick 41b2e99 yet_more_trash2
+  (use "git rebase --edit-todo" to view and edit)
+You are currently splitting a commit while rebasing branch 'test' on 'f962789'.
+  (Once your working directory is clean, run "git rebase --continue")
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   yet_more_trash
+
+no changes added to commit (use "git add" and/or "git commit -a")
+ ((no branch, rebasing test)): trash $ git diff
+diff --git a/yet_more_trash b/yet_more_trash
+index d7038a4..a8962b6 100644
+--- a/yet_more_trash
++++ b/yet_more_trash
+@@ -1,4 +1,7 @@
+ boffo
++curly
+ larry
++moe
+ more_trash
++README.md
+ yet_more_trash
+ ((no branch, rebasing test)): trash $ git add -A
+ ((no branch, rebasing test)): trash $ git commit -m'leftovers from yet_more_trash'
+@@pre-commit hook: 
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@post-commit hook: 
+[detached HEAD df7481c] leftovers from yet_more_trash
+ 1 file changed, 3 insertions(+)
+ ((no branch, rebasing test)): trash $ git status
+interactive rebase in progress; onto f962789
+Last commands done (5 commands done):
+   pick 6a17ad6 boffo
+   edit 575c7f6 yet_more_trash
+  (see more in file .git/rebase-merge/done)
+Next command to do (1 remaining command):
+   pick 41b2e99 yet_more_trash2
+  (use "git rebase --edit-todo" to view and edit)
+You are currently editing a commit while rebasing branch 'test' on 'f962789'.
+  (use "git commit --amend" to amend the current commit)
+  (use "git rebase --continue" once you are satisfied with your changes)
+
+nothing to commit, working tree clean
+ ((no branch, rebasing test)): trash $ git rebase --continue
+@@post-rewrite hook: rebase
+Successfully rebased and updated refs/heads/test.
+ (test): trash $
+ ** notes
+*** hooks used
+@@pre-rebase hook: HEAD~6
+@@pre-commit hook: 
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@post-commit hook: 
+@@post-rewrite hook: amend
+@@pre-commit hook: 
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@post-commit hook: 
+@@post-rewrite hook: rebase
+** reorder 2 commits
+*** log
+git lg -7
+ 50f34e8      eric van tassell : leftovers from yet_more_trash
+ 1ed27d8      eric van tassell : yet_more_trash2
+ 791c07f      eric van tassell : boffo
+ 78aac63      eric van tassell : moe: subj chg
+ e258db2      eric van tassell : curly x
+ 53aaf26      evantass@amd.com : more_trash, subject mofier:xxx
+ f962789      Eric van Tassell : Initial commit
+ (test): trash $ git rebase -i HEAD~6
+@@pre-rebase hook: HEAD~6
+@@post-rewrite hook: rebase
+Successfully rebased and updated refs/heads/test.
+ (test): trash $ git lg -7
+ c16f1fe      eric van tassell : leftovers from yet_more_trash
+ 89ba2e9      eric van tassell : boffo
+ c3b3ab4      eric van tassell : yet_more_trash2
+ 78aac63      eric van tassell : moe: subj chg
+ e258db2      eric van tassell : curly x
+ 53aaf26      evantass@amd.com : more_trash, subject mofier:xxx
+ f962789      Eric van Tassell : Initial commit
+ (test): trash $
+ *** notes
+*** hooks used
+@@pre-rebase hook: HEAD~6
+@@post-rewrite hook: rebase
+** drop a commit
+*** log
+ (test): trash $ git rebase -i HEAD~6
+@@pre-rebase hook: HEAD~6
+@@post-rewrite hook: rebase
+Successfully rebased and updated refs/heads/test.
+ *** notes
+*** hooks used
+@@pre-rebase hook: HEAD~6
+@@post-rewrite hook: rebase
+** squash 2 commits to one, dont edit cmt msg
+*** log
+git lg -9
+ fd5381c      eric van tassell : leftovers from yet_more_trash
+ 9ec69b4      eric van tassell : boffo
+ 78aac63      eric van tassell : moe: subj chg
+ e258db2      eric van tassell : curly x
+ 53aaf26      evantass@amd.com : more_trash, subject mofier:xxx
+ f962789      Eric van Tassell : Initial commit
+ (test): trash $ git rebase -i HEAD~5
+@@pre-rebase hook: HEAD~5
+hint: Waiting for your editor to close the file...
+@@post-commit hook: 
+@@post-rewrite hook: amend
+[detached HEAD 1192a66] moe: subj chg
+ Date: Sat Feb 8 15:45:22 2025 -0600
+ 3 files changed, 11 insertions(+)
+ create mode 100644 boffo
+ create mode 100644 moe
+ create mode 100644 yet_more_trash
+@@post-rewrite hook: rebase
+Successfully rebased and updated refs/heads/test.
+*** notes
+*** hooks used
+@@post-rewrite hook: amend
+@@post-rewrite hook: rebase
+@@post-commit hook: 
+@@pre-rebase hook: HEAD~5
+** squash 2 commits to one, edit cmt msg <same as dont edit cmt msg>
+** create new commit(edit, add, commit)
+*** log
+@@pre-commit hook: 
+hint: Waiting for your editor to close the file...
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@post-commit hook: 
+[test 69fff98] lalalalal
+ 1 file changed, 8 insertions(+)
+ create mode 100644 boring
+*** notes
+*** hooks used
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@pre-commit hook: 
+@@post-commit hook:
+** giit commit --amend
+*** log
+echo 'editing boring'
+editing boring
+ (test): trash $ git diff
+diff --git a/boring b/boring
+index 0d141c9..4b370e7 100644
+--- a/boring
++++ b/boring
+@@ -1,8 +1,8 @@
+ boffo
+-boring
++boringx
+ curly
+-larry
++larryx
+ moe
+-more_trash
++more_trashx
+ README.md
+ yet_more_trash
+ (test): trash $ git add -A
+ (test): trash $ git commit --amend
+@@pre-commit hook: 
+hint: Waiting for your editor to close the file...
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@post-commit hook: 
+@@post-rewrite hook: amend
+[test 55c6220] lalalalal
+ Date: Sun Feb 9 14:12:12 2025 -0600
+ 1 file changed, 8 insertions(+)
+ create mode 100644 boring
+ (test): trash $ git status
+On branch test
+Your branch and 'origin/test' have diverged,
+and have 4 and 4 different commits each, respectively.
+  (use "git pull" to merge the remote branch into yours)
+
+nothing to commit, working tree clean
+*** hooks used
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@post-rewrite hook: amend
+@@pre-commit hook: 
+@@post-commit hook: 
+** git rebase, edit two,  --edit-todo
+*** log
+ (test): trash $ git rebase -i HEAD~4
+@@pre-rebase hook: HEAD~4
+Successfully rebased and updated refs/heads/test.
+ (test): trash $ !!
+git rebase -i HEAD~4
+@@pre-rebase hook: HEAD~4
+Stopped at 4fb940b...  moe: subj chg
+You can amend the commit now, with
+
+  git commit --amend 
+
+Once you are satisfied with your changes, run
+
+  git rebase --continue
+ ((no branch, rebasing test)): trash $ git rebase --edit-todo
+ ((no branch, rebasing test)): trash $ git log -1
+commit 4fb940b134990255a1933c44504fc51a0437b11d (HEAD)
+Author: eric van tassell <Eric.VanTassell@amd.com>
+Date:   Sat Feb 8 15:45:22 2025 -0600
+
+    moe: subj chg
+    
+    boffo
+ ((no branch, rebasing test)): trash $ git status
+interactive rebase in progress; onto f962789
+Last commands done (2 commands done):
+   pick c7694eb more_trash, subject mofier:xxx xxx
+   edit 4fb940b moe: subj chg
+Next commands to do (2 remaining commands):
+   edit 840f40f leftovers from yet_more_trash
+   pick 55c6220 lalalalal
+  (use "git rebase --edit-todo" to view and edit)
+You are currently editing a commit while rebasing branch 'test' on 'f962789'.
+  (use "git commit --amend" to amend the current commit)
+  (use "git rebase --continue" once you are satisfied with your changes)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   more_trash
+
+no changes added to commit (use "git add" and/or "git commit -a")
+ ((no branch, rebasing test)): trash $ git add -A
+ ((no branch, rebasing test)): trash $ git status
+interactive rebase in progress; onto f962789
+Last commands done (2 commands done):
+   pick c7694eb more_trash, subject mofier:xxx xxx
+   edit 4fb940b moe: subj chg
+Next commands to do (2 remaining commands):
+   edit 840f40f leftovers from yet_more_trash
+   pick 55c6220 lalalalal
+  (use "git rebase --edit-todo" to view and edit)
+You are currently editing a commit while rebasing branch 'test' on 'f962789'.
+  (use "git commit --amend" to amend the current commit)
+  (use "git rebase --continue" once you are satisfied with your changes)
+
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   more_trash
+
+ ((no branch, rebasing test)): trash $ git commit --amend
+@@pre-commit hook: 
+hint: Waiting for your editor to close the file...
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@post-commit hook: 
+@@post-rewrite hook: amend
+[detached HEAD 5112a72] moe: subj chg
+ Date: Sat Feb 8 15:45:22 2025 -0600
+ 4 files changed, 12 insertions(+), 1 deletion(-)
+ create mode 100644 boffo
+ create mode 100644 moe
+ create mode 100644 yet_more_trash
+ ((no branch, rebasing test)): trash $ git status
+interactive rebase in progress; onto f962789
+Last commands done (2 commands done):
+   pick c7694eb more_trash, subject mofier:xxx xxx
+   edit 4fb940b moe: subj chg
+Next commands to do (2 remaining commands):
+   edit 840f40f leftovers from yet_more_trash
+   pick 55c6220 lalalalal
+  (use "git rebase --edit-todo" to view and edit)
+You are currently editing a commit while rebasing branch 'test' on 'f962789'.
+  (use "git commit --amend" to amend the current commit)
+  (use "git rebase --continue" once you are satisfied with your changes)
+
+nothing to commit, working tree clean
+ ((no branch, rebasing test)): trash $ git rebase --continue
+Stopped at 840f40f...  leftovers from yet_more_trash
+You can amend the commit now, with
+
+  git commit --amend 
+
+Once you are satisfied with your changes, run
+
+  git rebase --continue
+ ((no branch, rebasing test)): trash $ git rm README.md
+rm 'README.md'
+ ((no branch, rebasing test)): trash $ git status
+interactive rebase in progress; onto f962789
+Last commands done (3 commands done):
+   edit 4fb940b moe: subj chg
+   edit 840f40f leftovers from yet_more_trash
+  (see more in file .git/rebase-merge/done)
+Next command to do (1 remaining command):
+   pick 55c6220 lalalalal
+  (use "git rebase --edit-todo" to view and edit)
+You are currently editing a commit while rebasing branch 'test' on 'f962789'.
+  (use "git commit --amend" to amend the current commit)
+  (use "git rebase --continue" once you are satisfied with your changes)
+
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	deleted:    README.md
+
+ ((no branch, rebasing test)): trash $ git rebase --continue
+hint: Waiting for your editor to close the file...
+@@post-commit hook: 
+@@post-rewrite hook: amend
+[detached HEAD ce39635] leftovers from yet_more_trash
+ Date: Sun Feb 9 11:40:24 2025 -0600
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+ delete mode 100644 README.md
+@@post-rewrite hook: rebase
+Successfully rebased and updated refs/heads/test.
+ (test): trash $ 
+*** hooks used
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@post-rewrite hook: amend
+@@post-rewrite hook: rebase
+@@pre-commit hook: 
+@@post-commit hook: 
+@@pre-rebase hook: HEAD~4
+** push stuff
+*** log
+git push origin
+Username for 'https://github.com': evtHsa
+Password for 'https://evtHsa@github.com': 
+@@pre-push hook: origin https://github.com/evtHsa/trash.git
+To https://github.com/evtHsa/trash.git
+ ! [rejected]        test -> test (non-fast-forward)
+error: failed to push some refs to 'https://github.com/evtHsa/trash.git'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. Integrate the remote changes (e.g.
+hint: 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+ (test): trash $ git pull
+Username for 'https://github.com': evtHsa
+Password for 'https://evtHsa@github.com': 
+Auto-merging more_trash
+CONFLICT (add/add): Merge conflict in more_trash
+Automatic merge failed; fix conflicts and then commit the result.
+ (test): trash $ git status
+On branch test
+Your branch and 'origin/test' have diverged,
+and have 4 and 4 different commits each, respectively.
+  (use "git pull" to merge the remote branch into yours)
+
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+  (use "git merge --abort" to abort the merge)
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+
+	both added:      more_trash
+
+no changes added to commit (use "git add" and/or "git commit -a")
+ (test): trash $ git add more_trash
+ (test): trash $ git status
+On branch test
+Your branch and 'origin/test' have diverged,
+and have 4 and 4 different commits each, respectively.
+  (use "git pull" to merge the remote branch into yours)
+
+All conflicts fixed but you are still merging.
+  (use "git commit" to conclude merge)
+
+Changes to be committed:
+
+	modified:   more_trash
+
+ (test): trash $ git pull
+error: You have not concluded your merge (MERGE_HEAD exists).
+hint: Please, commit your changes before merging.
+fatal: Exiting because of unfinished merge.
+ (test): trash $ git commit
+@@pre-commit hook: 
+hint: Waiting for your editor to close the file...
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@post-commit hook: 
+[test a5a9fd1] Merge branch 'test' of https://github.com/evtHsa/trash into test
+ (test): trash $ git push origin
+Username for 'https://github.com': evtHsa
+Password for 'https://evtHsa@github.com': 
+remote: Support for password authentication was removed on August 13, 2021.
+remote: Please see https://docs.github.com/get-started/getting-started-with-git/about-remote-repositories#cloning-with-https-urls for information on currently recommended modes of authentication.
+fatal: Authentication failed for 'https://github.com/evtHsa/trash.git/'
+ (test): trash $ !!
+git push origin
+Username for 'https://github.com': evtHsa
+Password for 'https://evtHsa@github.com': 
+@@pre-push hook: origin https://github.com/evtHsa/trash.git
+Enumerating objects: 18, done.
+Counting objects: 100% (18/18), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (12/12), done.
+Writing objects: 100% (15/15), 1.58 KiB | 539.00 KiB/s, done.
+Total 15 (delta 5), reused 0 (delta 0)
+remote: Resolving deltas: 100% (5/5), completed with 1 local object.        
+To https://github.com/evtHsa/trash.git
+   886a281..a5a9fd1  test -> test
+ (test): trash $
+*** hooks used
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@pre-commit hook: 
+@@pre-push hook: origin https://github.com/evtHsa/trash.git
+@@post-commit hook:
+** used hooks aggregate
+@@commit-msg hook: .git/COMMIT_EDITMSG
+@@post-rewrite hook: amend
+@@post-rewrite hook: rebase
+@@pre-commit hook: 
+@@pre-push hook: origin https://github.com/evtHsa/trash.git
+@@post-commit hook: 
+@@pre-rebase hook
+@@pre-rebase hook: HEAD~4
+@@pre-rebase hook: HEAD~5
+@@pre-rebase hook: HEAD~6
+* needed funcitions
+** done
+** py
+** _done_
+** group 1
+*** _done_
+*** @@pre-rebase hook
+*** _done_
+*** ut: get sha from expr, see  backport tool
+*** no arg
+**** _done_
+**** base python script
+**** util script
+****
+****
+*** 1 arg:commit
+** group 2
+*** _done_
+*** @@pre-commit hook:
+*** @@commit-msg hook: .git/COMMIT_EDITMSG
+*** @@post-rewrite hook: amend
+*** @@post-rewrite hook: rebase
+** rest
+*** _done_
+*** @@pre-push hook: origin https://github.com/evtHsa/trash.git
+*** @@post-commit hook:
+** get_sha_expr(): HEAD~5 to some sha
+* stuff to worry about
+** _done_
+** rebase w/o '-i'
+** --onto
+** cleanup stuff if rebase aborted, how do we know

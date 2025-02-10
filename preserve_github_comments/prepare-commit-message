@@ -1,0 +1,2 @@
+#!/bin/sh
+echo "@@prepare-commit-message hook: $*"
