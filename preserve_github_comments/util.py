@@ -66,3 +66,9 @@ def state_file_exists():
 def save_state(state_dict):
     with open(get_pickle_file_name(), 'wb') as handle:
         pickle.dump(state_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        
+def invoke_hook_main(main):
+    if main():
+        exit(0)
+    else:
+        exit(1)
