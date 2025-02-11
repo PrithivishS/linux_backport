@@ -4,7 +4,7 @@
 # backport stuff
 import util as ut
 
-def main():
+def old_main(): # left around as a demo FIXME
     ut.show_args()
     if ut.argc() < 2: return False
     if not ut.check_github_comment_preserving_hooks_enabled(): return False
@@ -23,8 +23,7 @@ def main():
         ut.save_state(state)
         return True
     return False 
-        
-if main():
-    ut.exit(0)
-else:
-    ut.exit(1)
+def main():
+    return True
+
+ut.invoke_hook_main(main)
