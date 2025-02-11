@@ -1,18 +1,64 @@
 ; -*- mode: outline -*-
 * tbd
 ** _ done_
-** use hook_main in pre_rebase, but rip out fnality
-** implement post-checkout(beware billions of commits)
+*** eric: reference_transaction implementation
+**** _done_
+**** provide real data for post_push
+*** ?: pavan - post push area
+* notation
+  '@@' is a message from a stubby shell hook
+  '##' is from python
 * documentation
   https://git-scm.com/docs/githooks
 * basic idea]
-** main d/s
-*** looks like
-**** abstract
+** v2
+*** main d/s(s)
+    - stuff_rec_lock
+    - stuff_hash['sha] -> comment_list
+    - if the pickle file doesn't exist, it's created, in an empty state,
+      on the first access
+*** post-push needs
+**** why we need to run this post push even absent a post-push hook
+     - we can only copy the saved comments to github after the commit
+       they belong to has been pushed
+**** actions
+    - lock stuff
+    - for each sha in stuff.keys():
+      	  gh = get_PyGitHub_obj(sha)
+	  if not gh: continue
+	  dump comments in stuff_hash[sha] -> gh
+	  delete stuff_hash[sha]
+    - unlock stuff
+**** how we can accomplish this
+***** wrapper script
+****** actions
+      - pass all args to git push
+      - when git push returns do the post-push actions below
+****** pro
+	- easier than hacking git
+	- probably good enough
+****** con
+	- seems lame
+***** add a post-push hook to git
+****** pro
+      cleanest possible - zero change to Infobell workflow
+****** con
+      no idea how hard this is or isnt
+      we'd have to maintain a patch
+*** reference-transaction hook(can it detect deletion)
+     if old_sha in stuff_hash
+     	old_stuff = stufff_array[old_sha]
+	delete old_sha key in stuff_hash
+	old['modified'] = True
+	stuff_hash[new_sha] = old_stuff
+** v1
+*** main d/s
+**** looks like
+***** abstract
     stuff_rec = {'modified' : <bool>, 'comment-list' : [comments]}
     stuff[sha'] = {'modified' : <bool>, 'comment-list' : [comments]}
-**** created on checkout, deleted after push
-**** post-checkout hook
+***** created on checkout, deleted after push
+***** post-checkout hook
      - smash the pickle
      - init new pickle
      - for each sha on branch
@@ -20,15 +66,15 @@
 	   	  set sha
 		  modified = False
 		  comment_list = get_comment_list(upstream_sha)
-**** rebase hook - not sure it's needed
+***** rebase hook - not sure it's needed
      it seems rebase just causes ref changes and is not that interesting
-**** reference transaction hook(can it detect deletion)
+***** reference transaction hook(can it detect deletion)
      if old_sha in stuff_hash
      	old_stuff = stufff_array[old_sha]
 	delete old_sha key in stuff_hash
 	old['modified'] = True
 	stuff_hash[new_sha] = old_stuff
-**** last hook that runs after push
+***** last hook that runs after push
      for each stuff_key in stuff_rec.keys()
      	 stuff_rec = stuff_hash[stuff_key]
      	 us_commit_obj = get_PyGitHubObj(stuff_rec['sha'])
@@ -42,10 +88,6 @@
 	    us_commit_obj.add_comment
 	    stuff_hash.delete(stuff_key)
 	 
-**** xx hook    
-* notation
-  '@@' is a message from a stubby shell hook
-  '##' is from python
 * _done_
 * rebase scenarios
 ** ==== done - all are rebase scenarios ====
